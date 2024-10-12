@@ -4,8 +4,8 @@ print (a)
 b = 4
 print(b)
 
-c = 444444444444444444444
-print(c)
+c = 3213
+print (c)
 
-d=5 
-print(d)
+e = 3213
+print (c)
