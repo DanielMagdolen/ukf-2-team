@@ -1,45 +1,82 @@
-from flask import Flask, render_template, request, redirect
-from flask import Response
-from flask_pymongo import pymongo
-from flask import make_response
-from flask_paginate import Pagination, get_page_parameter
-import pymongo.collection
-
+from flask import Flask, render_template, request, redirect, url_for
+import pymongo
 
 COONECTIONS_STRING = "mongodb+srv://User1:ASDFGHJKL@cluster0.lnesjcy.mongodb.net/?retryWrites=true&w=majority"
 client = pymongo.MongoClient(COONECTIONS_STRING)
 db = client.get_database("school_submission_system")
-reviews_collection = pymongo.collection.Collection(db, "reviews")
 users_collection = pymongo.collection.Collection(db, "users")
-works_collection = pymongo.collection.Collection(db, "works")
 
 app = Flask(__name__)
 
+# Presmerovanie z koreňovej cesty na prihlasovaciu stránku
 @app.route('/')
 def home():
-    return render_template('index.html')  # Uisti sa, že máš index.html v priečinku templates
+    return redirect(url_for('login'))  # Presmerovanie na prihlasovaciu stránku
 
-@app.route('/users', methods=['GET', 'POST'])
-def manage_users():
+@app.route('/register', methods=['GET', 'POST'])
+def register():
     if request.method == 'POST':
-        # Spracovanie registrácie používateľa
-        name = request.form['name']
-        surname = request.form['surname']
         email = request.form['email']
-        password = request.form['password']
+        password = request.form['password']  # Priama hodnota hesla
+        name = request.form['name']
+        school = request.form['school']  # Získanie vybranej školy
+        role = request.form['role']  # Získanie vybranej funkcie
         
-        # Uloženie do databázy
+        # Uloženie používateľa do databázy
         users_collection.insert_one({
             "name": name,
-            "surname": surname,
             "email": email,
-            "password": password  # V reálnom svete by si mal heslo hashovať
+            "password": password,  # Uloženie hesla priamo
+            "role": role,  # Uloženie vybranej funkcie
+            "school": school  # Uloženie vybranej školy
         })
-        return redirect('/')
-    
-    # Získanie všetkých používateľov z databázy na zobrazenie
-    users = users_collection.find()
-    return render_template('users.html', users=users)  # Uisti sa, že máš users.html v priečinku templates
+        
+        # Presmerovanie na príslušný dashboard na základe vybranej funkcie
+        if role == 'student':
+            return redirect(url_for('student_dashboard'))
+        elif role == 'recenzent':
+            return redirect(url_for('recenzent_dashboard'))
+        elif role == 'admin':
+            return redirect(url_for('admin_dashboard'))
+
+    return render_template('register.html')
+
+@app.route('/login', methods=['GET', 'POST'])
+def login():
+    if request.method == 'POST':
+        email = request.form['email']
+        password = request.form['password']  # Priama hodnota hesla
+        
+        user = users_collection.find_one({'email': email})
+        
+        # Porovnanie hesla priamo bez hashovania
+        if user and user['password'] == password:
+            # Rozlíšenie prihláseného používateľa podľa role
+            if user['role'] == 'student':
+                return redirect(url_for('student_dashboard'))
+            elif user['role'] == 'recenzent':
+                return redirect(url_for('recenzent_dashboard'))
+            elif user['role'] == 'admin':
+                return redirect(url_for('admin_dashboard'))
+        else:
+            return 'Nesprávne prihlasovacie údaje!', 401
+        
+    return render_template('login.html')
+
+# Dashboard pre študenta
+@app.route('/student_dashboard')
+def student_dashboard():
+    return render_template('student_dashboard.html')  # Načítanie šablóny pre študenta
+
+# Dashboard pre recenzenta
+@app.route('/recenzent_dashboard')
+def recenzent_dashboard():
+    return render_template('recenzent_dashboard.html')  # Načítanie šablóny pre recenzenta
+
+# Dashboard pre admina
+@app.route('/admin_dashboard')
+def admin_dashboard():
+    return render_template('admin_dashboard.html')  # Načítanie šablóny pre admina
 
 if __name__ == '__main__':
-    app.run(debug=True)  # Spustí aplikáciu na localhost:5000
+    app.run(debug=True)

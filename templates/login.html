@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="sk">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Prihlásenie</title>
+</head>
+
+<body>
+    <h1>Prihlásenie</h1>
+    <form method="POST">
+        <label for="email">Email:</label>
+        <input type="email" name="email" required>
+        <br>
+        <label for="password">Heslo:</label>
+        <input type="password" name="password" required>
+        <br>
+        <button type="submit">Prihlásiť sa</button>
+    </form>
+    <br>
+    <a href="{{ url_for('register') }}">
+        <button>Zaregistrovať sa</button>
+    </a>
+</body>
+
+</html>

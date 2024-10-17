@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="sk">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registrácia</title>
+</head>
+
+<body>
+    <h1>Registrácia</h1>
+    <form method="POST">
+        <label for="name">Meno:</label>
+        <input type="text" name="name" required>
+        <br>
+
+        <label for="email">Email:</label>
+        <input type="email" name="email" required>
+        <br>
+
+        <label for="password">Heslo:</label>
+        <input type="password" name="password" required>
+        <br>
+
+        <label for="school">Vyberte školu:</label>
+        <select name="school" required>
+            <option value="Trnava">Trnava</option>
+            <option value="Nitra">Nitra</option>
+            <option value="Banska Bystrica">Banská Bystrica</option>
+        </select>
+        <br>
+
+        <label for="role">Vyberte funkciu:</label>
+        <select name="role" required>
+            <option value="student">Študent</option>
+            <option value="recenzent">Recenzent</option>
+        </select>
+        <br>
+
+        <button type="submit">Zaregistrovať sa</button>
+    </form>
+    <br>
+    <a href="{{ url_for('login') }}">
+        <button>Späť na prihlásenie</button>
+    </a>
+</body>
+
+</html>
