@@ -1,4 +1,5 @@
 from flask import Flask, render_template, request, redirect, url_for
+from werkzeug import secure_filename
 import pymongo
 
 COONECTIONS_STRING = "mongodb+srv://User1:ASDFGHJKL@cluster0.lnesjcy.mongodb.net/?retryWrites=true&w=majority"
@@ -77,6 +78,18 @@ def recenzent_dashboard():
 @app.route('/admin_dashboard')
 def admin_dashboard():
     return render_template('admin_dashboard.html')  # Načítanie šablóny pre admina
+
+
+@app.route('/submission_of_work')
+def upload_file():
+	return render_template('submission_of_work.html')
+
+@app.route('/uploader', methods = ['GET', 'POST'])
+def upload_file():
+	if request.method == 'POST':
+		file = request.files['file']
+		file.save(secure_filename(file.filename))
+		return 'File was successfully uploaded.'
 
 if __name__ == '__main__':
     app.run(debug=True)
