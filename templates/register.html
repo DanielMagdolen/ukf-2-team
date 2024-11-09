@@ -9,9 +9,28 @@
 
 <body>
     <h1>Registrácia</h1>
+
+    <!-- Zobrazenie chybových a úspešných hlásení (flash správ) -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+    <ul>
+        {% for category, message in messages %}
+        <li>
+            {{ message }}
+        </li>
+
+        {% endfor %}
+    </ul>
+    {% endif %}
+    {% endwith %}
+
     <form method="POST">
-        <label for="name">Meno:</label>
-        <input type="text" name="name" required>
+        <label for="first_name">Meno:</label>
+        <input type="text" name="first_name" required>
+        <br>
+
+        <label for="last_name">Priezvisko:</label>
+        <input type="text" name="last_name" required>
         <br>
 
         <label for="email">Email:</label>

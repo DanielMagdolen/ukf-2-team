@@ -1,14 +1,64 @@
 <!DOCTYPE html>
-<html>
+<html lang="sk">
 
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin Dashboard</title>
 </head>
 
 <body>
-    <h1>Welcome to the Admin Dashboard</h1>
-    <p>This is the dashboard for the admin.</p>
-    <!-- Pridaj tu správu používateľov, správu prác, priraďovanie recenzentov -->
+    <h1>Admin Dashboard</h1>
+    <a href="{{ url_for('logout') }}">
+        <button>Odhlásiť sa</button>
+    </a>
+    <hr>
+
+    <!-- Zobrazenie flash správ -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+    <ul>
+        {% for category, message in messages %}
+        <li>{{ message }}</li>
+        {% endfor %}
+    </ul>
+    {% endif %}
+    {% endwith %}
+
+    <h2>Nepriradené Práce</h2>
+    {% if not works %}
+    <p>Žiadne nepriradené práce.</p>
+    {% else %}
+    <ul>
+        {% for work in works %}
+        <li>
+            <strong>{{ work.title }}</strong> od {{ work.user_id }} -
+            <a href="{{ url_for('static', filename=work.file_path.split('static/')[-1]) }}" target="_blank">Zobraziť</a>
+            <br>
+            <form action="{{ url_for('assign_recenzent', work_id=work._id, recenzent_id=recenzent._id) }}" method="GET">
+                <label for="recenzent">Priradiť Recenzenta:</label>
+                <select name="recenzent_id">
+                    {% for recenzent in recenzenti %}
+                    <option value="{{ recenzent._id }}">{{ recenzent.first_name }} {{ recenzent.last_name }}</option>
+                    {% endfor %}
+                </select>
+                <button type="submit">Priradiť</button>
+            </form>
+        </li>
+        {% endfor %}
+    </ul>
+    {% endif %}
+
+    <h2>Recenzenti</h2>
+    {% if not recenzenti %}
+    <p>Žiadni recenzenti.</p>
+    {% else %}
+    <ul>
+        {% for recenzent in recenzenti %}
+        <li>{{ recenzent.first_name }} {{ recenzent.last_name }} - {{ recenzent.email }}</li>
+        {% endfor %}
+    </ul>
+    {% endif %}
 </body>
 
 </html>

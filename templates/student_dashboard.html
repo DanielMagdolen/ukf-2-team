@@ -1,14 +1,47 @@
 <!DOCTYPE html>
-<html>
+<html lang="sk">
 
 <head>
-    <title>Student Dashboard</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard Študenta</title>
 </head>
 
 <body>
-    <h1>Welcome to the Student Dashboard</h1>
-    <p>This is the dashboard for students.</p>
-    <!-- Pridaj tu ďalšie prvky, napr. zoznam odovzdaných prác -->
+    <h1>Dashboard Študenta</h1>
+    <p>Vitaj, {{ session['email'] }}!</p>
+    <a href="{{ url_for('add_work') }}">
+        <button>Pridať Prácu</button>
+    </a>
+    <a href="{{ url_for('logout') }}">
+        <button>Odhlásiť sa</button>
+    </a>
+    <hr>
+
+    <h2>Vaše Nahraté Práce</h2>
+    {% if not works %}
+    <p>Nemáte ešte žiadne nahraté práce.</p>
+    {% else %}
+    {% for work in works %}
+    <div class="work-item">
+        {% if work.file_path.lower().endswith(('.png', '.jpg', '.jpeg', '.gif')) %}
+        <img src="{{ url_for('static', filename=work.file_path.split('static/')[-1]) }}" alt="Práca">
+        {% elif work.file_path.lower().endswith('.pdf') %}
+        <iframe src="{{ url_for('static', filename=work.file_path.split('static/')[-1]) }}" width="150"
+            height="150"></iframe>
+        {% else %}
+        <p>Nezobrazuje sa pre tento typ súboru.</p>
+        {% endif %}
+        <div class="work-details">
+            <h3>{{ work.title }}</h3>
+            <p>{{ work.description }}</p>
+            <p>Nahraté dňa: {{ work.uploaded_at.strftime('%Y-%m-%d %H:%M:%S') }}</p>
+            <a href="{{ url_for('static', filename=work.file_path.split('static/')[-1]) }}" target="_blank">Zobraziť
+                Súbor</a>
+        </div>
+    </div>
+    {% endfor %}
+    {% endif %}
 </body>
 
 </html>
