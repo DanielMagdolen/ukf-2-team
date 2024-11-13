@@ -15,22 +15,19 @@
     {% if messages %}
     <ul>
         {% for category, message in messages %}
-        <li>
-            {{ message }}
-        </li>
-
+        <li>{{ message }}</li>
         {% endfor %}
     </ul>
     {% endif %}
     {% endwith %}
 
     <form method="POST">
-        <label for="first_name">Meno:</label>
-        <input type="text" name="first_name" required>
+        <label for="surname">Priezvisko:</label>
+        <input type="text" name="surname" required>
         <br>
 
-        <label for="last_name">Priezvisko:</label>
-        <input type="text" name="last_name" required>
+        <label for="name">Meno:</label>
+        <input type="text" name="name" required>
         <br>
 
         <label for="email">Email:</label>

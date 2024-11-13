@@ -3,13 +3,12 @@
 
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Pridať Prácu</title>
 </head>
 
 <body>
     <h1>Pridať Prácu</h1>
-    <form method="POST" enctype="multipart/form-data">
+    <form action="{{ url_for('add_work') }}" method="POST" enctype="multipart/form-data">
         <label for="title">Názov:</label>
         <input type="text" name="title" required><br>
 
@@ -22,27 +21,14 @@
         <label for="faculty">Fakulta:</label>
         <input type="text" name="faculty" required><br>
 
-        <label for="year">Ročník:</label>
-        <input type="text" name="year" required><br>
+        <label for="year">Rok:</label>
+        <input type="number" name="year" required><br>
 
-        <label for="recenzent">Recenzent:</label>
-        <input type="text" name="recenzent" value="{{ recenzent_name }}" readonly><br>
-
-        <label for="file">Súbor:</label>
+        <label for="file">Priložiť Súbor:</label>
         <input type="file" name="file" required><br>
 
         <button type="submit">Pridať Prácu</button>
     </form>
-
-    {% with messages = get_flashed_messages(with_categories=true) %}
-    {% if messages %}
-    <ul>
-        {% for category, message in messages %}
-        <li class="{{ category }}">{{ message }}</li>
-        {% endfor %}
-    </ul>
-    {% endif %}
-    {% endwith %}
 </body>
 
 </html>
