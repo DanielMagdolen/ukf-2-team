@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="sk">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Dashboard Študenta</title>
+</head>
+
+<body>
+    <h1>Vitajte na vašom Dashboarde</h1>
+    <a href="{{ url_for('add_work') }}">Pridať Prácu</a>
+    <br><br>
+
+    <!-- Odhlásiť sa tlačidlo -->
+    <a href="{{ url_for('login') }}">
+        <button>Odhlásiť sa</button>
+    </a>
+
+    <h2>Vaše Práce:</h2>
+    <ul>
+        {% for work in works %}
+        <li>
+            <strong>Názov:</strong> {{ work.title }}<br>
+            <strong>Popis:</strong> {{ work.description }}<br>
+            <strong>Škola:</strong> {{ work.school }}<br>
+            <strong>Fakulta:</strong> {{ work.faculty }}<br>
+            <strong>Recenzent:</strong> {{ work.recenzent }}<br>
+            <strong>Dátum nahrania:</strong> {{ work.uploaded_at.strftime('%d.%m.%Y %H:%M:%S') }}<br>
+            <a href="{{ work.file_path }}">Zobraziť Súbor</a><br>
+        </li>
+        {% else %}
+        <li>Žiadne práce na zobrazenie.</li>
+        {% endfor %}
+    </ul>
+</body>
+
+</html>

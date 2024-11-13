@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="sk">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Správa používateľov</title>
+</head>
+
+<body>
+    <h1>Správa používateľov</h1>
+    <form method="POST">
+        <input type="text" name="name" placeholder="Krstné meno" required>
+        <input type="text" name="surname" placeholder="Priezvisko" required>
+        <input type="email" name="email" placeholder="E-mail" required>
+        <input type="password" name="password" placeholder="Heslo" required>
+        <button type="submit">Registrovať</button>
+    </form>
+
+    <h2>Zaregistrovaní používatelia:</h2>
+    <ul>
+        {% for user in users %}
+        <li>{{ user['name'] }} {{ user['surname'] }} - {{ user['email'] }}</li>
+        {% endfor %}
+    </ul>
+</body>
+
+</html>

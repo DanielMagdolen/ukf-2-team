@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="sk">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Pridať Prácu</title>
+</head>
+
+<body>
+    <h1>Pridať Prácu</h1>
+    <form action="{{ url_for('add_work') }}" method="POST" enctype="multipart/form-data">
+        <label for="title">Názov:</label>
+        <input type="text" name="title" required><br>
+
+        <label for="description">Popis:</label>
+        <textarea name="description" required></textarea><br>
+
+        <label for="school">Škola:</label>
+        <input type="text" name="school" required><br>
+
+        <label for="faculty">Fakulta:</label>
+        <input type="text" name="faculty" required><br>
+
+        <label for="year">Rok:</label>
+        <input type="number" name="year" required><br>
+
+        <label for="file">Priložiť Súbor:</label>
+        <input type="file" name="file" required><br>
+
+        <button type="submit">Pridať Prácu</button>
+    </form>
+</body>
+
+</html>

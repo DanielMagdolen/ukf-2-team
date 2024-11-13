@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="sk">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard</title>
+</head>
+
+<body>
+    <h1>Admin Dashboard</h1>
+
+    {% if works %}
+    <h3>Práce pridané študentami:</h3>
+    <ul>
+        {% for work in works %}
+        <li>
+            <strong>{{ work.title }}</strong><br>
+            Študent: {{ work.full_name }}<br> <!-- Tu sa zobrazuje celé meno študenta -->
+            Popis: {{ work.description }}<br>
+            Škola: {{ work.school }}<br>
+            Fakulta: {{ work.faculty }}<br>
+            Ročník: {{ work.year }}<br>
+            <a href="{{ work.file_path }}" target="_blank">Zobraziť súbor</a><br>
+        </li>
+        {% endfor %}
+    </ul>
+    {% else %}
+    <p>Žiadne práce neboli pridané.</p>
+    {% endif %}
+
+    <a href="{{ url_for('logout') }}">Odhlásiť sa</a>
+</body>
+
+</html>
