@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>View Conferences</title>
+    <style>
+        /* Pridanie medzier medzi konferenciami */
+        ul {
+            list-style-type: none;
+            padding: 0;
+        }
+
+        li {
+            margin-bottom: 20px;
+            /* Medzera medzi konferenciami */
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+
+        li strong {
+            font-size: 18px;
+            margin-bottom: 5px;
+            display: block;
+        }
+
+        li em {
+            font-size: 16px;
+            margin-bottom: 10px;
+            display: block;
+        }
+
+        li p {
+            font-size: 14px;
+            margin-bottom: 10px;
+        }
+
+        form {
+            margin-top: 10px;
+        }
+
+        button {
+            padding: 8px 16px;
+            font-size: 14px;
+            cursor: pointer;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 4px;
+        }
+
+        button:hover {
+            background-color: #0056b3;
+        }
+    </style>
+
+<body>
+    <h1>Conferences</h1>
+
+    <!-- User Greeting -->
+    <p>Welcome, {{ session['email'] }}!</p>
+    <a href="{{ url_for('first_page') }}">Logout</a>
+
+    <!-- List of Conferences -->
+    <ul>
+        {% for conference in conferences %}
+        <li>
+            <strong>{{ conference['name'] }}</strong><br>
+            <em>{{ conference['date'] }}</em><br>
+            <p>{{ conference['description'] }}</p>
+
+            <!-- Button to enter the conference -->
+            <form action="{{ url_for('enter_conference', conference_id=conference['_id']) }}" method="post">
+                <button type="submit">Enter</button>
+            </form>
+        </li>
+        {% endfor %}
+    </ul>
+</body>
+
+
+</html>

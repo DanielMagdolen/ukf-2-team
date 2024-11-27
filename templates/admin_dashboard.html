@@ -10,13 +10,29 @@
 <body>
     <h1>Admin Dashboard</h1>
 
+    <!-- Dropdown menu na filtrovanie podľa konferencií -->
+    <form method="get" action="{{ url_for('admin_dashboard') }}">
+        <label for="conference">Vyberte konferenciu:</label>
+        <select name="conference_id" id="conference" onchange="this.form.submit()">
+            <option value="" {% if not selected_conference_id %}selected{% endif %}>Všetky konferencie</option>
+            {% for conference in conferences %}
+            <option value="{{ conference['_id'] }}" {% if selected_conference_id==conference['_id'] %}selected{% endif
+                %}>
+                {{ conference['name'] }}
+            </option>
+            {% endfor %}
+        </select>
+    </form>
+
+    <!-- Zobrazenie prác -->
     {% if works %}
     <h3>Práce pridané študentami:</h3>
     <ul>
         {% for work in works %}
         <li>
-            <strong>{{ work.title }}</strong><br>
-            Študent: {{ work.full_name }}<br> <!-- Tu sa zobrazuje celé meno študenta -->
+            <strong>Konferencia:</strong> {{ work.conference_name }}<br>
+            <strong>Názov práce:</strong> {{ work.title }}<br>
+            Študent: {{ work.full_name }}<br>
             Popis: {{ work.description }}<br>
             Škola: {{ work.school }}<br>
             Fakulta: {{ work.faculty }}<br>

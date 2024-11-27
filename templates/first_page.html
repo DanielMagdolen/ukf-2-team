@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Welcome to the Conference System</title>
+</head>
+
+<body>
+    <h1>Welcome to the Conference Management System</h1>
+
+    <!-- Login and Registration Links -->
+    <div>
+        <a href="{{ url_for('login') }}">Login</a> |
+        <a href="{{ url_for('register') }}">Register</a>
+    </div>
+
+    <!-- List of Conferences -->
+    <h2>Available Conferences</h2>
+    <ul>
+        {% for conference in conferences %}
+        <li>
+            <strong>{{ conference['name'] }}</strong><br>
+            <em>{{ conference['date'] }}</em><br>
+            <p>{{ conference['description'] }}</p>
+        </li>
+        {% endfor %}
+    </ul>
+</body>
+
+</html>
