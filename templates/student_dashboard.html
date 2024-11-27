@@ -7,12 +7,17 @@
 </head>
 
 <body>
-    <h1>Vitajte na vašom Dashboarde</h1>
-    <a href="{{ url_for('add_work') }}">Pridať Prácu</a>
+    <!-- Zobrazenie názvu konferencie -->
+    <h1>Vitajte v konferencii: {{ session['current_conference_name'] }}</h1>
+
+    <!-- Tlačidlo na pridanie práce -->
+    <a href="{{ url_for('add_work') }}">
+        <button>Pridať Prácu</button>
+    </a>
     <br><br>
 
-    <!-- Odhlásiť sa tlačidlo -->
-    <a href="{{ url_for('login') }}">
+    <!-- Tlačidlo na odhlásenie -->
+    <a href="{{ url_for('logout') }}">
         <button>Odhlásiť sa</button>
     </a>
 
@@ -24,9 +29,15 @@
             <strong>Popis:</strong> {{ work.description }}<br>
             <strong>Škola:</strong> {{ work.school }}<br>
             <strong>Fakulta:</strong> {{ work.faculty }}<br>
-            <strong>Recenzent:</strong> {{ work.recenzent }}<br>
+            <strong>Recenzent:</strong>
+            {% if work.recenzent %}
+            {{ work.recenzent }} <!-- Meno recenzenta, ak je priradený -->
+            {% else %}
+            Nepriradený
+            {% endif %}
+            <br>
             <strong>Dátum nahrania:</strong> {{ work.uploaded_at.strftime('%d.%m.%Y %H:%M:%S') }}<br>
-            <a href="{{ work.file_path }}">Zobraziť Súbor</a><br>
+            <a href="{{ work.file_path }}" target="_blank">Zobraziť Súbor</a><br>
         </li>
         {% else %}
         <li>Žiadne práce na zobrazenie.</li>
