@@ -140,8 +140,8 @@ def student_dashboard():
     return render_template('student_dashboard.html', works=works)
 
 
-@app.route('/recenzent_dashboard')
-def recenzent_dashboard():
+@app.route('/reviewer_dashboard')
+def reviewer_dashboard():
     if not is_logged_in('recenzent'):
         return redirect(url_for('login'))
 
@@ -226,8 +226,8 @@ def admin_dashboard():
 
     return render_template('admin_dashboard.html', works=works)
 
-@app.route('/assign_recenzent/<work_id>', methods=['POST'])
-def assign_recenzent(work_id):
+@app.route('/assign_reviewer/<work_id>', methods=['POST'])
+def assign_reviewer(work_id):
     if 'user_id' not in session or session.get('role') != 'admin':
         flash('You must be logged in as an admin.', 'error')
         return redirect(url_for('login'))

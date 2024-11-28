@@ -61,6 +61,7 @@
             Fakulta: {{ work.faculty }}<br>
             Ročník: {{ work.year }}<br>
             <a href="{{ work.file_path }}" target="_blank">Zobraziť súbor</a><br>
+            <a href="{{ url_for('assign_recenzent') }}"><button> Priradiť recenzenta </button></a>
         </li>
         {% endfor %}
     </ul>
