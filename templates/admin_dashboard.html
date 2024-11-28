@@ -10,10 +10,10 @@
 <body>
     <h1>Admin Dashboard</h1>
 
-    <!-- Dropdown menu na filtrovanie podľa konferencií -->
+    <!-- Jeden formulár na filtrovanie podľa konferencie, študenta a recenzenta -->
     <form method="get" action="{{ url_for('admin_dashboard') }}">
         <label for="conference">Vyberte konferenciu:</label>
-        <select name="conference_id" id="conference" onchange="this.form.submit()">
+        <select name="conference_id" id="conference">
             <option value="" {% if not selected_conference_id %}selected{% endif %}>Všetky konferencie</option>
             {% for conference in conferences %}
             <option value="{{ conference['_id'] }}" {% if selected_conference_id==conference['_id'] %}selected{% endif
@@ -22,6 +22,28 @@
             </option>
             {% endfor %}
         </select>
+
+        <label for="student">Vyberte študenta:</label>
+        <select name="student_id" id="student">
+            <option value="" {% if not selected_student_id %}selected{% endif %}>Všetci študenti</option>
+            {% for student in students %}
+            <option value="{{ student['_id'] }}" {% if selected_student_id==student['_id'] %}selected{% endif %}>
+                {{ student['surname'] }} {{ student['name'] }}
+            </option>
+            {% endfor %}
+        </select>
+
+        <label for="reviewer">Vyberte recenzenta:</label>
+        <select name="reviewer_id" id="reviewer">
+            <option value="" {% if not selected_reviewer_id %}selected{% endif %}>Všetci recenzenti</option>
+            {% for reviewer in reviewers %}
+            <option value="{{ reviewer['_id'] }}" {% if selected_reviewer_id==reviewer['_id'] %}selected{% endif %}>
+                {{ reviewer['surname'] }} {{ reviewer['name'] }}
+            </option>
+            {% endfor %}
+        </select>
+
+        <button type="submit">Filtruj</button>
     </form>
 
     <!-- Zobrazenie prác -->
@@ -33,6 +55,7 @@
             <strong>Konferencia:</strong> {{ work.conference_name }}<br>
             <strong>Názov práce:</strong> {{ work.title }}<br>
             Študent: {{ work.full_name }}<br>
+            Recenzent: {{ work.reviewer_name if work.reviewer_name else "Nepriradený" }}<br>
             Popis: {{ work.description }}<br>
             Škola: {{ work.school }}<br>
             Fakulta: {{ work.faculty }}<br>
@@ -46,6 +69,8 @@
     {% endif %}
 
     <a href="{{ url_for('logout') }}">Odhlásiť sa</a>
+    <br>
+    <a href="{{ url_for('view_conferences') }}">Naspäť</a>
 </body>
 
 </html>
