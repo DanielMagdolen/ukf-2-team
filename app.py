@@ -154,27 +154,44 @@ def admin_dashboard():
         flash('You must be logged in as an admin.', 'error')
         return redirect(url_for('login'))
 
-    # Načítanie všetkých konferencií pre dropdown menu
-    conferences = list(conferences_collection.find().sort("date", 1))  # Kolekcia 'conferences'
+    # Načítanie konferencií, študentov a recenzentov pre dropdown menu
+    conferences = list(conferences_collection.find().sort("date", 1))
+    students = list(users_collection.find({"role": "student"}))
+    reviewers = list(users_collection.find({"role": "recenzent"}))  # Načítanie recenzentov
     for conference in conferences:
-        conference["_id"] = str(conference["_id"])  # Konverzia ObjectId na string
+        conference["_id"] = str(conference["_id"])
+    for student in students:
+        student["_id"] = str(student["_id"])
+    for reviewer in reviewers:
+        reviewer["_id"] = str(reviewer["_id"])
 
-    # Získanie zvolenej konferencie z GET parametra
+    # Získanie filtrov z GET parametrov
     selected_conference_id = request.args.get('conference_id')
+    selected_student_id = request.args.get('student_id')
+    selected_reviewer_id = request.args.get('reviewer_id')
 
-    # Filtrovanie prác podľa konferencie
-    if selected_conference_id:  # Ak je zvolená konkrétna konferencia
-        works = list(works_collection.find({"conference_id": ObjectId(selected_conference_id)}))
-    else:  # Ak sa zobrazujú všetky práce
-        works = list(works_collection.find())
+    # Filtrovanie prác
+    query = {}
+    if selected_conference_id:
+        query["conference_id"] = ObjectId(selected_conference_id)
+    if selected_student_id:
+        query["user_id"] = ObjectId(selected_student_id)
+    if selected_reviewer_id:
+        query["recenzent"] = ObjectId(selected_reviewer_id)  # Filtrovanie podľa recenzenta
 
-    # Načítanie mena študenta a názvu konferencie pre každú prácu
+    works = list(works_collection.find(query))
+
+    # Načítanie mena študenta, recenzenta a názvu konferencie pre každú prácu
     for work in works:
-        # Načítanie mena študenta
+        # Meno študenta
         user = users_collection.find_one({"_id": ObjectId(work.get("user_id"))})
         work["full_name"] = f"{user.get('surname', '')} {user.get('name', '')}".strip() if user else "Neznámy"
 
-        # Načítanie názvu konferencie
+        # Meno recenzenta
+        reviewer = users_collection.find_one({"_id": ObjectId(work.get("recenzent"))}) if work.get("recenzent") else None
+        work["reviewer_name"] = f"{reviewer.get('surname', '')} {reviewer.get('name', '')}".strip() if reviewer else None
+
+        # Názov konferencie
         conference = conferences_collection.find_one({"_id": ObjectId(work.get("conference_id"))})
         work["conference_name"] = conference["name"] if conference else "Nepriradená konferencia"
 
@@ -182,9 +199,12 @@ def admin_dashboard():
         'admin_dashboard.html',
         works=works,
         conferences=conferences,
-        selected_conference_id=selected_conference_id
+        students=students,
+        reviewers=reviewers,
+        selected_conference_id=selected_conference_id,
+        selected_student_id=selected_student_id,
+        selected_reviewer_id=selected_reviewer_id
     )
-
 
     # Get student's name for each work
     for work in works:
