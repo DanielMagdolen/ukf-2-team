@@ -333,6 +333,47 @@ def add_work():
 
     return render_template('add_work.html', conferences=conferences)
 
+@app.route('/add_review', methods=['GET', 'POST'])
+def add_review():
+    if 'user_id' not in session or session.get('role') != 'reviewer':
+        flash('You must be logged in as a reviewer.', 'error')
+        return redirect(url_for('login'))
+
+    if request.method == 'POST':
+        work_id = request.form.get('work_id')
+
+        if not work_id:
+            flash('Vyberte prácu.', 'error')
+            return redirect(url_for('recenzent_dashboard'))
+
+        try:
+            reviews_collection.insert_one({
+                "user_id": ObjectId(session['user_id']),
+                "work_id": ObjectId(work_id),
+                "aspect_1": form.request['aspect_1'],
+                "aspect_2": form.request['aspect_2'],
+                "aspect_3": form.request['aspect_3'],
+                "aspect_4": form.request['aspect_4'],
+                "aspect_5": form.request['aspect_5'],
+                "decision": form.request['decision'],
+                "uploaded_at": datetime.datetime.utcnow()
+            })
+
+            flash('Posudok bol úspešne pridaný k práci!', 'success')
+            return redirect(url_for('recenzent_dashboard'))
+
+        except Exception as e:
+            logging.error(f"Error adding review: {e}")
+            flash('Nastala chyba pri pridávaní vášho posudku. Skúste, prosím, opäť neskôr.', 'error')
+            return redirect(url_for('add_review'))
+
+    conferences = list(conferences_collection.find().sort("date", 1))
+    if not conferences:
+        flash('Nie sú dostupné konferencie pre pridanie posudku.', 'error')
+        return redirect(url_for('recenzent_dashboard'))
+
+    return render_template('add_review.html', conferences = conferences)
+
 @app.route('/enter_conference/<conference_id>', methods=['POST'])
 def enter_conference(conference_id):
     if 'user_id' not in session:
