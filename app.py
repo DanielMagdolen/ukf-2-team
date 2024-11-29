@@ -138,14 +138,32 @@ def student_dashboard():
 
     # Vráť dashboard s prácami
     return render_template('student_dashboard.html', works=works)
-
-
-@app.route('/reviewer_dashboard')
-def reviewer_dashboard():
+@app.route('/recenzent_dashboard')
+def recenzent_dashboard():
     if not is_logged_in('recenzent'):
         return redirect(url_for('login'))
 
-    return render_template('recenzent_dashboard.html')
+    # Získame ID recenzenta z relácie
+    reviewer_id = ObjectId(session['user_id'])
+
+    # Skontrolujeme, či je recenzent prihlásený do konferencie
+    if 'current_conference_id' not in session:
+        flash('Please select a conference to view your assigned works.', 'error')
+        return redirect(url_for('view_conferences'))
+
+    # Získame ID aktuálnej konferencie
+    conference_id = session['current_conference_id']
+
+    # Získame priradené práce pre recenzenta v tejto konferencii
+    works = list(works_collection.find({
+        'recenzent': reviewer_id,  # Priradený recenzent
+        'conference_id': ObjectId(conference_id)  # Konferencia, kde je práca priradená
+    }))
+
+    # Zobrazíme stránku s priradenými prácami
+    return render_template('recenzent_dashboard.html', works=works)
+
+
 
 
 @app.route('/admin_dashboard', methods=['GET'])
@@ -206,6 +224,39 @@ def admin_dashboard():
         selected_reviewer_id=selected_reviewer_id
     )
 
+@app.route('/assign_recenzent', methods=['GET', 'POST'])
+def assign_recenzent():
+    if not is_logged_in('admin'):
+        return redirect(url_for('login'))
+
+    if request.method == 'POST':
+        # Získaj ID práce a ID recenzenta z formulára
+        work_id = request.form.get('work_id')
+        reviewer_id = request.form.get('reviewer_id')
+
+        if not work_id or not reviewer_id:
+            flash('Please select both a work and a reviewer.', 'error')
+            return redirect(url_for('admin_dashboard'))
+
+        try:
+            # Aktualizuj prácu, priraď recenzenta
+            works_collection.update_one(
+                {"_id": ObjectId(work_id)},
+                {"$set": {"recenzent": ObjectId(reviewer_id)}}
+            )
+            flash('Reviewer successfully assigned!', 'success')
+        except Exception as e:
+            flash('Error assigning reviewer.', 'error')
+            logging.error(f"Error assigning reviewer: {e}")
+
+        return redirect(url_for('admin_dashboard'))
+
+    # Načítanie všetkých prác a recenzentov (na testovanie GET metódy)
+    works = list(works_collection.find())
+    reviewers = list(users_collection.find({"role": "recenzent"}))
+
+    return render_template('assign_recenzent.html', works=works, reviewers=reviewers)
+
     # Get student's name for each work
     for work in works:
         try:
@@ -225,34 +276,6 @@ def admin_dashboard():
         flash('No works have been added.', 'error')
 
     return render_template('admin_dashboard.html', works=works)
-
-@app.route('/assign_reviewer/<work_id>', methods=['POST'])
-def assign_reviewer(work_id):
-    if 'user_id' not in session or session.get('role') != 'admin':
-        flash('You must be logged in as an admin.', 'error')
-        return redirect(url_for('login'))
-
-    # Get recenzent_id from the form
-    recenzent_id = request.form.get('recenzent_id')
-
-    if not recenzent_id:
-        flash('Please select a reviewer.', 'error')
-        return redirect(url_for('admin_dashboard'))
-
-    try:
-        # Update work in the database with the reviewer
-        works_collection.update_one(
-            {"_id": ObjectId(work_id)},
-            {"$set": {"recenzent": ObjectId(recenzent_id)}}
-        )
-
-        flash('Reviewer has been successfully assigned to the work.', 'success')
-        return redirect(url_for('admin_dashboard'))
-
-    except Exception as e:
-        logging.error(f"Error assigning reviewer: {e}")
-        flash('Error assigning reviewer. Please try again.', 'error')
-        return redirect(url_for('admin_dashboard'))
 
 @app.route('/add_work', methods=['GET', 'POST'])
 def add_work():

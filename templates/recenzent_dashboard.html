@@ -6,9 +6,27 @@
 </head>
 
 <body>
-    <h1>Welcome to the Recenzent Dashboard</h1>
-    <p>This is the dashboard for reviewers.</p>
-    <!-- Pridaj tu zoznam prác na recenzovanie -->
+    <h1>Vitajte v Dashboarde Recenzenta</h1>
+    <p>Toto je dashboard pre recenzentov.</p>
+
+    <h2>Priradené Práce v tejto Konferencii:</h2>
+    <ul>
+        {% if works %}
+        {% for work in works %}
+        <li>
+            <strong>Názov:</strong> {{ work.title }}<br>
+            <strong>Popis:</strong> {{ work.description }}<br>
+            <strong>Škola:</strong> {{ work.school }}<br>
+            <strong>Fakulta:</strong> {{ work.faculty }}<br>
+            <strong>Recenzent:</strong> {{ work.recenzent_name if work.recenzent_name else "Nepriradený" }}<br>
+            <strong>Dátum nahrania:</strong> {{ work.uploaded_at.strftime('%d.%m.%Y %H:%M:%S') }}<br>
+            <a href="{{ work.file_path }}" target="_blank">Zobraziť súbor</a><br>
+        </li>
+        {% endfor %}
+        {% else %}
+        <li>Žiadne priradené práce na recenzovanie v tejto konferencii.</li>
+        {% endif %}
+    </ul>
 </body>
 
 </html>

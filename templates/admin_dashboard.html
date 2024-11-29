@@ -10,7 +10,7 @@
 <body>
     <h1>Admin Dashboard</h1>
 
-    <!-- Jeden formulár na filtrovanie podľa konferencie, študenta a recenzenta -->
+    <!-- Formulár na filtrovanie -->
     <form method="get" action="{{ url_for('admin_dashboard') }}">
         <label for="conference">Vyberte konferenciu:</label>
         <select name="conference_id" id="conference">
@@ -61,7 +61,18 @@
             Fakulta: {{ work.faculty }}<br>
             Ročník: {{ work.year }}<br>
             <a href="{{ work.file_path }}" target="_blank">Zobraziť súbor</a><br>
-            <a href="{{ url_for('assign_recenzent') }}"><button> Priradiť recenzenta </button></a>
+
+            <!-- Formulár na priradenie recenzenta -->
+            <form method="post" action="{{ url_for('assign_recenzent') }}">
+                <input type="hidden" name="work_id" value="{{ work['_id'] }}">
+                <label for="reviewer_{{ work['_id'] }}">Vyberte recenzenta:</label>
+                <select name="reviewer_id" id="reviewer_{{ work['_id'] }}">
+                    {% for reviewer in reviewers %}
+                    <option value="{{ reviewer['_id'] }}">{{ reviewer['surname'] }} {{ reviewer['name'] }}</option>
+                    {% endfor %}
+                </select>
+                <button type="submit">Priradiť recenzenta</button>
+            </form>
         </li>
         {% endfor %}
     </ul>
