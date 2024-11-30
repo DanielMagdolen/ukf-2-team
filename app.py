@@ -173,9 +173,9 @@ def admin_dashboard():
         return redirect(url_for('login'))
 
     # Načítanie konferencií, študentov a recenzentov pre dropdown menu
-    conferences = list(conferences_collection.find().sort("date", 1))
+    conferences = list(conferences_collection.find().sort("date", 1))  # Zmena na 'conference'
     students = list(users_collection.find({"role": "student"}))
-    reviewers = list(users_collection.find({"role": "recenzent"}))  # Načítanie recenzentov
+    reviewers = list(users_collection.find({"role": "recenzent"}))
     for conference in conferences:
         conference["_id"] = str(conference["_id"])
     for student in students:
@@ -183,20 +183,22 @@ def admin_dashboard():
     for reviewer in reviewers:
         reviewer["_id"] = str(reviewer["_id"])
 
-    # Získanie filtrov z GET parametrov
-    selected_conference_id = request.args.get('conference_id')
+    # Získanie vybraného študenta a recenzenta z URL parametrov
     selected_student_id = request.args.get('student_id')
     selected_reviewer_id = request.args.get('reviewer_id')
 
-    # Filtrovanie prác
-    query = {}
-    if selected_conference_id:
-        query["conference_id"] = ObjectId(selected_conference_id)
-    if selected_student_id:
-        query["user_id"] = ObjectId(selected_student_id)
-    if selected_reviewer_id:
-        query["recenzent"] = ObjectId(selected_reviewer_id)  # Filtrovanie podľa recenzenta
+    # Ak nie je žiadny filter, použije sa prázdny objekt pre vyhľadávanie všetkých prác
+    query = {"conference_id": ObjectId(session['current_conference_id'])}
 
+    # Filtrovanie podľa študenta, ak je zadané
+    if selected_student_id:
+        query['user_id'] = ObjectId(selected_student_id)
+
+    # Filtrovanie podľa recenzenta, ak je zadané
+    if selected_reviewer_id:
+        query['recenzent'] = ObjectId(selected_reviewer_id)
+
+    # Načítanie prác podľa filtrovaného dotazu
     works = list(works_collection.find(query))
 
     # Načítanie mena študenta, recenzenta a názvu konferencie pre každú prácu
@@ -207,10 +209,10 @@ def admin_dashboard():
 
         # Meno recenzenta
         reviewer = users_collection.find_one({"_id": ObjectId(work.get("recenzent"))}) if work.get("recenzent") else None
-        work["reviewer_name"] = f"{reviewer.get('surname', '')} {reviewer.get('name', '')}".strip() if reviewer else None
+        work["reviewer_name"] = f"{reviewer.get('surname', '')} {reviewer.get('name', '')}".strip() if reviewer else "Nepriradený"
 
         # Názov konferencie
-        conference = conferences_collection.find_one({"_id": ObjectId(work.get("conference_id"))})
+        conference = conferences_collection.find_one({"_id": ObjectId(work.get("conference_id"))})  # Zmena na 'conference'
         work["conference_name"] = conference["name"] if conference else "Nepriradená konferencia"
 
     return render_template(
@@ -219,10 +221,12 @@ def admin_dashboard():
         conferences=conferences,
         students=students,
         reviewers=reviewers,
-        selected_conference_id=selected_conference_id,
         selected_student_id=selected_student_id,
         selected_reviewer_id=selected_reviewer_id
     )
+
+
+
 
 @app.route('/assign_recenzent', methods=['GET', 'POST'])
 def assign_recenzent():
@@ -277,11 +281,19 @@ def assign_recenzent():
 
     return render_template('admin_dashboard.html', works=works)
 
+  
 @app.route('/add_work', methods=['GET', 'POST'])
 def add_work():
     if 'user_id' not in session or session.get('role') != 'student':
         flash('You must be logged in as a student.', 'error')
         return redirect(url_for('login'))
+
+    # Získanie aktuálnej konferencie zo session
+    current_conference_id = session.get('current_conference_id')
+
+    if not current_conference_id:
+        flash('You must be enrolled in a conference first.', 'error')
+        return redirect(url_for('view_conferences'))  # Ak nie je vybraná konferencia, presmeruj na výber
 
     if request.method == 'POST':
         # Získanie údajov z formulára
@@ -290,7 +302,7 @@ def add_work():
         school = request.form.get('school')
         faculty = request.form.get('faculty')
         year = request.form.get('year')
-        conference_id = request.form.get('conference_id')  # ID vybranej konferencie
+        conference_id = current_conference_id  # Automaticky vyplnená konferencia zo session
         file = request.files.get('file')
 
         # Validácia súboru
@@ -325,13 +337,14 @@ def add_work():
             flash('An error occurred while adding your work. Please try again later.', 'error')
             return redirect(url_for('add_work'))
 
-    # Načítanie dostupných konferencií na výber vo formulári
-    conferences = list(conferences_collection.find().sort("date", 1))  # Zoradenie podľa dátumu
+    # Získanie informácií o konferencii zo session pre predvyplnenie
+    conferences = list(conferences_collection.find({"_id": ObjectId(current_conference_id)}))
     if not conferences:
         flash('No conferences available to add work to.', 'error')
         return redirect(url_for('student_dashboard'))
 
-    return render_template('add_work.html', conferences=conferences)
+    return render_template('add_work.html', conferences=conferences, selected_conference_id=current_conference_id)
+
 
 @app.route('/add_review', methods=['GET', 'POST'])
 def add_review():

@@ -12,17 +12,6 @@
 
     <!-- Formulár na filtrovanie -->
     <form method="get" action="{{ url_for('admin_dashboard') }}">
-        <label for="conference">Vyberte konferenciu:</label>
-        <select name="conference_id" id="conference">
-            <option value="" {% if not selected_conference_id %}selected{% endif %}>Všetky konferencie</option>
-            {% for conference in conferences %}
-            <option value="{{ conference['_id'] }}" {% if selected_conference_id==conference['_id'] %}selected{% endif
-                %}>
-                {{ conference['name'] }}
-            </option>
-            {% endfor %}
-        </select>
-
         <label for="student">Vyberte študenta:</label>
         <select name="student_id" id="student">
             <option value="" {% if not selected_student_id %}selected{% endif %}>Všetci študenti</option>
@@ -49,17 +38,17 @@
     <!-- Zobrazenie prác -->
     {% if works %}
     <h3>Práce pridané študentami:</h3>
-    <ul>
+    <div>
         {% for work in works %}
-        <li>
+        <div>
             <strong>Konferencia:</strong> {{ work.conference_name }}<br>
             <strong>Názov práce:</strong> {{ work.title }}<br>
-            Študent: {{ work.full_name }}<br>
-            Recenzent: {{ work.reviewer_name if work.reviewer_name else "Nepriradený" }}<br>
-            Popis: {{ work.description }}<br>
-            Škola: {{ work.school }}<br>
-            Fakulta: {{ work.faculty }}<br>
-            Ročník: {{ work.year }}<br>
+            <strong>Študent:</strong> {{ work.full_name }}<br>
+            <strong>Recenzent:</strong> {{ work.reviewer_name if work.reviewer_name else "Nepriradený" }}<br>
+            <strong>Popis:</strong> {{ work.description }}<br>
+            <strong>Škola:</strong> {{ work.school }}<br>
+            <strong>Fakulta:</strong> {{ work.faculty }}<br>
+            <strong>Ročník:</strong> {{ work.year }}<br>
             <a href="{{ work.file_path }}" target="_blank">Zobraziť súbor</a><br>
 
             <!-- Formulár na priradenie recenzenta -->
@@ -73,9 +62,9 @@
                 </select>
                 <button type="submit">Priradiť recenzenta</button>
             </form>
-        </li>
+        </div>
         {% endfor %}
-    </ul>
+    </div>
     {% else %}
     <p>Žiadne práce neboli pridané.</p>
     {% endif %}
