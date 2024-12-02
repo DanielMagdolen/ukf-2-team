@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title> Pridanie posudku </title>
+  </head>
+  <body>
+    <h2> Pridanie posudku </h2>
+    <form method="POST" enctype="multipart/form-data" action="{{ url_for('add_review') }}">
+      <label for="file"> Nahrajte súbor: </label>
+      <input type="file" id="file" name="file" required>
+      <fieldset>
+        <legend> Záverečné rozhodnutie o prijatí práce: </legend>
+        <input type="radio" id="not accepted" name="decision" value="not accepted" />
+        <label for="not accepted"> Neprijatá </label>
+        <input type="radio" id="accepted" name="decision" value="accepted" />
+        <label for="accepted"> Prijatá </label>
+      </fieldset>
+      <br>
+      <br>
+      <button type="submit"> Odoslať posudok </button>
+    </form>
+  </body>
+</html>
