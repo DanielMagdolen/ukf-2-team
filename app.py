@@ -353,21 +353,26 @@ def add_review():
         return redirect(url_for('login'))
 
     if request.method == 'POST':
-        work_id = request.form.get('work_id')
+        file = request.files.get('file')
+        decision = request.form.get('decision')
 
         if not work_id:
             flash('Vyberte prácu.', 'error')
             return redirect(url_for('recenzent_dashboard'))
+            
+        if not file or not allowed_file(file.filename):
+            flash('Neplatný alebo chýbajúci súbor. Podporované formáty: pdf, doc, docx', 'error')
+            return redirect(url_for('add_review'))
 
         try:
+            filename = secure_filename(file.filename)
+            file_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+            file.save(file_path)
+        
             reviews_collection.insert_one({
                 "user_id": ObjectId(session['user_id']),
                 "work_id": ObjectId(work_id),
-                "aspect_1": form.request['aspect_1'],
-                "aspect_2": form.request['aspect_2'],
-                "aspect_3": form.request['aspect_3'],
-                "aspect_4": form.request['aspect_4'],
-                "aspect_5": form.request['aspect_5'],
+                "file_path": file_path,
                 "decision": form.request['decision'],
                 "uploaded_at": datetime.datetime.utcnow()
             })
