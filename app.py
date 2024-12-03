@@ -156,7 +156,7 @@ def recenzent_dashboard():
 
     # Získame priradené práce pre recenzenta v tejto konferencii
     works = list(works_collection.find({
-        'recenzent': reviewer_id,  # Priradený recenzent
+        'recenzent': ObjectId(reviewer_id),  # Priradený recenzent
         'conference_id': ObjectId(conference_id)  # Konferencia, kde je práca priradená
     }))
 
@@ -353,6 +353,7 @@ def add_review():
         return redirect(url_for('login'))
 
     if request.method == 'POST':
+        work_id = request.form.get('work_id')
         file = request.files.get('file')
         decision = request.form.get('decision')
 
