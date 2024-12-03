@@ -2,7 +2,9 @@
 <html>
 
 <head>
-    <title>Recenzent Dashboard</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reviewer Dashboard</title>
 </head>
 
 <body>
@@ -21,6 +23,11 @@
             <strong>Recenzent:</strong> {{ work.recenzent_name if work.recenzent_name else "Nepriradený" }}<br>
             <strong>Dátum nahrania:</strong> {{ work.uploaded_at.strftime('%d.%m.%Y %H:%M:%S') }}<br>
             <a href="{{ work.file_path }}" target="_blank">Zobraziť súbor</a><br>
+
+            <form method="POST" action="{{ url_for('add_review') }}">
+                <input type="hidden" name="work_id" value="{{ work['_id'] }}">
+                <button type="submit"> Pridať posudok </button>
+            </form>
         </li>
         {% endfor %}
         {% else %}
