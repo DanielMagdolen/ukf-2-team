@@ -138,6 +138,7 @@ def student_dashboard():
 
     # Vráť dashboard s prácami
     return render_template('student_dashboard.html', works=works)
+
 @app.route('/recenzent_dashboard')
 def recenzent_dashboard():
     if not is_logged_in('recenzent'):
@@ -160,9 +161,17 @@ def recenzent_dashboard():
         'conference_id': ObjectId(conference_id)  # Konferencia, kde je práca priradená
     }))
 
+    # Získame meno študenta, ktorý pridal prácu
+    for work in works:
+        # Získame používateľa (študenta) podľa user_id
+        student = users_collection.find_one({"_id": ObjectId(work['user_id'])})
+        if student:
+            work['student_name'] = f"{student['surname']} {student['name']}"
+        else:
+            work['student_name'] = "Neznámy študent"
+
     # Zobrazíme stránku s priradenými prácami
     return render_template('recenzent_dashboard.html', works=works)
-
 
 
 
@@ -348,7 +357,7 @@ def add_work():
 
 @app.route('/add_review', methods=['GET', 'POST'])
 def add_review():
-    if 'user_id' not in session or session.get('role') != 'reviewer':
+    if 'user_id' not in session or session.get('role') != 'recenzent':
         flash('You must be logged in as a reviewer.', 'error')
         return redirect(url_for('login'))
 

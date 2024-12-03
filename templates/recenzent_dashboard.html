@@ -20,7 +20,7 @@
             <strong>Popis:</strong> {{ work.description }}<br>
             <strong>Škola:</strong> {{ work.school }}<br>
             <strong>Fakulta:</strong> {{ work.faculty }}<br>
-            <strong>Recenzent:</strong> {{ work.recenzent_name if work.recenzent_name else "Nepriradený" }}<br>
+            <strong>Študent:</strong> {{ work.student_name }}<br> <!-- Display student's name -->
             <strong>Dátum nahrania:</strong> {{ work.uploaded_at.strftime('%d.%m.%Y %H:%M:%S') }}<br>
             <a href="{{ work.file_path }}" target="_blank">Zobraziť súbor</a><br>
 
