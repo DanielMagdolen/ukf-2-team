@@ -15,13 +15,13 @@
         <button>Pridať Prácu</button>
     </a>
     <br><br>
-    
+
     <!-- Tlačidlo na odhlásenie -->
     <a href="{{ url_for('logout') }}">
         <button>Odhlásiť sa</button>
     </a>
     <br><br>
-    <!-- Tlačidlo na odhlásenie -->
+
     <a href="{{ url_for('view_conferences') }}">
         <button>Naspäť na konferencie</button>
     </a>
@@ -34,15 +34,29 @@
             <strong>Popis:</strong> {{ work.description }}<br>
             <strong>Škola:</strong> {{ work.school }}<br>
             <strong>Fakulta:</strong> {{ work.faculty }}<br>
+
+            <!-- Recenzent - Priradený / Nepriradený -->
             <strong>Recenzent:</strong>
             {% if work.recenzent %}
-            {{ work.recenzent }} <!-- Meno recenzenta, ak je priradený -->
+            Priradený
             {% else %}
             Nepriradený
             {% endif %}
             <br>
+
             <strong>Dátum nahrania:</strong> {{ work.uploaded_at.strftime('%d.%m.%Y %H:%M:%S') }}<br>
             <a href="{{ work.file_path }}" target="_blank">Zobraziť Súbor</a><br>
+
+            <!-- Posudok -->
+            <strong>Posudok:</strong>
+            {% if work.review %}
+            <!-- Ak existuje posudok -->
+            {{ work.review }} <!-- Zobraziť rozhodnutie recenzenta -->
+            <br>
+            <a href="{{ url_for('view_review', work_id=work['_id']) }}">Zobraziť podrobnosti posudku</a>
+            {% else %}
+            Posudok ešte nebol pridaný.
+            {% endif %}
         </li>
         {% else %}
         <li>Žiadne práce na zobrazenie.</li>

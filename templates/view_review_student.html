@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="sk">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Zobrazenie Posudku</title>
+</head>
+
+<body>
+    <h1>Posudok pre prácu: {{ work['title'] }}</h1>
+
+    {% if review %}
+    <h3>Podrobnosti o posudku:</h3>
+    <p><strong>Dátum pridania:</strong> {{ review['uploaded_at'].strftime('%d.%m.%Y %H:%M:%S') }}</p>
+
+    <h3>Hodnotenie otázok:</h3>
+    <ul>
+        <li><strong>Splnila práca cieľ? - </strong> {{ review['goal'] }}</li>
+        <li><strong>Je práca metodologicky správna? - </strong> {{ review['methodology'] }}</li>
+        <li><strong>Sú výsledky práce zrozumiteľné? - </strong> {{ review['results'] }}</li>
+        <li><strong>Má práca praktickú hodnotu? - </strong> {{ review['practical_value'] }}</li>
+        <li><strong>Je text práce gramaticky správny? - </strong> {{ review['grammar'] }}</li>
+        <li><strong>Je práca štruktúrovaná prehľadne? - </strong> {{ review['structure'] }}</li>
+        <li><strong>Sú všetky citácie uvedené správne? - </strong> {{ review['citations'] }}</li>
+    </ul>
+
+    <p><strong>Záverečné rozhodnutie:</strong> {{ review['decision'] }}</p>
+    {% else %}
+    <p>Posudok pre túto prácu ešte nebol pridaný.</p>
+    {% endif %}
+
+    <a href="{{ url_for('student_dashboard') }}">Späť na Práce</a>
+</body>
+
+</html>

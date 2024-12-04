@@ -10,6 +10,17 @@
 <body>
     <h1>Admin Dashboard</h1>
 
+    <!-- Zobrazenie chybových a úspešných hlásení (flash správ) -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+    <ul>
+        {% for category, message in messages %}
+        <li>{{ message }}</li>
+        {% endfor %}
+    </ul>
+    {% endif %}
+    {% endwith %}
+
     <!-- Formulár na filtrovanie -->
     <form method="get" action="{{ url_for('admin_dashboard') }}">
         <label for="student">Vyberte študenta:</label>
@@ -41,17 +52,32 @@
     <div>
         {% for work in works %}
         <div>
-            <strong>Konferencia:</strong> {{ work.conference_name }}<br>
-            <strong>Názov práce:</strong> {{ work.title }}<br>
-            <strong>Študent:</strong> {{ work.full_name }}<br>
-            <strong>Recenzent:</strong> {{ work.reviewer_name if work.reviewer_name else "Nepriradený" }}<br>
-            <strong>Popis:</strong> {{ work.description }}<br>
-            <strong>Škola:</strong> {{ work.school }}<br>
-            <strong>Fakulta:</strong> {{ work.faculty }}<br>
-            <strong>Ročník:</strong> {{ work.year }}<br>
-            <a href="{{ work.file_path }}" target="_blank">Zobraziť súbor</a><br>
+            <p><strong>Konferencia:</strong> {{ work.conference_name }}</p>
+            <p><strong>Názov práce:</strong> {{ work.title }}</p>
+            <p><strong>Študent:</strong> {{ work.full_name }}</p>
+            <p><strong>Recenzent:</strong>
+                {% if work.reviewer_name %}
+                {{ work.reviewer_name }}
+                {% else %}
+                Nepriradený
+                {% endif %}
+            </p>
+            <p><strong>Popis:</strong> {{ work.description }}</p>
+            <p><strong>Škola:</strong> {{ work.school }}</p>
+            <p><strong>Fakulta:</strong> {{ work.faculty }}</p>
+            <p><strong>Ročník:</strong> {{ work.year }}</p>
+            <p><strong>Posudok:</strong>
+                {% if work.review %}
+                <a href="{{ url_for('view_review_admin', work_id=work['_id']) }}">Zobraziť posudok</a>
+                {% else %}
+                Posudok ešte nebol pridaný.
+                {% endif %}
+            </p>
+            <br><br>
+            <a href="{{ work.file_path }}" target="_blank">Zobraziť súbor</a>
 
-            <!-- Formulár na priradenie recenzenta -->
+            <!-- Formulár na priradenie recenzenta sa zobrazí iba, ak recenzent ešte nie je priradený -->
+            {% if not work.is_assigned %}
             <form method="post" action="{{ url_for('assign_recenzent') }}">
                 <input type="hidden" name="work_id" value="{{ work['_id'] }}">
                 <label for="reviewer_{{ work['_id'] }}">Vyberte recenzenta:</label>
@@ -62,6 +88,9 @@
                 </select>
                 <button type="submit">Priradiť recenzenta</button>
             </form>
+            {% else %}
+            <p><strong>Recenzent už bol priradený k tejto práci.</strong></p>
+            {% endif %}
         </div>
         {% endfor %}
     </div>

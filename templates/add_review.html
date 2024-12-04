@@ -1,24 +1,97 @@
 <!DOCTYPE html>
-  <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title> Pridanie posudku </title>
-  </head>
-  <body>
-    <h2> Pridanie posudku </h2>
-    <form method="POST" enctype="multipart/form-data" action="{{ url_for('add_review') }}">
-      <label for="file"> Nahrajte súbor: </label>
-      <input type="file" id="file" name="file" required>
-      <fieldset>
-        <legend> Záverečné rozhodnutie o prijatí práce: </legend>
-        <input type="radio" id="not accepted" name="decision" value="not accepted" />
-        <label for="not accepted"> Neprijatá </label>
-        <input type="radio" id="accepted" name="decision" value="accepted" />
-        <label for="accepted"> Prijatá </label>
-      </fieldset>
-      <br>
-      <br>
-      <button type="submit"> Odoslať posudok </button>
-    </form>
-  </body>
+<html lang="sk">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Pridanie posudku</title>
+</head>
+
+<body>
+  <h2>Pridanie posudku pre: {{ work.title }}</h2>
+
+  <form method="POST" enctype="multipart/form-data" action="{{ url_for('add_review', work_id=work['_id']) }}">
+    <label for="file">Nahrajte súbor:</label>
+    <input type="file" id="file" name="file" required>
+
+    <fieldset>
+      <legend>Hodnotenie práce</legend>
+
+      <!-- Otázka 1 -->
+      <p>Splnila práca cieľ?</p>
+      <input type="radio" id="goal_yes" name="goal" value="yes" required>
+      <label for="goal_yes">Áno</label>
+      <input type="radio" id="goal_partially" name="goal" value="partially">
+      <label for="goal_partially">Nie úplne</label>
+      <input type="radio" id="goal_no" name="goal" value="no">
+      <label for="goal_no">Nie</label>
+
+      <!-- Otázka 2 -->
+      <p>Je práca metodologicky správna?</p>
+      <input type="radio" id="method_yes" name="methodology" value="yes" required>
+      <label for="method_yes">Áno</label>
+      <input type="radio" id="method_partially" name="methodology" value="partially">
+      <label for="method_partially">Nie úplne</label>
+      <input type="radio" id="method_no" name="methodology" value="no">
+      <label for="method_no">Nie</label>
+
+      <!-- Otázka 3 -->
+      <p>Sú výsledky práce zrozumiteľné?</p>
+      <input type="radio" id="results_yes" name="results" value="yes" required>
+      <label for="results_yes">Áno</label>
+      <input type="radio" id="results_partially" name="results" value="partially">
+      <label for="results_partially">Nie úplne</label>
+      <input type="radio" id="results_no" name="results" value="no">
+      <label for="results_no">Nie</label>
+
+      <!-- Otázka 4 -->
+      <p>Má práca praktickú hodnotu?</p>
+      <input type="radio" id="value_yes" name="practical_value" value="yes" required>
+      <label for="value_yes">Áno</label>
+      <input type="radio" id="value_partially" name="practical_value" value="partially">
+      <label for="value_partially">Nie úplne</label>
+      <input type="radio" id="value_no" name="practical_value" value="no">
+      <label for="value_no">Nie</label>
+
+      <!-- Otázka 5 -->
+      <p>Je text práce gramaticky správny?</p>
+      <input type="radio" id="grammar_yes" name="grammar" value="yes" required>
+      <label for="grammar_yes">Áno</label>
+      <input type="radio" id="grammar_partially" name="grammar" value="partially">
+      <label for="grammar_partially">Nie úplne</label>
+      <input type="radio" id="grammar_no" name="grammar" value="no">
+      <label for="grammar_no">Nie</label>
+
+      <!-- Otázka 6 -->
+      <p>Je práca štruktúrovaná prehľadne?</p>
+      <input type="radio" id="structure_yes" name="structure" value="yes" required>
+      <label for="structure_yes">Áno</label>
+      <input type="radio" id="structure_partially" name="structure" value="partially">
+      <label for="structure_partially">Nie úplne</label>
+      <input type="radio" id="structure_no" name="structure" value="no">
+      <label for="structure_no">Nie</label>
+
+      <!-- Otázka 7 -->
+      <p>Sú všetky citácie uvedené správne?</p>
+      <input type="radio" id="citations_yes" name="citations" value="yes" required>
+      <label for="citations_yes">Áno</label>
+      <input type="radio" id="citations_partially" name="citations" value="partially">
+      <label for="citations_partially">Nie úplne</label>
+      <input type="radio" id="citations_no" name="citations" value="no">
+      <label for="citations_no">Nie</label>
+    </fieldset>
+
+    <fieldset>
+      <legend>Záverečné rozhodnutie o prijatí práce:</legend>
+      <input type="radio" id="not_accepted" name="decision" value="not accepted" required>
+      <label for="not_accepted">Neprijatá</label>
+      <input type="radio" id="accepted" name="decision" value="accepted">
+      <label for="accepted">Prijatá</label>
+    </fieldset>
+
+    <br><br>
+    <button type="submit">Odoslať posudok</button>
+  </form>
+</body>
+
 </html>

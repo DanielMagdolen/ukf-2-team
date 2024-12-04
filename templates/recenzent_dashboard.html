@@ -20,13 +20,13 @@
             <strong>Popis:</strong> {{ work.description }}<br>
             <strong>Škola:</strong> {{ work.school }}<br>
             <strong>Fakulta:</strong> {{ work.faculty }}<br>
-            <strong>Študent:</strong> {{ work.student_name }}<br> <!-- Display student's name -->
+            <strong>Študent:</strong> {{ work.student_name }}<br> <!-- Zobrazenie mena študenta -->
             <strong>Dátum nahrania:</strong> {{ work.uploaded_at.strftime('%d.%m.%Y %H:%M:%S') }}<br>
             <a href="{{ work.file_path }}" target="_blank">Zobraziť súbor</a><br>
 
-            <form method="POST" action="{{ url_for('add_review') }}">
-                <input type="hidden" name="work_id" value="{{ work['_id'] }}">
-                <button type="submit"> Pridať posudok </button>
+            <!-- Formulár na pridanie posudku -->
+            <form method="POST" action="{{ url_for('add_review', work_id=work['_id']) }}">
+                <button type="submit">Pridať posudok</button>
             </form>
         </li>
         {% endfor %}
@@ -34,6 +34,9 @@
         <li>Žiadne priradené práce na recenzovanie v tejto konferencii.</li>
         {% endif %}
     </ul>
+
+    <a href="{{ url_for('logout') }}">Odhlásiť sa</a><br>
+    <a href="{{ url_for('view_conferences') }}">Naspäť na konferencie</a>
 </body>
 
 </html>
