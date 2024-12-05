@@ -62,12 +62,27 @@ def register():
         email = request.form['email']
         password = request.form['password']
         school = request.form['school']
-        role = request.form['role']
-
-        # Check if email already exists
+        # Skontrolovanie, či už nie je niekto so zadaným emailom zaregistrovaný
         if users_collection.find_one({'email': email}):
-            flash('This email is already registered. Please use a different email.', 'error')
+            flash('S týmto emailom už je zaregistrovaný iný používateľ. Použite, prosím, iný email.', 'error')
             return redirect(url_for('register'))
+
+        # Bezpečnostné opatrenie, aby nemal možnosť prihlásiť sa do konferencie a pridať do nej prácu ktokoľvek a v prípade väčšieho počtu používateľov tak preplniť systém napríklad náhodnými súbormi, ktoré tam nepatria
+        # Zaregistrovanie sa pomocou univerzitného emailu automaticky zabezpečí priradenie role "student" alebo "reviewer" podľa domény emailu
+        # Používateľ sa môže zaregistrovať iným emailom, ale získa tak rolu "visitor" a kvôli bezpečnosti musí počkať, kým mu rolu priradí admin
+        domain_name = (email.split("@"))[1]
+        domain_name_found = False
+        domains = ["ukf", "uniba", "stuba", "bisla", "euba", "ku", "unipo", "uniag", "szu", "truni", "umb", "upjs", "ucm", "uvlf", "vsbm", "vsemba", "vsm", "ismpo", "uniza", "vsmu"]
+
+        for domain in domains: # Automatické priraďovanie role podľa doménového mena v emaili
+            if (domain_name == ("student." + domain + ".sk")):
+                domain_name_found = True
+                role = "student"
+            elif (domain_name == (domain + ".sk")):
+                domain_name_found = True
+                role = "recenzent"
+        if domain_name_found == False:
+            role = "visitor"
 
         # Save user to the database
         users_collection.insert_one({
@@ -95,7 +110,10 @@ def login():
             session['user_id'] = str(user['_id'])
             session['email'] = user['email']
             session['role'] = user['role']
-            return redirect(url_for('view_conferences'))  # Zmenené na 'first_page'
+            if session['role'] != "visitor":
+                return redirect(url_for('view_conferences')) # Zmenené na 'first_page'
+            else:
+                return redirect(url_for('visitor_page'))
         
         flash('Incorrect login details!', 'error')
         return redirect(url_for('login'))
@@ -107,6 +125,11 @@ def logout():
     session.clear()
     flash('You have been logged out.', 'success')
     return redirect(url_for('login'))
+
+@app.route('/visitor_page')
+def visitor_page():
+    conferences = list(conferences_collection.find().sort("date", 1)) # Načítanie konferencií
+    return render_template('visitor_page.html', conferences = conferences)
 
 @app.route('/view_conferences')
 def view_conferences():
