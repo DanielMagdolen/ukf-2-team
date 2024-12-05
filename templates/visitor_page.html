@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title> Školský konferenčný systém </title>
+  </head>
+  <body>
+    <h1> Vitajte v školskom konferenčnom systéme! </h1>
+    <br><br>
+    <div>
+      <p> Vaša aktuálna rola v systéme je návštevník.
+      Pre prihlasovanie sa do konferencií musíte získať rolu študent alebo recenzent.
+      Ak ste sa prihlásili pod iným ako univerzitným emailom, musíte počkať, kým Vám zmení rolu administrátor systému. </p>
+    </div>
+    <br><br>
+    <h2> Dostupné konferencie: </h2>
+    <ul>
+      {% for conference in conferences %}
+      <li>
+        <strong> {{ conference['name'] }} </strong> <br>
+        <em> {{ conference['date'] }} </em> <br>
+        <p> {{ conference['description'] }} </p>
+      </li>
+      {% endfor %}
+    </ul>
+  </body>
+</html>
