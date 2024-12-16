@@ -97,6 +97,24 @@
     {% else %}
     <p>Žiadne práce neboli pridané.</p>
     {% endif %}
+    <br>
+    
+    {% if users %}
+    <h3> Používatelia: </h3>
+    <div>
+        {% for user in users %}
+        <div>
+            <p><strong> Meno: </strong> {{ user.name }} </p>
+            <p><strong> Priezvisko: </strong> {{ user.surname }} </p>
+            <p><strong> Email: </strong> {{ user.email }} </p>
+            <p><strong> Rola: </strong> {{ user.role }} </p>
+            <p><strong> Škola: </strong> {{ user.school }} </p>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <p> Žiadni používatelia neboli nájdení. </p>
+    {% endif %}
 
     <a href="{{ url_for('logout') }}">Odhlásiť sa</a>
     <br>
