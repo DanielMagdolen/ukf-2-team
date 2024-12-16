@@ -214,6 +214,7 @@ def admin_dashboard():
 
     # Načítanie konferencií, študentov a recenzentov pre dropdown menu
     conferences = list(conferences_collection.find().sort("date", 1))  # Zmena na 'conference'
+    users = list(users_collection)
     students = list(users_collection.find({"role": "student"}))
     reviewers = list(users_collection.find({"role": "recenzent"}))
     for conference in conferences:
