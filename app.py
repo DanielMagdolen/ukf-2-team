@@ -6,6 +6,8 @@ import os
 from werkzeug.utils import secure_filename
 import datetime
 import logging
+from bson import ObjectId
+from flask import flash, redirect, url_for
 
 # Configuration settings for file upload and MongoDB connection
 UPLOAD_FOLDER = 'static/uploads'
@@ -395,7 +397,6 @@ def add_work():
 
     return render_template('add_work.html', conferences=conferences, selected_conference_id=current_conference_id)
 
-
 @app.route('/add_review/<work_id>', methods=['GET', 'POST'])
 def add_review(work_id):
     # Overenie, či je používateľ prihlásený a má rolu recenzenta
@@ -405,10 +406,19 @@ def add_review(work_id):
 
     # Načítanie práce podľa ID
     work = works_collection.find_one({'_id': ObjectId(work_id)})
-    
     if not work:
         flash('Práca neexistuje.', 'error')
         return redirect(url_for('recenzent_dashboard'))
+
+    # Načítanie posudku pre aktuálneho recenzenta a prácu
+    existing_review = reviews_collection.find_one({
+        "user_id": ObjectId(session['user_id']),
+        "work_id": ObjectId(work_id)
+    })
+
+    # Ak už existuje posudok, zobrazí sa iba posudok
+    if existing_review:
+        return render_template('view_review.html', review=existing_review, work=work)
 
     # Spracovanie formulára (POST žiadosť)
     if request.method == 'POST':
@@ -455,7 +465,6 @@ def add_review(work_id):
 
     # Zobrazenie formulára na pridanie posudku (GET žiadosť)
     return render_template('add_review.html', work=work)
-
 
 
 
@@ -551,6 +560,55 @@ def enter_conference(conference_id):
     else:
         flash('Unknown role.', 'error')
         return redirect(url_for('view_conferences'))
+@app.route('/view_review_recenzent/<work_id>', methods=['GET'])
+def view_review_recenzent(work_id):
+    # Overenie, či je používateľ prihlásený a má rolu recenzenta
+    if 'user_id' not in session or session.get('role') != 'recenzent':
+        flash('Musíte byť prihlásený ako recenzent.', 'error')
+        return redirect(url_for('login'))
+
+    # Načítanie posudku pre aktuálneho recenzenta a prácu
+    review = reviews_collection.find_one({
+        "user_id": ObjectId(session['user_id']),
+        "work_id": ObjectId(work_id)
+    })
+
+    if not review:
+        flash('Posudok pre túto prácu neexistuje.', 'error')
+        return redirect(url_for('recenzent_dashboard'))
+
+    # Načítanie práce podľa ID
+    work = works_collection.find_one({'_id': ObjectId(work_id)})
+
+    return render_template('view_review_recenzent.html', review=review, work=work)
+
+@app.route('/review_redirect/<work_id>', methods=['POST'])
+def review_redirect(work_id):
+    try:
+        # Overenie, či je používateľ prihlásený a má rolu recenzenta
+        if 'user_id' not in session or session.get('role') != 'recenzent':
+            flash('Musíte byť prihlásený ako recenzent.', 'error')
+            return redirect(url_for('login'))
+
+        # Načítanie posudku pre aktuálneho recenzenta a prácu
+        existing_review = reviews_collection.find_one({
+            "user_id": ObjectId(session['user_id']),
+            "work_id": ObjectId(work_id)
+        })
+
+        # Ak už existuje posudok, presmerujeme na stránku na zobrazenie detailov posudku
+        if existing_review:
+            return redirect(url_for('view_review_recenzent', work_id=work_id))
+
+        # Ak posudok neexistuje, presmerujeme na stránku pre pridanie posudku
+        return redirect(url_for('add_review', work_id=work_id))
+
+    except Exception as e:
+        logging.error(f"Error in review_redirect: {e}")
+        flash('Došlo k chybe pri spracovaní požiadavky. Skúste to prosím neskôr.', 'error')
+        return redirect(url_for('recenzent_dashboard'))
+
+
 
 if __name__ == '__main__':
     app.run(debug=True)

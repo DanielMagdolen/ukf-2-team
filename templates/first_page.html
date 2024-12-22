@@ -4,20 +4,20 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Welcome to the Conference System</title>
+    <title>Školský konferenčný systém</title>
 </head>
 
 <body>
-    <h1>Welcome to the Conference Management System</h1>
+    <h1>Vitajte v školskom konferenčnom systéme!</h1>
 
     <!-- Login and Registration Links -->
     <div>
-        <a href="{{ url_for('login') }}">Login</a> |
-        <a href="{{ url_for('register') }}">Register</a>
+        <a href="{{ url_for('login') }}">Prihlásiť sa</a> |
+        <a href="{{ url_for('register') }}">Registrovať sa</a>
     </div>
 
     <!-- List of Conferences -->
-    <h2>Available Conferences</h2>
+    <h2>Dostupné konferencie</h2>
     <ul>
         {% for conference in conferences %}
         <li>

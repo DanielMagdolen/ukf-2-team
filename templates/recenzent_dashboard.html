@@ -24,10 +24,11 @@
             <strong>Dátum nahrania:</strong> {{ work.uploaded_at.strftime('%d.%m.%Y %H:%M:%S') }}<br>
             <a href="{{ work.file_path }}" target="_blank">Zobraziť súbor</a><br>
 
-            <!-- Formulár na pridanie posudku -->
-            <form method="POST" action="{{ url_for('add_review', work_id=work['_id']) }}">
+            <form method="POST" action="{{ url_for('review_redirect', work_id=work['_id']) }}">
                 <button type="submit">Pridať posudok</button>
             </form>
+
+
         </li>
         {% endfor %}
         {% else %}

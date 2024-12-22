@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>View Conferences</title>
+    <title>Tu nájdete všetky konferencie</title>
     <style>
         /* Pridanie medzier medzi konferenciami */
         ul {
@@ -57,11 +57,11 @@
     </style>
 
 <body>
-    <h1>Conferences</h1>
+    <h1>Konferencie</h1>
 
     <!-- User Greeting -->
-    <p>Welcome, {{ session['email'] }}!</p>
-    <a href="{{ url_for('first_page') }}">Logout</a>
+    <p>Vitajte, {{ session['email'] }}!</p>
+    <a href="{{ url_for('first_page') }}">Odhlásiť sa</a>
 
     <!-- List of Conferences -->
     <ul>
@@ -73,7 +73,7 @@
 
             <!-- Button to enter the conference -->
             <form action="{{ url_for('enter_conference', conference_id=conference['_id']) }}" method="post">
-                <button type="submit">Enter</button>
+                <button type="submit">Vstúpiť</button>
             </form>
         </li>
         {% endfor %}

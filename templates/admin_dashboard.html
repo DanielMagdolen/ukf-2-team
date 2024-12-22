@@ -73,7 +73,6 @@
                 Posudok ešte nebol pridaný.
                 {% endif %}
             </p>
-            <br><br>
             <a href="{{ work.file_path }}" target="_blank">Zobraziť súbor</a>
 
             <!-- Formulár na priradenie recenzenta sa zobrazí iba, ak recenzent ešte nie je priradený -->
@@ -87,6 +86,7 @@
                     {% endfor %}
                 </select>
                 <button type="submit">Priradiť recenzenta</button>
+                <br></br>
             </form>
             {% else %}
             <p><strong>Recenzent už bol priradený k tejto práci.</strong></p>
