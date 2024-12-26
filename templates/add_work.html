@@ -6,34 +6,39 @@
     </head>
     <body>
         <form method="post" enctype="multipart/form-data" action="{{ url_for('add_work') }}">
-            <label for="title">Title:</label>
+            <label for="title">Názov práce:</label>
             <input type="text" id="title" name="title" required><br><br>
 
-            <label for="description">Description:</label>
+            <label for="description">Popis práce:</label>
             <textarea id="description" name="description" required></textarea><br><br>
 
-            <label for="school">Select School:</label>
+            <label for="school">Vyberte školu:</label>
             <select name="school" required>
-                <option value="Trnava">Trnava</option>
-                <option value="Nitra">Nitra</option>
-                <option value="Banska Bystrica">Banská Bystrica</option>
+                <option value="Univerzita sv. Cyrila a Metoda v Trnave">Univerzita sv. Cyrila a Metoda v Trnave</option>
+                <option value="Univerzita Konštantína Filozofa v Nitre">Univerzita Konštantína Filozofa v Nitre</option>
+                <option value="Univerzita Mateja Bela v Banskej Bystrici">Univerzita Mateja Bela v Banskej Bystrici</option>
             </select><br><br>
 
-            <label for="faculty">Faculty:</label>
+            <label for="faculty">Fakulta:</label>
             <input type="text" id="faculty" name="faculty" required><br><br>
 
-            <label for="year">Year:</label>
+            <label for="year">Ročník štúdia:</label>
             <input type="number" id="year" name="year" required min="1" step="1"><br><br>
 
             <!-- Predvyplnená konferencia, ktorá sa nedá zmeniť -->
             <input type="hidden" name="conference_id" value="{{ selected_conference_id }}">
 
-            <p>Conference: {{ conferences[0]['name'] }}</p><br><br>
+            <p>Konferencia: {{ conferences[0]['name'] }}</p><br><br>
 
-            <label for="file">Upload File:</label>
+            <label for="file">Nahrajte súbor:</label>
             <input type="file" id="file" name="file" required><br><br>
 
-            <button type="submit">Submit Work</button>
+            <button type="submit">Odoslať prácu</button>
+            
         </form>
+    
+        <a href="{{ url_for('student_dashboard') }}">Späť na zoznam prác</a>
+
     </body>
+    
 </html>

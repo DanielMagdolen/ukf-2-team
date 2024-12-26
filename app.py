@@ -216,7 +216,7 @@ def admin_dashboard():
 
     # Načítanie konferencií, študentov a recenzentov pre dropdown menu
     conferences = list(conferences_collection.find().sort("date", 1))  # Zmena na 'conference'
-    users = list(users_collection)
+    users = list(users_collection.find())
     students = list(users_collection.find({"role": "student"}))
     reviewers = list(users_collection.find({"role": "recenzent"}))
     for conference in conferences:
@@ -561,6 +561,8 @@ def enter_conference(conference_id):
     else:
         flash('Unknown role.', 'error')
         return redirect(url_for('view_conferences'))
+    
+
 @app.route('/view_review_recenzent/<work_id>', methods=['GET'])
 def view_review_recenzent(work_id):
     # Overenie, či je používateľ prihlásený a má rolu recenzenta
