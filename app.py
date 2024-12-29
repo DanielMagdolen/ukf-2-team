@@ -8,6 +8,9 @@ import datetime
 import logging
 from bson import ObjectId
 from flask import flash, redirect, url_for
+from datetime import datetime
+
+
 
 # Configuration settings for file upload and MongoDB connection
 UPLOAD_FOLDER = 'static/uploads'
@@ -113,7 +116,7 @@ def login():
             session['email'] = user['email']
             session['role'] = user['role']
             if session['role'] != "visitor":
-                return redirect(url_for('view_conferences')) # Zmenené na 'first_page'
+                return redirect(url_for('view_conferences')) 
             else:
                 return redirect(url_for('visitor_page'))
         
@@ -610,6 +613,80 @@ def review_redirect(work_id):
         logging.error(f"Error in review_redirect: {e}")
         flash('Došlo k chybe pri spracovaní požiadavky. Skúste to prosím neskôr.', 'error')
         return redirect(url_for('recenzent_dashboard'))
+
+
+@app.route('/create_conference', methods=['GET', 'POST'])
+def create_conference():
+    if request.method == 'POST':
+        # Načítanie údajov z formulára
+        name = request.form['name']
+        date = datetime.strptime(request.form['date'], '%Y-%m-%d')  # Konvertovanie dátumu
+        description = request.form['description']
+
+        # Uloženie konferencie do databázy
+        new_conference = {
+            'name': name,
+            'date': date,
+            'description': description
+        }
+        conferences_collection.insert_one(new_conference)
+
+        flash('Konferencia bola úspešne vytvorená!', 'success')
+        return redirect(url_for('view_conferences'))
+
+    return render_template('create_conference.html')
+
+@app.route('/delete_conference/<conference_id>', methods=['POST'])
+def delete_conference(conference_id):
+    if 'user_id' not in session or session['role'] != 'admin':
+        flash('Nemáte oprávnenie na vymazanie konferencie.', 'error')
+        return redirect(url_for('view_conferences'))
+
+    # Vymazanie konferencie z databázy
+    conferences_collection.delete_one({'_id': ObjectId(conference_id)})
+
+    flash('Konferencia bola úspešne vymazaná.', 'success')
+    return redirect(url_for('view_conferences'))
+
+from datetime import datetime
+from bson import ObjectId
+
+# Trasa na načítanie konferencie na úpravu
+@app.route('/edit_conference/<conference_id>', methods=['GET'])
+def edit_conference(conference_id):
+    if 'user_id' not in session or session['role'] != 'admin':
+        flash('Nemáte oprávnenie na úpravu konferencie.', 'error')
+        return redirect(url_for('view_conferences'))
+
+    # Načítanie konferencie z databázy
+    conference = conferences_collection.find_one({'_id': ObjectId(conference_id)})
+    if not conference:
+        flash('Konferencia sa nenašla.', 'error')
+        return redirect(url_for('view_conferences'))
+
+    return render_template('edit_conference.html', conference=conference)
+
+# Trasa na spracovanie aktualizácie konferencie
+@app.route('/update_conference/<conference_id>', methods=['POST'])
+def update_conference(conference_id):
+    if 'user_id' not in session or session['role'] != 'admin':
+        flash('Nemáte oprávnenie na úpravu konferencie.', 'error')
+        return redirect(url_for('view_conferences'))
+
+    # Získanie údajov z formulára
+    name = request.form['name']
+    description = request.form['description']
+    date = datetime.strptime(request.form['date'], '%Y-%m-%d')
+
+    # Aktualizácia konferencie v databáze
+    conferences_collection.update_one(
+        {'_id': ObjectId(conference_id)},
+        {'$set': {'name': name, 'description': description, 'date': date}}
+    )
+
+    flash('Konferencia bola úspešne upravená.', 'success')
+    return redirect(url_for('view_conferences'))
+
 
 
 

@@ -4,7 +4,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tu nájdete všetky konferencie</title>
+    <title>Konferencie</title>
+    <!-- Pridanie odkazu na Material Icons -->
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <style>
         /* Pridanie medzier medzi konferenciami */
         ul {
@@ -14,7 +16,6 @@
 
         li {
             margin-bottom: 20px;
-            /* Medzera medzi konferenciami */
             padding: 10px;
             border: 1px solid #ddd;
             border-radius: 5px;
@@ -54,7 +55,45 @@
         button:hover {
             background-color: #0056b3;
         }
+
+        .admin-actions {
+            margin-bottom: 20px;
+        }
+
+        /* Ikony Material Icons */
+        .material-icons {
+            vertical-align: middle;
+            font-size: 24px;
+            /* Veľkosť ikony */
+            color: black;
+            /* Farba ikony */
+        }
+
+        /* Štýl tlačidla na vymazanie konferencie (s ikonou koša) */
+        .delete-button {
+            background-color: transparent;
+            border: none;
+            cursor: pointer;
+        }
+
+        .delete-button:hover {
+            opacity: 0.7;
+            /* Znížená opacita pri hover */
+        }
+
+        /* Štýl tlačidla na editovanie konferencie (s ikonou ceruzky) */
+        .edit-button {
+            background-color: transparent;
+            border: none;
+            cursor: pointer;
+        }
+
+        .edit-button:hover {
+            opacity: 0.7;
+            /* Znížená opacita pri hover */
+        }
     </style>
+</head>
 
 <body>
     <h1>Konferencie</h1>
@@ -63,22 +102,48 @@
     <p>Vitajte, {{ session['email'] }}!</p>
     <a href="{{ url_for('first_page') }}">Odhlásiť sa</a>
 
+    <!-- Admin option to create a conference -->
+    {% if session['role'] == 'admin' %}
+    <div class="admin-actions">
+        <a href="{{ url_for('create_conference') }}">
+            <button type="button">Vytvoriť novú konferenciu</button>
+        </a>
+    </div>
+    {% endif %}
+
     <!-- List of Conferences -->
     <ul>
         {% for conference in conferences %}
         <li>
             <strong>{{ conference['name'] }}</strong><br>
-            <em>{{ conference['date'] }}</em><br>
+            <em>{{ conference['date'].strftime('%d.%m.%Y') if conference['date'] else 'Neznámy dátum' }}</em><br>
             <p>{{ conference['description'] }}</p>
 
             <!-- Button to enter the conference -->
             <form action="{{ url_for('enter_conference', conference_id=conference['_id']) }}" method="post">
                 <button type="submit">Vstúpiť</button>
             </form>
+
+            <!-- Admin options: Delete and Edit Conference -->
+            {% if session['role'] == 'admin' %}
+            <!-- Button to delete the conference (with trash icon only) -->
+            <form action="{{ url_for('delete_conference', conference_id=conference['_id']) }}" method="post"
+                style="display:inline;">
+                <button type="submit" class="delete-button">
+                    <i class="material-icons">&#xe872;</i> <!-- Ikona koša -->
+                </button>
+            </form>
+            <!-- Button to edit the conference (with pencil icon only) -->
+            <form action="{{ url_for('edit_conference', conference_id=conference['_id']) }}" method="get"
+                style="display:inline;">
+                <button type="submit" class="edit-button">
+                    <i class="material-icons">&#xe3c9;</i> <!-- Ikona ceruzky -->
+                </button>
+            </form>
+            {% endif %}
         </li>
         {% endfor %}
     </ul>
 </body>
-
 
 </html>
