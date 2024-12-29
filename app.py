@@ -4,7 +4,6 @@ from pymongo import errors
 from bson import ObjectId
 import os
 from werkzeug.utils import secure_filename
-import datetime
 import logging
 from bson import ObjectId
 from flask import flash, redirect, url_for
@@ -337,7 +336,9 @@ def assign_recenzent():
 
     return render_template('admin_dashboard.html', works=works)
 
-  
+
+
+
 @app.route('/add_work', methods=['GET', 'POST'])
 def add_work():
     if 'user_id' not in session or session.get('role') != 'student':
@@ -382,7 +383,7 @@ def add_work():
                 "faculty": faculty,
                 "year": year,
                 "file_path": file_path,
-                "uploaded_at": datetime.datetime.utcnow()
+                "uploaded_at": datetime.utcnow()
             })
 
             flash('Work has been successfully added to the selected conference!', 'success')
@@ -399,7 +400,14 @@ def add_work():
         flash('No conferences available to add work to.', 'error')
         return redirect(url_for('student_dashboard'))
 
-    return render_template('add_work.html', conferences=conferences, selected_conference_id=current_conference_id)
+    # Vypísanie konferencie pre zobrazenie v šablóne
+    conference_name = conferences[0]['name'] if conferences else 'Unknown Conference'
+
+    return render_template('add_work.html', conferences=conferences, selected_conference_id=current_conference_id, conference_name=conference_name)
+
+
+
+
 
 @app.route('/add_review/<work_id>', methods=['GET', 'POST'])
 def add_review(work_id):
