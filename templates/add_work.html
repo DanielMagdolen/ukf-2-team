@@ -19,14 +19,17 @@
         <textarea id="description" name="description" required></textarea><br><br>
 
         <label for="school">Vyberte školu:</label>
-        <select name="school" required>
+        <select name="school" id="school" required>
+            <option value="">--Vyberte školu--</option>
             <option value="Univerzita sv. Cyrila a Metoda v Trnave">Univerzita sv. Cyrila a Metoda v Trnave</option>
             <option value="Univerzita Konštantína Filozofa v Nitre">Univerzita Konštantína Filozofa v Nitre</option>
             <option value="Univerzita Mateja Bela v Banskej Bystrici">Univerzita Mateja Bela v Banskej Bystrici</option>
         </select><br><br>
 
         <label for="faculty">Fakulta:</label>
-        <input type="text" id="faculty" name="faculty" required><br><br>
+        <select id="faculty" name="faculty" required>
+            <option value="">--Najprv vyberte školu--</option>
+        </select><br><br>
 
         <label for="year">Ročník štúdia:</label>
         <input type="number" id="year" name="year" required min="1" step="1"><br><br>
@@ -44,6 +47,53 @@
 
     <a href="{{ url_for('student_dashboard') }}">Späť na zoznam prác</a>
 
+    <script>
+        const faculties = {
+            "Univerzita sv. Cyrila a Metoda v Trnave": [
+                "Filozofická fakulta",
+                "Fakulta masmediálnej komunikácie",
+                "Fakulta prírodných vied",
+                "Fakulta sociálnych vied",
+                "Fakulta zdravotníckych vied"
+            ],
+            "Univerzita Konštantína Filozofa v Nitre": [
+                "Fakulta prírodných vied a informatiky",
+                "Fakulta sociálnych vied a zdravotníctva",
+                "Fakulta stredoeurópskych štúdií",
+                "Filozofická fakulta",
+                "Pedagogická fakulta"
+            ],
+            "Univerzita Mateja Bela v Banskej Bystrici": [
+                "Ekonomická fakulta",
+                "Fakulta prírodných vied",
+                "Fakulta politických vied a medzinárodných vzťahov",
+                "Fakulta telesnej výchovy, športu a zdravia",
+                "Filozofická fakulta",
+                "Pedagogická fakulta",
+                "Právnická fakulta"
+            ]
+        };
+
+        const schoolSelect = document.getElementById("school");
+        const facultySelect = document.getElementById("faculty");
+
+        schoolSelect.addEventListener("change", () => {
+            const selectedSchool = schoolSelect.value;
+
+            // Vyčisti aktuálne možnosti fakulty
+            facultySelect.innerHTML = '<option value="">--Vyberte fakultu--</option>';
+
+            // Pridaj nové možnosti podľa vybranej školy
+            if (faculties[selectedSchool]) {
+                faculties[selectedSchool].forEach(faculty => {
+                    const option = document.createElement("option");
+                    option.value = faculty;
+                    option.textContent = faculty;
+                    facultySelect.appendChild(option);
+                });
+            }
+        });
+    </script>
 </body>
 
 </html>
