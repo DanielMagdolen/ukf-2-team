@@ -3,132 +3,91 @@
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title> Pridanie práce </title>
-        <style>
-            * {
-                margin: 0;
-                padding: 0;
-                box-sizing: border-box;
-            }
-
-            body{
-                font-family: 'Arial', sans-serif;
-                background-color: #d9ead3;
-                color: #333;
-                line-height: 1.6px;
-                padding: 20px;
-            }
-
-            h2 {
-                color: #1a2516;
-                text-align: center;
-                margin-bottom: 20px;
-            }
-
-            form {
-                background-color: #fff;
-                padding: 30px;
-                border-radius: 8px;
-                box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-                max-width: 800px;
-                margin: 0 auto;
-            }
-
-            label{
-                font-weight: bold;
-                margin-right: 10px;
-            }
-
-            input[type="radio"] {
-                margin-right: 8px;
-            }
-
-            p {
-                margin: 15px;
-                font-size: 1.1rem;
-                color: #555;
-            }
-
-            fieldset {
-                border: 1px solid #ddd;
-                padding: 15px;
-                border-radius: 8px;
-                margin-bottom: 20px;
-            }
-
-            legend{
-                font-weight: bold;
-                font-size: 1.2rem;
-                color: #2a7c37;
-                padding: 0 5px;
-            }
-
-            button[type="submit"] {
-                background-color: #007bffaf;
-                color: #fff;
-                border: none;
-                padding: 10px 20px;
-                font-size: 1.1rem;
-                border-radius: 5px;
-                cursor: pointer;
-                transition: background-color 0.3s ease;
-            }
-
-            button[type="submit"]:hover {
-                background-color: #0056b3;
-            }
-
-            input[type="file"] {
-                margin-top: 10px;
-                margin-bottom: 20px;
-                padding: 8px;
-                border-radius: 5px;
-                border: 1px solid #ccc;
-            }
-
-            .radio-group {
-                margin-bottom: 10px;
-            }
-
-            .radio-group input {
-                margin-right: 5px;
-            }
-
-            .radio-group label {
-                margin-right: 15px;
-            }
-
-        </style>
     </head>
     <body>
         <form method="post" enctype="multipart/form-data" action="{{ url_for('add_work') }}">
             <label for="title">Title:</label>
             <input type="text" id="title" name="title" required><br><br>
 
-            <label for="description">Description:</label>
-            <textarea id="description" name="description" required></textarea><br><br>
+        <label for="description">Popis práce:</label>
+        <textarea id="description" name="description" required></textarea><br><br>
 
-            <label for="school">Select School:</label>
-            <select name="school" required>
-                <option value="Trnava">Trnava</option>
-                <option value="Nitra">Nitra</option>
-                <option value="Banska Bystrica">Banská Bystrica</option>
-            </select><br><br>
+        <label for="school">Vyberte školu:</label>
+        <select name="school" id="school" required>
+            <option value="">--Vyberte školu--</option>
+            <option value="Univerzita sv. Cyrila a Metoda v Trnave">Univerzita sv. Cyrila a Metoda v Trnave</option>
+            <option value="Univerzita Konštantína Filozofa v Nitre">Univerzita Konštantína Filozofa v Nitre</option>
+            <option value="Univerzita Mateja Bela v Banskej Bystrici">Univerzita Mateja Bela v Banskej Bystrici</option>
+        </select><br><br>
 
-            <label for="faculty">Faculty:</label>
-            <input type="text" id="faculty" name="faculty" required><br><br>
+        <label for="faculty">Fakulta:</label>
+        <select id="faculty" name="faculty" required>
+            <option value="">--Najprv vyberte školu--</option>
+        </select><br><br>
 
-            <label for="year">Year:</label>
-            <input type="number" id="year" name="year" required min="1" step="1"><br><br>
+        <label for="year">Ročník štúdia:</label>
+        <input type="number" id="year" name="year" required min="1" step="1"><br><br>
 
-            <!-- Predvyplnená konferencia, ktorá sa nedá zmeniť -->
-            <input type="hidden" name="conference_id" value="{{ selected_conference_id }}">
+        <!-- Predvyplnená konferencia, ktorá sa nedá zmeniť -->
+        <input type="hidden" name="conference_id" value="{{ selected_conference_id }}">
 
-            <p>Conference: {{ conferences[0]['name'] }}</p><br><br>
+        <p>Konferencia: {{ conference_name }}</p><br><br>
 
-            <label for="file">Upload File:</label>
-            <input type="file" id="file" name="file" required><br><br>
+        <label for="file">Nahrajte súbor:</label>
+        <input type="file" id="file" name="file" required><br><br>
 
-            <button type="submit">Submit Work</button>
-        </form>
-    </body>
+        <button type="submit">Odoslať prácu</button>
+    </form>
+
+    <a href="{{ url_for('student_dashboard') }}">Späť na zoznam prác</a>
+
+    <script>
+        const faculties = {
+            "Univerzita sv. Cyrila a Metoda v Trnave": [
+                "Filozofická fakulta",
+                "Fakulta masmediálnej komunikácie",
+                "Fakulta prírodných vied",
+                "Fakulta sociálnych vied",
+                "Fakulta zdravotníckych vied"
+            ],
+            "Univerzita Konštantína Filozofa v Nitre": [
+                "Fakulta prírodných vied a informatiky",
+                "Fakulta sociálnych vied a zdravotníctva",
+                "Fakulta stredoeurópskych štúdií",
+                "Filozofická fakulta",
+                "Pedagogická fakulta"
+            ],
+            "Univerzita Mateja Bela v Banskej Bystrici": [
+                "Ekonomická fakulta",
+                "Fakulta prírodných vied",
+                "Fakulta politických vied a medzinárodných vzťahov",
+                "Fakulta telesnej výchovy, športu a zdravia",
+                "Filozofická fakulta",
+                "Pedagogická fakulta",
+                "Právnická fakulta"
+            ]
+        };
+
+        const schoolSelect = document.getElementById("school");
+        const facultySelect = document.getElementById("faculty");
+
+        schoolSelect.addEventListener("change", () => {
+            const selectedSchool = schoolSelect.value;
+
+            // Vyčisti aktuálne možnosti fakulty
+            facultySelect.innerHTML = '<option value="">--Vyberte fakultu--</option>';
+
+            // Pridaj nové možnosti podľa vybranej školy
+            if (faculties[selectedSchool]) {
+                faculties[selectedSchool].forEach(faculty => {
+                    const option = document.createElement("option");
+                    option.value = faculty;
+                    option.textContent = faculty;
+                    facultySelect.appendChild(option);
+                });
+            }
+        });
+    </script>
+</body>
+
 </html>

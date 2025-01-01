@@ -222,7 +222,6 @@
                 Posudok ešte nebol pridaný.
                 {% endif %}
             </p>
-            <br><br>
             <a href="{{ work.file_path }}" target="_blank">Zobraziť súbor</a>
 
             <!-- Formulár na priradenie recenzenta sa zobrazí iba, ak recenzent ešte nie je priradený -->
@@ -236,6 +235,7 @@
                     {% endfor %}
                 </select>
                 <button type="submit">Priradiť recenzenta</button>
+                <br></br>
             </form>
             {% else %}
             <p><strong>Recenzent už bol priradený k tejto práci.</strong></p>
@@ -245,6 +245,24 @@
     </div>
     {% else %}
     <p>Žiadne práce neboli pridané.</p>
+    {% endif %}
+    <br>
+    
+    {% if users %}
+    <h3> Používatelia: </h3>
+    <div>
+        {% for user in users %}
+        <div>
+            <p><strong> Meno: </strong> {{ user.name }} </p>
+            <p><strong> Priezvisko: </strong> {{ user.surname }} </p>
+            <p><strong> Email: </strong> {{ user.email }} </p>
+            <p><strong> Rola: </strong> {{ user.role }} </p>
+            <p><strong> Škola: </strong> {{ user.school }} </p>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <p> </p>
     {% endif %}
 
     <a href="{{ url_for('logout') }}">Odhlásiť sa</a>

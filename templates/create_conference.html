@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vytvoriť Konferenciu</title>
+</head>
+
+<body>
+    <h1>Vytvoriť Novú Konferenciu</h1>
+    <form method="POST" action="{{ url_for('create_conference') }}">
+        <label for="name">Názov:</label><br>
+        <input type="text" id="name" name="name" placeholder="Zadajte názov konferencie" required><br><br>
+
+        <label for="date">Dátum:</label><br>
+        <input type="date" id="date" name="date" required><br><br>
+
+        <label for="description">Popis:</label><br>
+        <textarea id="description" name="description" rows="5" placeholder="Zadajte popis konferencie"
+            required></textarea><br><br>
+
+        <button type="submit">Vytvoriť</button>
+    </form>
+
+    <br>
+    <a href="{{ url_for('view_conferences') }}">Späť na zoznam konferencií</a>
+</body>
+
+</html>

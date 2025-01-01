@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Welcome to the Conference System</title>
     <style>
-         * {
+        * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
@@ -17,16 +17,15 @@
             background-color: #f4f6f9;
             color: #333;
             line-height: 1.6;
-            padding: 0 20px;
+            padding: 20px;
         }
 
         h1 {
             text-align: center;
-            font-size: 3rem;
+            font-size: 2.5rem;
             color: #2c3e50;
             margin-bottom: 40px;
             font-weight: 700;
-            padding-top: 30px;
         }
 
         h2 {
@@ -74,14 +73,15 @@
         }
 
         .conference-item {
-            background-color: #fff;
+            background-color: #eaf2f8;
             padding: 25px;
             width: 300px;
             border-radius: 10px;
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
             transition: transform 0.3s ease, box-shadow 0.3s ease;
-            text-align: center;
+            text-align: left;
             margin-bottom: 20px;
+            border-left: 5px solid #3498db;
         }
 
         .conference-item:hover {
@@ -162,12 +162,12 @@
 </head>
 
 <body>
-    <h1>Systém správy konferencií</h1>
+    <h1>Welcome to the Conference Management System</h1>
 
     <!-- Login and Registration Links -->
     <div>
-        <a href="{{ url_for('login') }}">Prihlásenie</a> |
-        <a href="{{ url_for('register') }}">Registrácia</a>
+        <a href="{{ url_for('login') }}">Login</a> |
+        <a href="{{ url_for('register') }}">Register</a>
     </div>
 
     <!-- List of Conferences -->
@@ -176,7 +176,6 @@
         {% for conference in conferences %}
         <li>
             <strong>{{ conference['name'] }}</strong><br>
-            <em>{{ conference['date'] }}</em><br>
             <p>{{ conference['description'] }}</p>
         </li>
         {% endfor %}

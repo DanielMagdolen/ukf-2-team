@@ -4,8 +4,12 @@ from pymongo import errors
 from bson import ObjectId
 import os
 from werkzeug.utils import secure_filename
-import datetime
 import logging
+from bson import ObjectId
+from flask import flash, redirect, url_for
+from datetime import datetime
+
+
 
 # Configuration settings for file upload and MongoDB connection
 UPLOAD_FOLDER = 'static/uploads'
@@ -111,7 +115,7 @@ def login():
             session['email'] = user['email']
             session['role'] = user['role']
             if session['role'] != "visitor":
-                return redirect(url_for('view_conferences')) # Zmenené na 'first_page'
+                return redirect(url_for('view_conferences')) 
             else:
                 return redirect(url_for('visitor_page'))
         
@@ -214,6 +218,7 @@ def admin_dashboard():
 
     # Načítanie konferencií, študentov a recenzentov pre dropdown menu
     conferences = list(conferences_collection.find().sort("date", 1))  # Zmena na 'conference'
+    users = list(users_collection.find())
     students = list(users_collection.find({"role": "student"}))
     reviewers = list(users_collection.find({"role": "recenzent"}))
     for conference in conferences:
@@ -331,7 +336,9 @@ def assign_recenzent():
 
     return render_template('admin_dashboard.html', works=works)
 
-  
+
+
+
 @app.route('/add_work', methods=['GET', 'POST'])
 def add_work():
     if 'user_id' not in session or session.get('role') != 'student':
@@ -376,7 +383,7 @@ def add_work():
                 "faculty": faculty,
                 "year": year,
                 "file_path": file_path,
-                "uploaded_at": datetime.datetime.utcnow()
+                "uploaded_at": datetime.utcnow()
             })
 
             flash('Work has been successfully added to the selected conference!', 'success')
@@ -393,7 +400,13 @@ def add_work():
         flash('No conferences available to add work to.', 'error')
         return redirect(url_for('student_dashboard'))
 
-    return render_template('add_work.html', conferences=conferences, selected_conference_id=current_conference_id)
+    # Vypísanie konferencie pre zobrazenie v šablóne
+    conference_name = conferences[0]['name'] if conferences else 'Unknown Conference'
+
+    return render_template('add_work.html', conferences=conferences, selected_conference_id=current_conference_id, conference_name=conference_name)
+
+
+
 
 
 @app.route('/add_review/<work_id>', methods=['GET', 'POST'])
@@ -405,10 +418,19 @@ def add_review(work_id):
 
     # Načítanie práce podľa ID
     work = works_collection.find_one({'_id': ObjectId(work_id)})
-    
     if not work:
         flash('Práca neexistuje.', 'error')
         return redirect(url_for('recenzent_dashboard'))
+
+    # Načítanie posudku pre aktuálneho recenzenta a prácu
+    existing_review = reviews_collection.find_one({
+        "user_id": ObjectId(session['user_id']),
+        "work_id": ObjectId(work_id)
+    })
+
+    # Ak už existuje posudok, zobrazí sa iba posudok
+    if existing_review:
+        return render_template('view_review.html', review=existing_review, work=work)
 
     # Spracovanie formulára (POST žiadosť)
     if request.method == 'POST':
@@ -455,7 +477,6 @@ def add_review(work_id):
 
     # Zobrazenie formulára na pridanie posudku (GET žiadosť)
     return render_template('add_review.html', work=work)
-
 
 
 
@@ -551,6 +572,131 @@ def enter_conference(conference_id):
     else:
         flash('Unknown role.', 'error')
         return redirect(url_for('view_conferences'))
+    
+
+@app.route('/view_review_recenzent/<work_id>', methods=['GET'])
+def view_review_recenzent(work_id):
+    # Overenie, či je používateľ prihlásený a má rolu recenzenta
+    if 'user_id' not in session or session.get('role') != 'recenzent':
+        flash('Musíte byť prihlásený ako recenzent.', 'error')
+        return redirect(url_for('login'))
+
+    # Načítanie posudku pre aktuálneho recenzenta a prácu
+    review = reviews_collection.find_one({
+        "user_id": ObjectId(session['user_id']),
+        "work_id": ObjectId(work_id)
+    })
+
+    if not review:
+        flash('Posudok pre túto prácu neexistuje.', 'error')
+        return redirect(url_for('recenzent_dashboard'))
+
+    # Načítanie práce podľa ID
+    work = works_collection.find_one({'_id': ObjectId(work_id)})
+
+    return render_template('view_review_recenzent.html', review=review, work=work)
+
+@app.route('/review_redirect/<work_id>', methods=['POST'])
+def review_redirect(work_id):
+    try:
+        # Overenie, či je používateľ prihlásený a má rolu recenzenta
+        if 'user_id' not in session or session.get('role') != 'recenzent':
+            flash('Musíte byť prihlásený ako recenzent.', 'error')
+            return redirect(url_for('login'))
+
+        # Načítanie posudku pre aktuálneho recenzenta a prácu
+        existing_review = reviews_collection.find_one({
+            "user_id": ObjectId(session['user_id']),
+            "work_id": ObjectId(work_id)
+        })
+
+        # Ak už existuje posudok, presmerujeme na stránku na zobrazenie detailov posudku
+        if existing_review:
+            return redirect(url_for('view_review_recenzent', work_id=work_id))
+
+        # Ak posudok neexistuje, presmerujeme na stránku pre pridanie posudku
+        return redirect(url_for('add_review', work_id=work_id))
+
+    except Exception as e:
+        logging.error(f"Error in review_redirect: {e}")
+        flash('Došlo k chybe pri spracovaní požiadavky. Skúste to prosím neskôr.', 'error')
+        return redirect(url_for('recenzent_dashboard'))
+
+
+@app.route('/create_conference', methods=['GET', 'POST'])
+def create_conference():
+    if request.method == 'POST':
+        # Načítanie údajov z formulára
+        name = request.form['name']
+        date = datetime.strptime(request.form['date'], '%Y-%m-%d')  # Konvertovanie dátumu
+        description = request.form['description']
+
+        # Uloženie konferencie do databázy
+        new_conference = {
+            'name': name,
+            'date': date,
+            'description': description
+        }
+        conferences_collection.insert_one(new_conference)
+
+        flash('Konferencia bola úspešne vytvorená!', 'success')
+        return redirect(url_for('view_conferences'))
+
+    return render_template('create_conference.html')
+
+@app.route('/delete_conference/<conference_id>', methods=['POST'])
+def delete_conference(conference_id):
+    if 'user_id' not in session or session['role'] != 'admin':
+        flash('Nemáte oprávnenie na vymazanie konferencie.', 'error')
+        return redirect(url_for('view_conferences'))
+
+    # Vymazanie konferencie z databázy
+    conferences_collection.delete_one({'_id': ObjectId(conference_id)})
+
+    flash('Konferencia bola úspešne vymazaná.', 'success')
+    return redirect(url_for('view_conferences'))
+
+from datetime import datetime
+from bson import ObjectId
+
+# Trasa na načítanie konferencie na úpravu
+@app.route('/edit_conference/<conference_id>', methods=['GET'])
+def edit_conference(conference_id):
+    if 'user_id' not in session or session['role'] != 'admin':
+        flash('Nemáte oprávnenie na úpravu konferencie.', 'error')
+        return redirect(url_for('view_conferences'))
+
+    # Načítanie konferencie z databázy
+    conference = conferences_collection.find_one({'_id': ObjectId(conference_id)})
+    if not conference:
+        flash('Konferencia sa nenašla.', 'error')
+        return redirect(url_for('view_conferences'))
+
+    return render_template('edit_conference.html', conference=conference)
+
+# Trasa na spracovanie aktualizácie konferencie
+@app.route('/update_conference/<conference_id>', methods=['POST'])
+def update_conference(conference_id):
+    if 'user_id' not in session or session['role'] != 'admin':
+        flash('Nemáte oprávnenie na úpravu konferencie.', 'error')
+        return redirect(url_for('view_conferences'))
+
+    # Získanie údajov z formulára
+    name = request.form['name']
+    description = request.form['description']
+    date = datetime.strptime(request.form['date'], '%Y-%m-%d')
+
+    # Aktualizácia konferencie v databáze
+    conferences_collection.update_one(
+        {'_id': ObjectId(conference_id)},
+        {'$set': {'name': name, 'description': description, 'date': date}}
+    )
+
+    flash('Konferencia bola úspešne upravená.', 'success')
+    return redirect(url_for('view_conferences'))
+
+
+
 
 if __name__ == '__main__':
     app.run(debug=True)
