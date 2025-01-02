@@ -7,9 +7,9 @@
     <title>Admin Dashboard</title>
     <style>
         * {
-        margin: 0;
-        padding: 0;
-        box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
         }
 
         body {
@@ -20,28 +20,48 @@
             padding: 20px;
         }
 
-        h1 {
-            text-align: center;
-            font-size: 2.5rem;
-            color: #1a2516;
-            margin-bottom: 30px;
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
         }
 
-        h3 {
-            color: #2c2f3198;
-            margin-bottom: 15px;
+        h1, h3 {
+            color: #1a2516;
+            text-align: center;
+        }
+
+        .auth-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        .auth-buttons a {
+            background-color: #4CAF50;
+            color: white;
+            padding: 12px 20px;
+            text-decoration: none;
+            border-radius: 5px;
+            font-size: 16px;
+            transition: background-color 0.3s ease;
+        }
+
+        .auth-buttons a:hover {
+            background-color: #45a049;
         }
 
         form {
             background-color: #fff;
             padding: 20px;
-            margin-bottom: 30px;
+            margin-top: 20px;
             border-radius: 8px;
             box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
             display: flex;
             flex-direction: column;
             gap: 15px;
-            max-width: 500px;
+            max-width: 600px;
             margin-left: auto;
             margin-right: auto;
         }
@@ -80,6 +100,36 @@
             background-color: #2980b9;
         }
 
+        .work-item, .user-item {
+            background-color: #fff;
+            padding: 20px;
+            margin-bottom: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .work-item a {
+            color: #3498db;
+            text-decoration: none;
+        }
+
+        .work-item a:hover {
+            text-decoration: underline;
+        }
+
+        .logout-link, .back-link {
+            display: block;
+            text-align: center;
+            margin-top: 20px;
+            font-size: 1.1rem;
+            color: #3498db;
+            text-decoration: none;
+        }
+
+        .logout-link:hover, .back-link:hover {
+            text-decoration: underline;
+        }
+
         .message-list {
             background-color: #ecf0f1;
             padding: 15px;
@@ -96,148 +146,98 @@
             border-left: 4px solid #2ecc71;
             font-size: 1.1rem;
         }
-
-        .work-item {
-            background-color: #fff;
-            padding: 20px;
-            margin-bottom: 20px;
-            border-radius: 8px;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-        }
-
-        .work-item p {
-            font-size: 1.1rem;
-            margin-bottom: 10px;
-        }
-
-        .work-item strong {
-            color: #2c3e50;
-        }
-
-        .work-item a {
-            color: #3498db;
-            text-decoration: none;
-        }
-
-        .work-item a:hover {
-            text-decoration: underline;
-        }
-
-        .assign-reviewer-form {
-         margin-top: 20px;
-         display: flex;
-         flex-direction: column;
-         gap: 10px  
-        }
-
-        .assign-reviewer-form label {
-            color: #34495e;
-        }
-
-        .logout-link, .back-link {
-            display: block;
-            text-align: center;
-            margin-top: 20px;
-            font-size: 1.1rem;
-            color: #3498db;
-        }
-
-        .logout-link:hover, .back-link:hover {
-            text-decoration: underline;
-        }
-
-        .no-works {
-            font-size: 1.2rem;
-            text-align: center;
-            color: #e74c3c;
-            margin-top: 20px;
-        }
-
     </style>
 </head>
 
 <body>
-    <h1>Admin Dashboard</h1>
-    <h3>Vitajte v konferencii: {{ session['current_conference_name'] }}</h3>
-
-    <!-- Zobrazenie chybových a úspešných hlásení (flash správ) -->
-    {% with messages = get_flashed_messages(with_categories=true) %}
-    {% if messages %}
-    <ul>
-        {% for category, message in messages %}
-        <li>{{ message }}</li>
-        {% endfor %}
-    </ul>
-    {% endif %}
-    {% endwith %}
-
-    <!-- Formulár na filtrovanie -->
-    <form method="get" action="{{ url_for('admin_dashboard') }}">
-        <label for="student">Vyberte študenta:</label>
-        <select name="student_id" id="student">
-            <option value="" {% if not selected_student_id %}selected{% endif %}>Všetci študenti</option>
-            {% for student in students %}
-            <option value="{{ student['_id'] }}" {% if selected_student_id==student['_id'] %}selected{% endif %}>
-                {{ student['surname'] }} {{ student['name'] }}
-            </option>
-            {% endfor %}
-        </select>
-
-        <label for="reviewer">Vyberte recenzenta:</label>
-        <select name="reviewer_id" id="reviewer">
-            <option value="" {% if not selected_reviewer_id %}selected{% endif %}>Všetci recenzenti</option>
-            {% for reviewer in reviewers %}
-            <option value="{{ reviewer['_id'] }}" {% if selected_reviewer_id==reviewer['_id'] %}selected{% endif %}>
-                {{ reviewer['surname'] }} {{ reviewer['name'] }}
-            </option>
-            {% endfor %}
-        </select>
-
-        <button type="submit">Filtruj</button>
-    </form>
-
-    <!-- Zobrazenie prác -->
-    {% if works %}
-    <h3>Práce pridané študentami:</h3>
-    <div>
-        {% for work in works %}
-        <li>
-            <strong>Konferencia:</strong> {{ work.conference_name }}<br>
-            <strong>Názov práce:</strong> {{ work.title }}<br>
-            Študent: {{ work.full_name }}<br>
-            Popis: {{ work.description }}<br>
-            Škola: {{ work.school }}<br>
-            Fakulta: {{ work.faculty }}<br>
-            Ročník: {{ work.year }}<br>
-            <a href="{{ work.file_path }}" target="_blank">Zobraziť súbor</a><br>
-        </li>
-        {% endfor %}
-    </div>
-    {% else %}
-    <p>Žiadne práce neboli pridané.</p>
-    {% endif %}
-    <br>
-    
-    {% if users %}
-    <h3> Používatelia: </h3>
-    <div>
-        {% for user in users %}
-        <div>
-            <p><strong> Meno: </strong> {{ user.name }} </p>
-            <p><strong> Priezvisko: </strong> {{ user.surname }} </p>
-            <p><strong> Email: </strong> {{ user.email }} </p>
-            <p><strong> Rola: </strong> {{ user.role }} </p>
-            <p><strong> Škola: </strong> {{ user.school }} </p>
+    <div class="container">
+        <!-- Logout and Previous Page Buttons -->
+        <div class="auth-buttons">
+            <a href="{{ url_for('logout') }}" class="logout-link">Odhlásiť sa</a>
+            <a href="{{ url_for('view_conferences') }}" class="back-link">Naspäť</a>
         </div>
-        {% endfor %}
-    </div>
-    {% else %}
-    <p> </p>
-    {% endif %}
 
-    <a href="{{ url_for('logout') }}">Odhlásiť sa</a>
-    <br>
-    <a href="{{ url_for('view_conferences') }}">Naspäť</a>
+        <!-- Title Section -->
+        <h1>Admin Dashboard</h1>
+        <h3>Vitajte v konferencii: {{ session['current_conference_name'] }}</h3>
+
+        <!-- Flash Messages -->
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+            <div class="message-list">
+                <ul>
+                    {% for category, message in messages %}
+                    <li>{{ message }}</li>
+                    {% endfor %}
+                </ul>
+            </div>
+            {% endif %}
+        {% endwith %}
+
+        <!-- Filtering Form -->
+        <form method="get" action="{{ url_for('admin_dashboard') }}">
+            <label for="student">Vyberte študenta:</label>
+            <select name="student_id" id="student">
+                <option value="" {% if not selected_student_id %}selected{% endif %}>Všetci študenti</option>
+                {% for student in students %}
+                <option value="{{ student['_id'] }}" {% if selected_student_id==student['_id'] %}selected{% endif %}>
+                    {{ student['surname'] }} {{ student['name'] }}
+                </option>
+                {% endfor %}
+            </select>
+
+            <label for="reviewer">Vyberte recenzenta:</label>
+            <select name="reviewer_id" id="reviewer">
+                <option value="" {% if not selected_reviewer_id %}selected{% endif %}>Všetci recenzenti</option>
+                {% for reviewer in reviewers %}
+                <option value="{{ reviewer['_id'] }}" {% if selected_reviewer_id==reviewer['_id'] %}selected{% endif %}>
+                    {{ reviewer['surname'] }} {{ reviewer['name'] }}
+                </option>
+                {% endfor %}
+            </select>
+
+            <button type="submit">Filtruj</button>
+        </form>
+
+        <!-- Works Section -->
+        {% if works %}
+        <h3>Práce pridané študentami:</h3>
+        <div>
+            {% for work in works %}
+            <div class="work-item">
+                <p><strong>Konferencia:</strong> {{ work.conference_name }}</p>
+                <p><strong>Názov práce:</strong> {{ work.title }}</p>
+                <p>Študent: {{ work.full_name }}</p>
+                <p>Popis: {{ work.description }}</p>
+                <p>Škola: {{ work.school }}</p>
+                <p>Fakulta: {{ work.faculty }}</p>
+                <p>Ročník: {{ work.year }}</p>
+                <a href="{{ work.file_path }}" target="_blank">Zobraziť súbor</a>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <p>Žiadne práce neboli pridané.</p>
+        {% endif %}
+
+        <!-- Users Section -->
+        {% if users %}
+        <h3> Používatelia: </h3>
+        <div>
+            {% for user in users %}
+            <div class="user-item">
+                <p><strong> Meno: </strong> {{ user.name }}</p>
+                <p><strong> Priezvisko: </strong> {{ user.surname }}</p>
+                <p><strong> Email: </strong> {{ user.email }}</p>
+                <p><strong> Rola: </strong> {{ user.role }}</p>
+                <p><strong> Škola: </strong> {{ user.school }}</p>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <p> </p>
+        {% endif %}
+    </div>
 </body>
 
 </html>
