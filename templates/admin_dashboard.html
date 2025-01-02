@@ -158,6 +158,7 @@
 
 <body>
     <h1>Admin Dashboard</h1>
+    <h3>Vitajte v konferencii: {{ session['current_conference_name'] }}</h3>
 
     <!-- Zobrazenie chybových a úspešných hlásení (flash správ) -->
     {% with messages = get_flashed_messages(with_categories=true) %}
