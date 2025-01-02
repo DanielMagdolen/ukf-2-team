@@ -201,47 +201,16 @@
     <h3>Práce pridané študentami:</h3>
     <div>
         {% for work in works %}
-        <div>
-            <p><strong>Konferencia:</strong> {{ work.conference_name }}</p>
-            <p><strong>Názov práce:</strong> {{ work.title }}</p>
-            <p><strong>Študent:</strong> {{ work.full_name }}</p>
-            <p><strong>Recenzent:</strong>
-                {% if work.reviewer_name %}
-                {{ work.reviewer_name }}
-                {% else %}
-                Nepriradený
-                {% endif %}
-            </p>
-            <p><strong>Popis:</strong> {{ work.description }}</p>
-            <p><strong>Škola:</strong> {{ work.school }}</p>
-            <p><strong>Fakulta:</strong> {{ work.faculty }}</p>
-            <p><strong>Ročník:</strong> {{ work.year }}</p>
-            <p><strong>Posudok:</strong>
-                {% if work.review %}
-                <a href="{{ url_for('view_review_admin', work_id=work['_id']) }}">Zobraziť posudok</a>
-                {% else %}
-                Posudok ešte nebol pridaný.
-                {% endif %}
-            </p>
-            <a href="{{ work.file_path }}" target="_blank">Zobraziť súbor</a>
-
-            <!-- Formulár na priradenie recenzenta sa zobrazí iba, ak recenzent ešte nie je priradený -->
-            {% if not work.is_assigned %}
-            <form method="post" action="{{ url_for('assign_recenzent') }}">
-                <input type="hidden" name="work_id" value="{{ work['_id'] }}">
-                <label for="reviewer_{{ work['_id'] }}">Vyberte recenzenta:</label>
-                <select name="reviewer_id" id="reviewer_{{ work['_id'] }}">
-                    {% for reviewer in reviewers %}
-                    <option value="{{ reviewer['_id'] }}">{{ reviewer['surname'] }} {{ reviewer['name'] }}</option>
-                    {% endfor %}
-                </select>
-                <button type="submit">Priradiť recenzenta</button>
-                <br></br>
-            </form>
-            {% else %}
-            <p><strong>Recenzent už bol priradený k tejto práci.</strong></p>
-            {% endif %}
-        </div>
+        <li>
+            <strong>Konferencia:</strong> {{ work.conference_name }}<br>
+            <strong>Názov práce:</strong> {{ work.title }}<br>
+            Študent: {{ work.full_name }}<br>
+            Popis: {{ work.description }}<br>
+            Škola: {{ work.school }}<br>
+            Fakulta: {{ work.faculty }}<br>
+            Ročník: {{ work.year }}<br>
+            <a href="{{ work.file_path }}" target="_blank">Zobraziť súbor</a><br>
+        </li>
         {% endfor %}
     </div>
     {% else %}
