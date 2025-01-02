@@ -2,184 +2,126 @@
 <html lang="sk">
 
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Vitajte v Konferenčnom systéme</title>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Vitajte v Konferenčnom systéme</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
 
-        body {
-            font-family: 'Arial', sans-serif;
-            background-color: #f4f6f9;
-            color: #333;
-            line-height: 1.6;
-            padding: 20px;
-        }
+    body {
+      font-family: 'Arial', sans-serif;
+      background-color: #d9ead3;
+      color: #333;
+      line-height: 1.6;
+      padding: 20px;
+    }
 
-        h1 {
-            text-align: center;
-            font-size: 2.5rem;
-            color: #2c3e50;
-            margin-bottom: 40px;
-            font-weight: 700;
-        }
+    h1 {
+      color: #1a2516;
+      text-align: center;
+      margin-bottom: 20px;
+    }
 
-        h2 {
-            font-size: 2rem;
-            color: #34495e;
-            margin-bottom: 20px;
-            font-weight: 600;
-            text-align: center;
-        }
+    h2 {
+      color: #1a2516;
+      text-align: center;
+      margin-bottom: 20px;
+    }
 
-        .login-register {
-            text-align: center;
-            margin-bottom: 30px;
-            font-size: 1.1rem;
-        }
+    .auth-buttons {
+      display: flex;
+      justify-content: center;
+      gap: 20px;
+      margin-top: 30px;
+    }
 
-        .login-register a {
-            font-weight: bold;
-        }
+    .auth-buttons a {
+      background-color: #4CAF50;
+      color: white;
+      padding: 12px 20px;
+      text-decoration: none;
+      border-radius: 5px;
+      font-size: 16px;
+      transition: background-color 0.3s ease;
+    }
 
-        .login-register button {
-            background-color: #007bffaf;
-            color: #fff;
-            border: none;
-            padding: 10px 20px;
-            font-size: 1.1rem;
-            border-radius: 5px;
-            cursor: pointer;
-            margin-right: 10px;
-            transition: background-color 0.3s ease;
-        }
+    .auth-buttons a:hover {
+      background-color: #45a049;
+    }
 
-        .login-register button:hover {
-            background-color: #0056b3;
-        }
+    .conferences-container {
+      background-color: #fff;
+      padding: 30px;
+      border-radius: 8px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+      max-width: 800px;
+      margin: 30px auto;
+    }
 
-        .conference-list {
-            list-style: none;
-            padding: 0;
-            display: flex;
-            flex-wrap: wrap;
-            gap: 20px;
-            justify-content: center;
-            margin-top: 20px;
-        }
+    .conference-item {
+      padding: 20px;
+      border-bottom: 1px solid #ddd;
+    }
 
-        .conference-item {
-            background-color: #eaf2f8;
-            padding: 25px;
-            width: 300px;
-            border-radius: 10px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
-            text-align: left;
-            margin-bottom: 20px;
-            border-left: 5px solid #3498db;
-        }
+    .conference-item:last-child {
+      border-bottom: none;
+    }
 
-        .conference-item:hover {
-            transform: translateY(-10px);
-            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
-        }
+    .conference-item h3 {
+      font-size: 20px;
+      color: #333;
+    }
 
-        .conference-item strong {
-            font-size: 1.6rem;
-            color: #2c3e50;
-            font-weight: 700;
-            margin-bottom: 10px;
-        }
+    .conference-item p {
+      font-size: 14px;
+      color: #555;
+      margin-top: 10px;
+    }
 
-        .conference-item em {
-            display: block;
-            margin-top: 10px;
-            color: #7f8c8d;
-            font-size: 1rem;
-        }
+    button[type="submit"] {
+      background-color: #007bffaf;
+      color: #fff;
+      border: none;
+      padding: 10px 20px;
+      font-size: 1.1rem;
+      border-radius: 5px;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
 
-        .conference-item p {
-            margin-top: 15px;
-            font-size: 1.1rem;
-            color: #34495e;
-        }
-
-        .conference-item a {
-            display: inline-block;
-            background-color: #3498db;
-            color: #fff;
-            padding: 8px 15px;
-            border-radius: 5px;
-            margin-top: 15px;
-            text-decoration: none;
-            transition: background-color 0.3s ease;
-        }
-
-        .conference-item a:hover {
-            background-color: #2980b9;
-        }
-
-        /* Responsive Design */
-        @media (max-width: 768px) {
-            .conference-item {
-                width: 100%;
-                max-width: 500px;
-            }
-
-            h1 {
-                font-size: 2.5rem;
-            }
-
-            h2 {
-                font-size: 1.8rem;
-            }
-        }
-
-        /* Footer */
-        .footer {
-            text-align: center;
-            margin-top: 40px;
-            padding: 20px;
-            background-color: #34495e;
-            color: #fff;
-            border-radius: 10px;
-        }
-
-        .footer a {
-            color: #ecf0f1;
-            font-weight: bold;
-        }
-
-        .footer a:hover {
-            color: #3498db;
-        }
-    </style>
+    button[type="submit"]:hover {
+      background-color: #0056b3;
+    }
+  </style>
 </head>
 
 <body>
-    <h1>Welcome to the Conference Management System</h1>
 
-    <!-- Login and Registration Links -->
-    <div>
-        <a href="{{ url_for('login') }}">Login</a> |
-        <a href="{{ url_for('register') }}">Register</a>
-    </div>
+  <h1>Vitajte v Konferenčnom systéme</h1>
 
-    <!-- List of Conferences -->
+  <!-- Login and Register Buttons -->
+  <div class="auth-buttons">
+    <a href="{{ url_for('login') }}">Login</a>
+    <a href="{{ url_for('register') }}">Register</a>
+  </div>
+
+  <!-- List of Conferences -->
+  <div class="conferences-container">
     <h2>Dostupné konferencie</h2>
     <ul>
-        {% for conference in conferences %}
-        <li>
-            <strong>{{ conference['name'] }}</strong><br>
-            <p>{{ conference['description'] }}</p>
-        </li>
-        {% endfor %}
+      {% for conference in conferences %}
+      <li class="conference-item">
+        <h3>{{ conference['name'] }}</h3>
+        <p>{{ conference['description'] }}</p>
+      </li>
+      {% endfor %}
     </ul>
+  </div>
+
 </body>
 
 </html>
