@@ -15,10 +15,7 @@
     {% if messages %}
     <ul>
         {% for category, message in messages %}
-    <li>
-        {{ message }}
-    </li>
-
+        <li>{{ message }}</li>
         {% endfor %}
     </ul>
     {% endif %}
@@ -36,8 +33,16 @@
         <button type="submit">Prihlásiť sa</button>
     </form>
     <br>
+
+    <!-- Odkaz na registráciu -->
     <a href="{{ url_for('register') }}">
         <button>Registrovať sa</button>
+    </a>
+
+    <!-- Odkaz na konferencie -->
+    <br><br>
+    <a href="{{ url_for('first_page') }}">
+        <button>Naspät na konferencie</button>
     </a>
 </body>
 

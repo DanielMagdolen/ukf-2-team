@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="sk">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Detail posudku</title>
+</head>
+
+<body>
+    <h2>Detail posudku pre: {{ work.title }}</h2>
+
+    <p><strong>Splnila práca cieľ?</strong> {{ review.goal }}</p>
+    <p><strong>Je práca metodologicky správna?</strong> {{ review.methodology }}</p>
+    <p><strong>Sú výsledky práce zrozumiteľné?</strong> {{ review.results }}</p>
+    <p><strong>Má práca praktickú hodnotu?</strong> {{ review.practical_value }}</p>
+    <p><strong>Je text práce gramaticky správny?</strong> {{ review.grammar }}</p>
+    <p><strong>Je práca štruktúrovaná prehľadne?</strong> {{ review.structure }}</p>
+    <p><strong>Sú všetky citácie uvedené správne?</strong> {{ review.citations }}</p>
+    <p><strong>Záverečné rozhodnutie:</strong> {{ review.decision }}</p>
+    </p>
+
+    <p><strong>Dátum pridania:</strong> {{ review.uploaded_at }}</p>
+
+    <a href="{{ url_for('recenzent_dashboard') }}">Späť na dashboard</a>
+</body>
+
+</html>
