@@ -213,6 +213,11 @@
                 <p>Fakulta: {{ work.faculty }}</p>
                 <p>Ročník: {{ work.year }}</p>
                 <a href="{{ work.file_path }}" target="_blank">Zobraziť súbor</a>
+                {% if work.review and work.review != "Posudok nebol pridaný" %}
+                <p><a href="{{ url_for('view_review_admin', work_id=work['_id']) }}">Pozrieť posudok</a></p>
+                {% else %}
+                <p>Posudok zatiaľ nebol pridaný.</p>
+                {% endif %}
             </div>
             {% endfor %}
         </div>

@@ -108,11 +108,9 @@
 <body>
     <div class="container">
         <!-- Dashboard Title -->
-        <h1>Vitajte v Dashboarde Recenzenta</h1>
-        <p>Toto je dashboard pre recenzentov.</p>
-
+        <h1>Vitajte v dashboarde recenzenta</h1>
         <!-- Priradené práce -->
-        <h2>Priradené Práce v tejto Konferencii:</h2>
+        <h2>Priradené práce pre Vás v tejto konferencii - {{ session['current_conference_name'] }}</h2>
         <div>
             {% if works %}
             {% for work in works %}
