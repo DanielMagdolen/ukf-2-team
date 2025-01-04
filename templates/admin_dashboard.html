@@ -26,7 +26,8 @@
             padding: 0 20px;
         }
 
-        h1, h3 {
+        h1,
+        h3 {
             color: #1a2516;
             text-align: center;
         }
@@ -100,7 +101,7 @@
             background-color: #2980b9;
         }
 
-        .work-item, .user-item {
+        .work-item {
             background-color: #fff;
             padding: 20px;
             margin-bottom: 20px;
@@ -117,7 +118,8 @@
             text-decoration: underline;
         }
 
-        .logout-link, .back-link {
+        .logout-link,
+        .back-link {
             display: block;
             text-align: center;
             margin-top: 20px;
@@ -126,25 +128,9 @@
             text-decoration: none;
         }
 
-        .logout-link:hover, .back-link:hover {
+        .logout-link:hover,
+        .back-link:hover {
             text-decoration: underline;
-        }
-
-        .message-list {
-            background-color: #ecf0f1;
-            padding: 15px;
-            border-radius: 5px;
-            margin-bottom: 20px;
-            list-style: none;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-        }
-
-        .message-list li {
-            padding: 10px;
-            background-color: #fff;
-            margin-bottom: 10px;
-            border-left: 4px solid #2ecc71;
-            font-size: 1.1rem;
         }
     </style>
 </head>
@@ -163,15 +149,15 @@
 
         <!-- Flash Messages -->
         {% with messages = get_flashed_messages(with_categories=true) %}
-            {% if messages %}
-            <div class="message-list">
-                <ul>
-                    {% for category, message in messages %}
-                    <li>{{ message }}</li>
-                    {% endfor %}
-                </ul>
-            </div>
-            {% endif %}
+        {% if messages %}
+        <div class="message-list">
+            <ul>
+                {% for category, message in messages %}
+                <li>{{ message }}</li>
+                {% endfor %}
+            </ul>
+        </div>
+        {% endif %}
         {% endwith %}
 
         <!-- Filtering Form -->
@@ -207,40 +193,52 @@
             <div class="work-item">
                 <p><strong>Konferencia:</strong> {{ work.conference_name }}</p>
                 <p><strong>Názov práce:</strong> {{ work.title }}</p>
-                <p>Študent: {{ work.full_name }}</p>
-                <p>Popis: {{ work.description }}</p>
-                <p>Škola: {{ work.school }}</p>
-                <p>Fakulta: {{ work.faculty }}</p>
-                <p>Ročník: {{ work.year }}</p>
-                <a href="{{ work.file_path }}" target="_blank">Zobraziť súbor</a>
+                <p><strong>Študent:</strong> {{ work.full_name }}</p>
+                <p><strong>Popis:</strong> {{ work.description }}</p>
+                <p><strong>Škola:</strong> {{ work.school }}</p>
+                <p><strong>Fakulta:</strong> {{ work.faculty }}</p>
+                <p><strong>Ročník:</strong> {{ work.year }}</p>
+
+                <!-- Recenzent -->
+                <p><strong>Recenzent:</strong>
+                    {% if work.reviewer_name %}
+                    {{ work.reviewer_name }}
+                    {% else %}
+                    Zatiaľ nebol priradený
+                    {% endif %}
+                </p>
+
+                <!-- Link to file -->
+                <p><a href="{{ work.file_path }}" target="_blank">Zobraziť súbor</a></p>
+
+                <!-- Link to review -->
                 {% if work.review and work.review != "Posudok nebol pridaný" %}
                 <p><a href="{{ url_for('view_review_admin', work_id=work['_id']) }}">Pozrieť posudok</a></p>
                 {% else %}
                 <p>Posudok zatiaľ nebol pridaný.</p>
                 {% endif %}
+
+                <!-- Form for Assigning Reviewer -->
+                <h4>Priradiť recenzenta:</h4>
+                <form method="POST" action="{{ url_for('assign_recenzent', work_id=work['_id']) }}">
+                    <label for="reviewer_id_{{ work['_id'] }}">Vyberte recenzenta:</label>
+                    <select name="reviewer_id" id="reviewer_id_{{ work['_id'] }}">
+                        <option value="" {% if not work.selected_reviewer_id %}selected{% endif %}>Vyberte recenzenta
+                        </option>
+                        {% for reviewer in reviewers %}
+                        <option value="{{ reviewer['_id'] }}" {% if work.selected_reviewer_id==reviewer['_id']
+                            %}selected{% endif %}>
+                            {{ reviewer['surname'] }} {{ reviewer['name'] }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                    <button type="submit">Priradiť recenzenta</button>
+                </form>
             </div>
             {% endfor %}
         </div>
         {% else %}
         <p>Žiadne práce neboli pridané.</p>
-        {% endif %}
-
-        <!-- Users Section -->
-        {% if users %}
-        <h3> Používatelia: </h3>
-        <div>
-            {% for user in users %}
-            <div class="user-item">
-                <p><strong> Meno: </strong> {{ user.name }}</p>
-                <p><strong> Priezvisko: </strong> {{ user.surname }}</p>
-                <p><strong> Email: </strong> {{ user.email }}</p>
-                <p><strong> Rola: </strong> {{ user.role }}</p>
-                <p><strong> Škola: </strong> {{ user.school }}</p>
-            </div>
-            {% endfor %}
-        </div>
-        {% else %}
-        <p> </p>
         {% endif %}
     </div>
 </body>

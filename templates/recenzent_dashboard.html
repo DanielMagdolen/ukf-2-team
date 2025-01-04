@@ -26,7 +26,8 @@
             padding: 0 20px;
         }
 
-        h1, h2 {
+        h1,
+        h2 {
             color: #1a2516;
             text-align: center;
         }
@@ -73,7 +74,8 @@
             margin-bottom: 10px;
         }
 
-        .logout-link, .back-link {
+        .logout-link,
+        .back-link {
             display: block;
             text-align: center;
             margin-top: 20px;
@@ -82,7 +84,8 @@
             text-decoration: none;
         }
 
-        .logout-link:hover, .back-link:hover {
+        .logout-link:hover,
+        .back-link:hover {
             text-decoration: underline;
         }
 
@@ -123,10 +126,24 @@
                 <p><strong>Dátum nahrania:</strong> {{ work.uploaded_at.strftime('%d.%m.%Y %H:%M:%S') }}</p>
                 <a href="{{ work.file_path }}" target="_blank">Zobraziť súbor</a><br>
 
-                <!-- Tlačidlo na recenziu -->
+                <!-- Kontrola existencie posudku pre danú prácu -->
+            <p><strong>Posudok:</strong>
+                {% if work.review %}
+                {{ work.review }}
+                <br>
+                <a href="{{ url_for('view_review_recenzent', work_id=work['_id']) }}">Zobraziť podrobnosti posudku</a>
+                {% else %}
+                Posudok ešte nebol pridaný.
+                {% endif %}
+            </p>
+
+
+                <!-- Tlačidlo na recenziu (pridať posudok) -->
+                {% if not work.review %}
                 <form method="POST" action="{{ url_for('review_redirect', work_id=work['_id']) }}">
                     <button type="submit" class="button">Pridať posudok</button>
                 </form>
+                {% endif %}
             </div>
             {% endfor %}
             {% else %}
@@ -135,10 +152,13 @@
         </div>
 
         <!-- Odhlásanie a predošlá strana -->
+        <!-- Login a predošlá strana -->
         <div class="auth-buttons">
             <a href="{{ url_for('logout') }}" class="logout-link">Odhlásiť sa</a>
-            <a href="{{ url_for('view_conferences') }}" class="back-link">Naspäť na konferencie</a>
+            <!-- Odkaz na recenzent dashboard -->
+            <a href="{{ url_for('view_conferences') }}" class="back-link">Späť na zoznam prác</a>
         </div>
+
     </div>
 </body>
 

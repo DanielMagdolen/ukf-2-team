@@ -125,15 +125,16 @@
                 <p><strong>Dátum nahrania:</strong> {{ work.uploaded_at.strftime('%d.%m.%Y %H:%M:%S') }}</p>
                 <a href="{{ work.file_path }}" target="_blank">Zobraziť Súbor</a><br>
 
-                <p><strong>Posudok:</strong>
-                    {% if work.review %}
-                    {{ work.review }}
-                    <br>
-                    <a href="{{ url_for('view_review', work_id=work['_id']) }}">Zobraziť podrobnosti posudku</a>
-                    {% else %}
-                    Posudok ešte nebol pridaný.
-                    {% endif %}
-                </p>
+            <p><strong>Posudok:</strong>
+                {% if work.review %}
+                {{ work.review }}
+                <br>
+                <a href="{{ url_for('view_review_student', work_id=work['_id']) }}">Zobraziť podrobnosti posudku</a>
+                {% else %}
+                Posudok ešte nebol pridaný.
+                {% endif %}
+            </p>
+
             </div>
             {% else %}
             <p>Žiadne práce na zobrazenie.</p>
@@ -143,9 +144,11 @@
         <!-- Login a predošlá strana -->
         <div class="auth-buttons">
             <a href="{{ url_for('logout') }}" class="logout-link">Odhlásiť sa</a>
-            <a href="{{ url_for('view_conferences') }}" class="back-link">Naspäť na konferencie</a>
+            <!-- Odkaz na recenzent dashboard -->
+            <a href="{{ url_for('view_conferences') }}" class="back-link">Späť na zoznam prác</a>
         </div>
-    </div>
+
+        </div>
 </body>
 
 </html>
