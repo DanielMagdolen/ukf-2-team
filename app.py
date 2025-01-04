@@ -217,15 +217,36 @@ def recenzent_dashboard():
     # Zobrazíme stránku s priradenými prácami
     return render_template('recenzent_dashboard.html', works=works)
 
-
-@app.route('/admin_dashboard', methods=['GET'])
+@app.route('/admin_dashboard', methods=['GET', 'POST'])
 def admin_dashboard():
     if 'user_id' not in session or session.get('role') != 'admin':
         flash('You must be logged in as an admin.', 'error')
         return redirect(url_for('login'))
 
+    if request.method == 'POST':
+        # Spracovanie formulára na aktualizáciu prác
+        work_id = request.form.get('work_id')
+        title = request.form.get('title')
+        description = request.form.get('description')
+        reviewer_id = request.form.get('reviewer_id')
+
+        # Aktualizácia práce v databáze
+        work = works_collection.find_one({"_id": ObjectId(work_id)})
+        if work:
+            update_data = {
+                "title": title,
+                "description": description,
+                "recenzent": ObjectId(reviewer_id) if reviewer_id else None
+            }
+            works_collection.update_one({"_id": ObjectId(work_id)}, {"$set": update_data})
+            flash('Work updated successfully!', 'success')
+        else:
+            flash('Work not found.', 'error')
+
+        return redirect(url_for('admin_dashboard'))
+
     # Načítanie konferencií, študentov a recenzentov pre dropdown menu
-    conferences = list(conferences_collection.find().sort("date", 1))  # Zmena na 'conference'
+    conferences = list(conferences_collection.find().sort("date", 1))
     users = list(users_collection.find())
     students = list(users_collection.find({"role": "student"}))
     reviewers = list(users_collection.find({"role": "recenzent"}))
@@ -241,35 +262,20 @@ def admin_dashboard():
     selected_student_id = request.args.get('student_id')
     selected_reviewer_id = request.args.get('reviewer_id')
 
-    # Ak nie je žiadny filter, použije sa prázdny objekt pre vyhľadávanie všetkých prác
     query = {"conference_id": ObjectId(session['current_conference_id'])}
-
-    # Filtrovanie podľa študenta, ak je zadané
     if selected_student_id:
         query['user_id'] = ObjectId(selected_student_id)
-
-    # Filtrovanie podľa recenzenta, ak je zadané
     if selected_reviewer_id:
         query['recenzent'] = ObjectId(selected_reviewer_id)
 
-    # Načítanie prác podľa filtrovaného dotazu
     works = list(works_collection.find(query))
-
-    # Načítanie mena študenta, recenzenta, posudku a názvu konferencie pre každú prácu
     for work in works:
-        # Meno študenta
         user = users_collection.find_one({"_id": ObjectId(work.get("user_id"))})
         work["full_name"] = f"{user.get('surname', '')} {user.get('name', '')}".strip() if user else "Neznámy"
-
-        # Meno recenzenta - rovnaký spôsob ako vo funkcii 'view_review_admin.html'
         reviewer = users_collection.find_one({"_id": ObjectId(work.get("recenzent"))}) if work.get("recenzent") else None
         work["reviewer_name"] = f"{reviewer.get('surname', '')} {reviewer.get('name', '')}".strip() if reviewer else "Nepriradený"
-
-        # Názov konferencie
         conference = conferences_collection.find_one({"_id": ObjectId(work.get("conference_id"))})
         work["conference_name"] = conference["name"] if conference else "Nepriradená konferencia"
-
-        # Získanie posudku pre danú prácu
         review = reviews_collection.find_one({"work_id": work['_id']})
         work["review"] = review['decision'] if review else "Posudok nebol pridaný"
 
@@ -282,6 +288,63 @@ def admin_dashboard():
         selected_student_id=selected_student_id,
         selected_reviewer_id=selected_reviewer_id
     )
+
+
+@app.route('/delete_work/<work_id>', methods=['POST'])
+def delete_work(work_id):
+    if 'user_id' not in session or session['role'] != 'admin':
+        flash('Nemáte oprávnenie na vymazanie práce.', 'error')
+        return redirect(url_for('admin_dashboard'))
+
+    # Vymazanie práce z databázy
+    result = works_collection.delete_one({'_id': ObjectId(work_id)})
+    if result.deleted_count > 0:
+        flash('Práca bola úspešne vymazaná.', 'success')
+    else:
+        flash('Práca nebola nájdená.', 'error')
+
+    return redirect(url_for('admin_dashboard'))
+
+@app.route('/edit_work/<work_id>', methods=['GET', 'POST'])
+def edit_work(work_id):
+    # Skontrolujte, či je používateľ prihlásený a má rolu 'admin'
+    if 'user_id' not in session or session.get('role') != 'admin':
+        flash('Nemáte oprávnenie na úpravu práce.', 'error')
+        return redirect(url_for('admin_dashboard'))
+
+    # Zaistíme, že work_id je validný ObjectId
+    try:
+        work = works_collection.find_one({"_id": ObjectId(work_id)})
+    except Exception as e:
+        flash('Neplatný ID formát.', 'error')
+        return redirect(url_for('admin_dashboard'))
+
+    if not work:
+        flash("Práca nebola nájdená.", "danger")
+        return redirect(url_for('admin_dashboard'))
+
+    if request.method == 'POST':
+        # Získame dáta z formulára a vykonáme úpravy
+        title = request.form['title']
+        description = request.form['description']
+        # Môžete pridať ďalšie polia podľa potreby
+
+        # Aktualizujeme prácu v databáze
+        try:
+            works_collection.update_one(
+                {"_id": ObjectId(work_id)},
+                {"$set": {"title": title, "description": description}}
+            )
+            flash("Práca bola úspešne upravená!", "success")
+            return redirect(url_for('admin_dashboard'))  # Presmerujeme späť na dashboard
+        except Exception as e:
+            flash("Došlo k chybe pri ukladaní zmien.", "danger")
+            return redirect(url_for('edit_work', work_id=work_id))  # Zostaneme na tej istej stránke v prípade chyby
+
+    # Ak je požiadavka GET, zobrazíme formulár pre úpravu
+    return render_template('edit_work.html', work=work)
+
+
 
 @app.route('/assign_recenzent/<work_id>', methods=['POST'])
 def assign_recenzent(work_id):
@@ -684,8 +747,7 @@ def delete_conference(conference_id):
     flash('Konferencia bola úspešne vymazaná.', 'success')
     return redirect(url_for('view_conferences'))
 
-from datetime import datetime
-from bson import ObjectId
+
 
 # Trasa na načítanie konferencie na úpravu
 @app.route('/edit_conference/<conference_id>', methods=['GET'])
