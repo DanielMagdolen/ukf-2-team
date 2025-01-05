@@ -5,6 +5,9 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Vitajte v Konferenčnom systéme</title>
+
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" rel="stylesheet">
+
   <style>
     * {
       margin: 0;
@@ -97,33 +100,66 @@
       background-color: #0056b3;
     }
 
-    /*Footer test*/
     footer {
-            background-color: #2c3e50; /* Dark background */
-            color: white;
-            padding: 20px;
-            text-align: center;
-            width: 100%;
-            margin-top: auto;
-        }
+      background-color: #2c3e50;
+      color: white;
+      padding: 20px;
+      width: 100%;
+      margin-top: auto;
+      font-size: 1rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
 
-        footer .contact-info {
-            font-size: 1rem;
-        }
+    footer .left-image {
+      flex: 1;
+      text-align: left;
+    }
 
-        footer .contact-info a {
-            color: #3498db; /* Blue color for links */
-            text-decoration: none;
-        }
+    footer .contact-info {
+      font-size: 1rem;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: left;
+      flex: 2;
+    }
 
-        footer .contact-info a:hover {
-            text-decoration: underline;
-        }
+    footer .social-icons {
+      flex: 1;
+      display: flex;
+      justify-content: flex-end;
+      gap: 20px;
+    }
 
-        footer p {
-            margin: 10px 0;
-        }
-        
+    footer .contact-info i {
+      margin-right: 10px;
+    }
+
+    footer .contact-info div {
+      margin-bottom: 10px;
+    }
+
+    footer .contact-info a {
+      color: #3498db;
+      text-decoration: none;
+    }
+
+    footer .contact-info a:hover {
+      text-decoration: underline;
+    }
+
+    footer .social-icons a {
+      color: white;
+      font-size: 30px;
+      text-decoration: none;
+      transition: color 0.3s ease;
+    }
+
+    footer .social-icons a:hover {
+      color: #3498db;
+    }
   </style>
 </head>
 
@@ -131,13 +167,11 @@
 
   <h1>Vitajte v Konferenčnom systéme</h1>
 
-  <!-- Login and Register Buttons -->
   <div class="auth-buttons">
     <a href="{{ url_for('login') }}">Login</a>
     <a href="{{ url_for('register') }}">Register</a>
   </div>
 
-  <!-- List of Conferences -->
   <div class="conferences-container">
     <h2>Dostupné konferencie</h2>
     <ul>
@@ -150,15 +184,40 @@
     </ul>
   </div>
 
-  <!-- Footer s kontaktami -->
-   <footer>
-    <div class="contact-info">
-      <p><strong>Kontakt</p>
-        <p>Email: <a href="mailto:admin@ukf.sk">Admin</a></p>
-        <p>Telefón: <a href="tel:+421000000000">+421 000 000 000</a></p>
-        <p>Adresa: <a href="https://maps.app.goo.gl/xbsYHRJh5tmQj82f9">Tr. A. Hlinku 1, 949 01 Nitra</a></p>
-
+  <footer>
+    <div class="left-image">
+      <img src="https://img.freepik.com/free-vector/bird-colorful-logo-gradient-vector_343694-1365.jpg" alt="Image" style="max-width: 100px; height: auto;">
     </div>
+  
+    <div class="contact-info">
+      <div>
+        <i class="fas fa-envelope"></i>
+        <span>Email: <a href="mailto:admin@ukf.sk">admin@ukf.sk</a></span>
+      </div>
+      <div>
+        <i class="fas fa-phone-alt"></i>
+        <span>Telefón: <a href="tel:+421000000000">+421 000 000 000</a></span>
+      </div>
+      <div>
+        <i class="fas fa-map-marker-alt"></i>
+        <span>Adresa: <a href="https://maps.app.goo.gl/xbsYHRJh5tmQj82f9" target="_blank">Tr. A. Hlinku 1, 949 01 Nitra</a></span>
+      </div>
+    </div>
+  
+    <div class="social-icons">
+      <a href="https://www.facebook.com/fpvai.ukf/" target="_blank">
+        <i class="fab fa-facebook-f"></i>
+      </a>
+      <a href="https://sk.linkedin.com/company/katedra-informatiky-fpv-ukf-v-nitre" target="_blank">
+        <i class="fab fa-linkedin-in"></i>
+      </a>
+      <a href="https://www.instagram.com/fpvai.ukf/" target="_blank">
+        <i class="fab fa-instagram"></i>
+      </a>
+    </div>
+  </footer>
+  
+
 </body>
 
 </html>
