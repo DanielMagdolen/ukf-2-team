@@ -110,6 +110,7 @@
       display: flex;
       justify-content: center;
       align-items: center;
+      gap: 20px;
     }
 
     footer .left-image {
@@ -164,6 +165,38 @@
     footer .social-icons a:hover {
       color: #3498db;
     }
+
+    @media (max-width: 768px) {
+      footer {
+        flex-direction: column;
+        align-items: center;
+        gap: 20px
+      }
+      footer .left-image,
+      footer .contact-info,
+      footer .social-icons {
+        flex: none;
+        width: 100%;
+        text-align: center;
+      }
+      footer .contact-info {
+        max-width: none;
+        padding-left: 0;
+        padding-right: 0;
+      }
+      footer .social-icons {
+        justify-content: center;
+      }
+    }
+    
+    @media (max-width: 480px) {
+      footer .social-icons {
+        gap: 10px;
+      }
+      footer .left-image img {
+        max-width: 80px;
+      }
+    }
   </style>
 </head>
 
@@ -190,7 +223,7 @@
 
   <footer>
     <div class="left-image">
-      <img src="https://www.fpvai.ukf.sk/images/logo/fpvai.png" alt="Image" style="max-width: 400px; height: auto;">
+      <img src="https://www.fpvai.ukf.sk/images/logo/fpvai.png" alt="Image" style="max-width: 280px; height: auto;">
     </div>
   
     <div class="contact-info">
