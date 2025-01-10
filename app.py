@@ -24,6 +24,7 @@ app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 client = pymongo.MongoClient(CONNECTION_STRING)
 db = client["school_submission_system"]
 users_collection = db["users"]
+roles_collection = db["roles"]
 works_collection = db["works"]
 reviews_collection = db["reviews"]
 conferences_collection = db["conferenc"]  # Correct collection name as 'conferenc'
@@ -71,30 +72,12 @@ def register():
             flash('S týmto emailom už je zaregistrovaný iný používateľ. Použite, prosím, iný email.', 'error')
             return redirect(url_for('register'))
 
-        # Bezpečnostné opatrenie, aby nemal možnosť prihlásiť sa do konferencie a pridať do nej prácu ktokoľvek a v prípade väčšieho počtu používateľov tak preplniť systém napríklad náhodnými súbormi, ktoré tam nepatria
-        # Zaregistrovanie sa pomocou univerzitného emailu automaticky zabezpečí priradenie role "student" alebo "reviewer" podľa domény emailu
-        # Používateľ sa môže zaregistrovať iným emailom, ale získa tak rolu "visitor" a kvôli bezpečnosti musí počkať, kým mu rolu priradí admin
-        domain_name = (email.split("@"))[1]
-        domain_name_found = False
-        domains = ["ukf", "uniba", "stuba", "bisla", "euba", "ku", "unipo", "uniag", "szu", "truni", "umb", "upjs", "ucm", "uvlf", "vsbm", "vsemba", "vsm", "ismpo", "uniza", "vsmu"]
-
-        for domain in domains: # Automatické priraďovanie role podľa doménového mena v emaili
-            if (domain_name == ("student." + domain + ".sk")):
-                domain_name_found = True
-                role = "student"
-            elif (domain_name == (domain + ".sk")):
-                domain_name_found = True
-                role = "recenzent"
-        if domain_name_found == False:
-            role = "visitor"
-
         # Save user to the database
         users_collection.insert_one({
             "surname": surname,
             "name": name,
             "email": email,
             "password": password,
-            "role": role,
             "school": school
         })
 
@@ -662,6 +645,8 @@ def view_review_recenzent(work_id):
 
 @app.route('/enter_conference/<conference_id>', methods=['POST'])
 def enter_conference(conference_id):
+    roles = list(roles_collection)
+    
     if 'user_id' not in session:
         flash('You must be logged in to enter a conference.', 'error')
         return redirect(url_for('login'))
@@ -675,16 +660,46 @@ def enter_conference(conference_id):
     session['current_conference_id'] = str(conference['_id'])
     session['current_conference_name'] = conference['name']
 
-    # Redirect based on user role
-    role = session['role']
-    if role == 'student':
+    role_found = False
+
+    for user_role in roles:
+        if (str(role['conference_id']) == session['current_conference_id']) and (role['user_id'] == session['user_id']):
+            role_found = True
+            current_role = user_role['role']
+    
+    if role_found == False:
+        # Bezpečnostné opatrenie, aby nemal možnosť vstúpiť do konferencie a pridať do nej prácu ktokoľvek a v prípade väčšieho počtu používateľov tak preplniť systém napríklad náhodnými súbormi, ktoré tam nepatria
+        # Zaregistrovanie sa pomocou univerzitného emailu automaticky zabezpečí priradenie role "student" pri vstupe do konferencie
+        # Používateľ sa môže zaregistrovať iným emailom, ale získa tak pri pokuse o vstup do konferencie rolu "visitor" a kvôli bezpečnosti musí počkať, kým mu inú rolu priradí admin
+        domain_name = (email.split("@"))[1]
+        domain_name_found = False
+        domains = ["ukf", "uniba", "stuba", "bisla", "euba", "ku", "unipo", "uniag", "szu", "truni", "umb", "upjs", "ucm", "uvlf", "vsbm", "vsemba", "vsm", "ismpo", "uniza", "vsmu"]
+
+        for domain in domains: # Automatické priraďovanie role podľa doménového mena v emaili
+            if (domain_name == ("student." + domain + ".sk")) or (domain_name == (domain + ".sk")):
+                domain_name_found = True
+                current_role = "student"
+        if domain_name_found == False:
+            current_role = "visitor"
+
+        roles_collection.insert_one({
+            "conference_id": ObjectId(session['current_conference_id']),
+            "user_id": ObjectId(session['user_id']),
+            "role": current_role
+        })
+
+    if current_role == "visitor":
+        return redirect(url_for('visitor_page'))
+    elif current_role == "student":
         return redirect(url_for('student_dashboard'))
-    elif role == 'recenzent':
+    elif current_role == "recenzent":
         return redirect(url_for('recenzent_dashboard'))
-    elif role == 'admin':
+    elif current_role == "recenzent, student":
+        return redirect(url_for('recenzent_student_dashboard'))
+    elif current_role == "admin":
         return redirect(url_for('admin_dashboard'))
     else:
-        flash('Unknown role.', 'error')
+        flash('Neznáma rola.', 'error')
         return redirect(url_for('view_conferences'))
     
 @app.route('/review_redirect/<work_id>', methods=['POST'])
