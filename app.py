@@ -695,7 +695,7 @@ def enter_conference(conference_id):
     elif current_role == "recenzent":
         return redirect(url_for('recenzent_dashboard'))
     elif current_role == "recenzent, student":
-        return redirect(url_for('recenzent_student_dashboard'))
+        return redirect(url_for('recenzent_dashboard'))
     elif current_role == "admin":
         return redirect(url_for('admin_dashboard'))
     else:
