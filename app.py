@@ -129,7 +129,7 @@ def view_conferences():
 
 @app.route('/student_dashboard')
 def student_dashboard():
-    if not is_logged_in('student'):
+    if 'user_id' not in session or ((session.get('role') != 'student') and (session.get('role') != 'recenzent, student')):
         return redirect(url_for('login'))
 
     user_id = ObjectId(session['user_id'])
@@ -158,7 +158,7 @@ def student_dashboard():
 
 @app.route('/recenzent_dashboard')
 def recenzent_dashboard():
-    if not is_logged_in('recenzent'):
+    if 'user_id' not in session or ((session.get('role') != 'recenzent') and (session.get('role') != 'recenzent, student')):
         return redirect(url_for('login'))
 
     # Získame ID recenzenta z relácie
@@ -388,7 +388,7 @@ def assign_recenzent(work_id):
 
 @app.route('/add_work', methods=['GET', 'POST'])
 def add_work():
-    if 'user_id' not in session or session.get('role') != 'student':
+    if 'user_id' not in session or ((session.get('role') != 'student') and (session.get('role') != 'recenzent, student')):
         flash('You must be logged in as a student.', 'error')
         return redirect(url_for('login'))
 
@@ -459,7 +459,7 @@ def add_work():
 @app.route('/add_review/<work_id>', methods=['GET', 'POST'])
 def add_review(work_id):
     # Overenie, či je používateľ prihlásený a má rolu recenzenta
-    if 'user_id' not in session or session.get('role') != 'recenzent':
+    if 'user_id' not in session or ((session.get('role') != 'recenzent') and (session.get('role') != 'recenzent, student')):
         flash('Musíte byť prihlásený ako recenzent.', 'error')
         return redirect(url_for('login'))
 
@@ -527,7 +527,7 @@ def add_review(work_id):
 
 @app.route('/view_review/<work_id>', methods=['GET'])
 def view_review(work_id):
-    if 'user_id' not in session or session.get('user_role') != 'student':
+    if 'user_id' not in session or ((session.get('role') != 'student') and (session.get('role') != 'recenzent, student')):
         flash('Musíte byť prihlásený ako študent.', 'error')
         return redirect(url_for('login'))
 
@@ -682,6 +682,8 @@ def enter_conference(conference_id):
         if domain_name_found == False:
             current_role = "visitor"
 
+        session['role'] = current_role
+
         roles_collection.insert_one({
             "conference_id": ObjectId(session['current_conference_id']),
             "user_id": ObjectId(session['user_id']),
@@ -706,7 +708,7 @@ def enter_conference(conference_id):
 def review_redirect(work_id):
     try:
         # Overenie, či je používateľ prihlásený a má rolu recenzenta
-        if 'user_id' not in session or session.get('role') != 'recenzent':
+        if 'user_id' not in session or ((session.get('role') != 'recenzent') and (session.get('role') != 'recenzent, student')):
             flash('Musíte byť prihlásený ako recenzent.', 'error')
             return redirect(url_for('login'))
 
