@@ -40,13 +40,10 @@ def allowed_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
 
-def is_logged_in(role=None):
-    """Check if user is logged in, optionally check for specific role."""
+def is_logged_in():
+    """ Skontrolovanie, či je používateľ prihlásený. """
     if 'user_id' not in session:
-        flash('You must be logged in to access this page.', 'error')
-        return False
-    if role and session.get('role') != role:
-        flash(f'You must be logged in as {role}.', 'error')
+        flash("Pre prístup na túto stránku sa musíte prihlásiť.", "error")
         return False
     return True
 
@@ -62,26 +59,26 @@ def first_page():
 @app.route('/register', methods=['GET', 'POST'])
 def register():
     if request.method == 'POST':
-        surname = request.form['surname']
         name = request.form['name']
+        surname = request.form['surname']
         email = request.form['email']
         password = request.form['password']
-        school = request.form['school']
+        school = request.from['school']
         # Skontrolovanie, či už nie je niekto so zadaným emailom zaregistrovaný
         if users_collection.find_one({'email': email}):
-            flash('S týmto emailom už je zaregistrovaný iný používateľ. Použite, prosím, iný email.', 'error')
+            flash("S týmto emailom už je zaregistrovaný iný používateľ. Použite, prosím, iný email.", "error")
             return redirect(url_for('register'))
 
         # Save user to the database
         users_collection.insert_one({
-            "surname": surname,
             "name": name,
+            "surname": surname,
             "email": email,
             "password": password,
             "school": school
         })
 
-        flash('Registration successful! You can now log in.', 'success')
+        flash("Boli ste úspešne zaregistrovaný/á!", "success")
         return redirect(url_for('login'))
 
     return render_template('register.html')
@@ -96,13 +93,9 @@ def login():
         if user and user['password'] == password:
             session['user_id'] = str(user['_id'])
             session['email'] = user['email']
-            session['role'] = user['role']
-            if session['role'] != "visitor":
-                return redirect(url_for('view_conferences')) 
-            else:
-                return redirect(url_for('visitor_page'))
+            return redirect(url_for('view_conferences')) 
         
-        flash('Incorrect login details!', 'error')
+        flash("Boli zadané nesprávne prihlasovacie údaje.", "error")
         return redirect(url_for('login'))
 
     return render_template('login.html')
@@ -110,7 +103,7 @@ def login():
 @app.route('/logout')
 def logout():
     session.clear()
-    flash('You have been logged out.', 'success')
+    flash("Boli ste odhlásený/á.", "success")
     return redirect(url_for('login'))
 
 @app.route('/visitor_page')
@@ -121,7 +114,7 @@ def visitor_page():
 @app.route('/view_conferences')
 def view_conferences():
     if 'user_id' not in session:
-        flash('You must be logged in to access this page.', 'error')
+        flash("Pre prístup na túto stránku sa musíte prihlásiť.", "error")
         return redirect(url_for('login'))
 
     conferences = list(conferences_collection.find().sort("date", 1))  # Načítanie konferencií
@@ -135,7 +128,7 @@ def student_dashboard():
     user_id = ObjectId(session['user_id'])
 
     if 'current_conference_id' not in session:
-        flash('Please select a conference to enter.', 'error')
+        flash("Vyberte si, prosím, konferenciu, do ktorej chcete vstúpiť.", "error")
         return redirect(url_for('view_conferences'))
 
     conference_id = session['current_conference_id']
@@ -166,7 +159,7 @@ def recenzent_dashboard():
 
     # Skontrolujeme, či je recenzent prihlásený do konferencie
     if 'current_conference_id' not in session:
-        flash('Please select a conference to view your assigned works.', 'error')
+        flash("Vyberte si, prosím, konferenciu na zobrazenie vašich priradených prác.", "error")
         return redirect(url_for('view_conferences'))
 
     # Získame ID aktuálnej konferencie
@@ -203,7 +196,7 @@ def recenzent_dashboard():
 @app.route('/admin_dashboard', methods=['GET', 'POST'])
 def admin_dashboard():
     if 'user_id' not in session or session.get('role') != 'admin':
-        flash('You must be logged in as an admin.', 'error')
+        flash("Musíte byť prihlásený/á ako admin.", "error")
         return redirect(url_for('login'))
 
     if request.method == 'POST':
@@ -222,9 +215,9 @@ def admin_dashboard():
                 "recenzent": ObjectId(reviewer_id) if reviewer_id else None
             }
             works_collection.update_one({"_id": ObjectId(work_id)}, {"$set": update_data})
-            flash('Work updated successfully!', 'success')
+            flash("Práca bola úspešne aktualizovaná.", "success")
         else:
-            flash('Work not found.', 'error')
+            flash("Práca nebola nájdená.", "error")
 
         return redirect(url_for('admin_dashboard'))
 
@@ -282,24 +275,24 @@ def delete_work(work_id):
     # Vymazanie práce z databázy
     result = works_collection.delete_one({'_id': ObjectId(work_id)})
     if result.deleted_count > 0:
-        flash('Práca bola úspešne vymazaná.', 'success')
+        flash("Práca bola úspešne vymazaná.", "success")
     else:
-        flash('Práca nebola nájdená.', 'error')
+        flash("Práca nebola nájdená.", "error")
 
     return redirect(url_for('admin_dashboard'))
 
 @app.route('/edit_work/<work_id>', methods=['GET', 'POST'])
 def edit_work(work_id):
-    # Skontrolujte, či je používateľ prihlásený a má rolu 'admin'
+    # Skontrolovanie, či je používateľ prihlásený a má rolu 'admin'
     if 'user_id' not in session or session.get('role') != 'admin':
-        flash('Nemáte oprávnenie na úpravu práce.', 'error')
+        flash("Nemáte oprávnenie na úpravu tejto práce.", "error")
         return redirect(url_for('admin_dashboard'))
 
     # Zaistíme, že work_id je validný ObjectId
     try:
         work = works_collection.find_one({"_id": ObjectId(work_id)})
     except Exception as e:
-        flash('Neplatný ID formát.', 'error')
+        flash("Neplatný ID formát.", "error")
         return redirect(url_for('admin_dashboard'))
 
     if not work:
@@ -318,10 +311,10 @@ def edit_work(work_id):
                 {"_id": ObjectId(work_id)},
                 {"$set": {"title": title, "description": description}}
             )
-            flash("Práca bola úspešne upravená!", "success")
+            flash("Práca bola úspešne upravená.", "success")
             return redirect(url_for('admin_dashboard'))  # Presmerujeme späť na dashboard
         except Exception as e:
-            flash("Došlo k chybe pri ukladaní zmien.", "danger")
+            flash("Nastala chyba pri ukladaní zmien.", "danger")
             return redirect(url_for('edit_work', work_id=work_id))  # Zostaneme na tej istej stránke v prípade chyby
 
     # Ak je požiadavka GET, zobrazíme formulár pre úpravu
@@ -332,19 +325,19 @@ def edit_work(work_id):
 @app.route('/assign_recenzent/<work_id>', methods=['POST'])
 def assign_recenzent(work_id):
     if 'user_id' not in session or session.get('role') != 'admin':
-        flash('You must be logged in as an admin.', 'error')
+        flash("Musíte byť prihlásený/á ako admin.", "error")
         return redirect(url_for('login'))
 
     reviewer_id = request.form.get('reviewer_id')  # Získame ID recenzenta z formulára
 
     if not reviewer_id:
-        flash('Please select a reviewer.', 'error')
+        flash("Vyberte, prosím, recenzenta.", "error")
         return redirect(url_for('admin_dashboard'))
 
     # Uistíme sa, že recenzent existuje
     reviewer = users_collection.find_one({'_id': ObjectId(reviewer_id), 'role': 'recenzent'})
     if not reviewer:
-        flash('Recenzent neexistuje.', 'error')
+        flash("Recenzent neexistuje.", "error")
         return redirect(url_for('admin_dashboard'))
 
     # Aktualizujeme prácu a priradíme recenzenta
@@ -354,9 +347,9 @@ def assign_recenzent(work_id):
     )
 
     if result.modified_count > 0:
-        flash('Recenzent bol úspešne priradený k práci.', 'success')
+        flash("Recenzent bol úspešne priradený k práci.", "success")
     else:
-        flash('Chyba pri priraďovaní recenzenta.', 'error')
+        flash("Nastala chyba pri priraďovaní recenzenta.", "error")
 
     return redirect(url_for('admin_dashboard'))
 
@@ -379,7 +372,7 @@ def assign_recenzent(work_id):
             work["full_name"] = "Unknown"
 
     if not works:
-        flash('No works have been added.', 'error')
+        flash("Neboli pridané žiadne práce.", "error")
 
     return render_template('admin_dashboard.html', works=works)
 
@@ -389,14 +382,14 @@ def assign_recenzent(work_id):
 @app.route('/add_work', methods=['GET', 'POST'])
 def add_work():
     if 'user_id' not in session or ((session.get('role') != 'student') and (session.get('role') != 'recenzent, student')):
-        flash('You must be logged in as a student.', 'error')
+        flash("Musíte byť prihlásený/á ako študent.", "error")
         return redirect(url_for('login'))
 
     # Získanie aktuálnej konferencie zo session
     current_conference_id = session.get('current_conference_id')
 
     if not current_conference_id:
-        flash('You must be enrolled in a conference first.', 'error')
+        flash("Najprv je potrebné vybrať si konferenciu.", "error")
         return redirect(url_for('view_conferences'))  # Ak nie je vybraná konferencia, presmeruj na výber
 
     if request.method == 'POST':
@@ -411,7 +404,7 @@ def add_work():
 
         # Validácia súboru
         if not file or not allowed_file(file.filename):
-            flash('Invalid or missing file. Allowed types: pdf, doc, docx', 'error')
+            flash("Neplatný alebo chýbajúci súbor. Povolené formáty: pdf, doc, docx", "error")
             return redirect(url_for('add_work'))
 
         try:
@@ -433,18 +426,18 @@ def add_work():
                 "uploaded_at": datetime.utcnow()
             })
 
-            flash('Work has been successfully added to the selected conference!', 'success')
+            flash("Práca bola úspešne pridaná do vybranej konferencie.", "success")
             return redirect(url_for('student_dashboard'))
 
         except Exception as e:
             logging.error(f"Error adding work: {e}")
-            flash('An error occurred while adding your work. Please try again later.', 'error')
+            flash("Nastala chyba pri pridávaní vašej práce. Skúste, prosím, opäť neskôr.", "error")
             return redirect(url_for('add_work'))
 
     # Získanie informácií o konferencii zo session pre predvyplnenie
     conferences = list(conferences_collection.find({"_id": ObjectId(current_conference_id)}))
     if not conferences:
-        flash('No conferences available to add work to.', 'error')
+        flash("Nie sú dostupné konferencie, do ktorých by sa dala pridať práca.", "error")
         return redirect(url_for('student_dashboard'))
 
     # Vypísanie konferencie pre zobrazenie v šablóne
@@ -460,13 +453,13 @@ def add_work():
 def add_review(work_id):
     # Overenie, či je používateľ prihlásený a má rolu recenzenta
     if 'user_id' not in session or ((session.get('role') != 'recenzent') and (session.get('role') != 'recenzent, student')):
-        flash('Musíte byť prihlásený ako recenzent.', 'error')
+        flash("Musíte byť prihlásený/á ako recenzent.", "error")
         return redirect(url_for('login'))
 
     # Načítanie práce podľa ID
     work = works_collection.find_one({'_id': ObjectId(work_id)})
     if not work:
-        flash('Práca neexistuje.', 'error')
+        flash("Práca neexistuje.", "error")
         return redirect(url_for('recenzent_dashboard'))
 
     # Načítanie posudku pre aktuálneho recenzenta a prácu
@@ -486,7 +479,7 @@ def add_review(work_id):
 
         # Overenie, či bol nahraný súbor
         if not file or not allowed_file(file.filename):
-            flash('Neplatný alebo chýbajúci súbor. Podporované formáty: pdf, doc, docx', 'error')
+            flash("Neplatný alebo chýbajúci súbor. Povolené formáty: pdf, doc, docx", "error")
             return redirect(url_for('add_review', work_id=work_id))
 
         try:
@@ -514,12 +507,12 @@ def add_review(work_id):
             # Uloženie posudku do databázy
             reviews_collection.insert_one(review_data)
 
-            flash('Posudok bol úspešne pridaný k práci!', 'success')
+            flash("Posudok bol úspešne pridaný k práci.", "success")
             return redirect(url_for('recenzent_dashboard'))
 
         except Exception as e:
             logging.error(f"Error adding review: {e}")
-            flash('Nastala chyba pri pridávaní vášho posudku. Skúste, prosím, opäť neskôr.', 'error')
+            flash("Nastala chyba pri pridávaní vášho posudku. Skúste, prosím, opäť neskôr.", "error")
             return redirect(url_for('add_review', work_id=work_id))
 
     # Zobrazenie formulára na pridanie posudku (GET žiadosť)
@@ -528,18 +521,18 @@ def add_review(work_id):
 @app.route('/view_review/<work_id>', methods=['GET'])
 def view_review(work_id):
     if 'user_id' not in session or ((session.get('role') != 'student') and (session.get('role') != 'recenzent, student')):
-        flash('Musíte byť prihlásený ako študent.', 'error')
+        flash("Musíte byť prihlásený/á ako študent.", "error")
         return redirect(url_for('login'))
 
     # Získame detail práce podľa ID
     work = works_collection.find_one({'_id': ObjectId(work_id)})
     if not work:
-        flash('Práca neexistuje.', 'error')
+        flash("Práca neexistuje.", "error")
         return redirect(url_for('student_dashboard'))  # Ak práca neexistuje, presmerujeme na dashboard
 
     # Overenie prístupových práv
     if str(work['user_id']) != str(session['user_id']):
-        flash('Nemáte prístup k tomuto posudku.', 'error')
+        flash("Nemáte prístup k tomuto posudku.", "error")
         return redirect(url_for('student_dashboard'))
 
     # Získame posudok pre danú prácu
@@ -555,18 +548,18 @@ def view_review(work_id):
 @app.route('/view_review_student/<work_id>', methods=['GET'])
 def view_review_student(work_id):
     if 'user_id' not in session:
-        flash('Musíte byť prihlásený.', 'error')
+        flash("Musíte byť prihlásený/á.", "error")
         return redirect(url_for('login'))
 
     # Získame informácie o práci
     work = works_collection.find_one({'_id': ObjectId(work_id)})
     if not work:
-        flash('Práca neexistuje.', 'error')
+        flash("Práca neexistuje.", "error")
         return redirect(url_for('student_dashboard'))  # Ak práca neexistuje, presmerujeme na dashboard
 
     # Overíme, že tento študent má právo vidieť tento posudok
     if str(work['user_id']) != str(session['user_id']):
-        flash('Nemáte prístup k tomuto posudku.', 'error')
+        flash("Nemáte prístup k tomuto posudku.", "error")
         return redirect(url_for('student_dashboard'))
 
     # Získame posudok pre danú prácu
@@ -583,19 +576,19 @@ def view_review_student(work_id):
 @app.route('/view_review_admin/<work_id>', methods=['GET'])
 def view_review_admin(work_id):
     if 'user_id' not in session:
-        flash('Musíte byť prihlásený.', 'error')
+        flash("Musíte byť prihlásený/á.", "error")
         return redirect(url_for('login'))
 
     # Skontrolujeme, či je prihlásený používateľ administrátor (predpokladajme, že používateľ má atribút 'role')
     user = users_collection.find_one({'_id': ObjectId(session['user_id'])})
     if not user or user['role'] != 'admin':
-        flash('Nemáte prístup k tomuto posudku.', 'error')
+        flash("Nemáte prístup k tomuto posudku.", "error")
         return redirect(url_for('admin_dashboard'))  # Ak nie je administrátor, presmerujeme na admin dashboard
 
     # Získanie detailov o práci
     work = works_collection.find_one({'_id': ObjectId(work_id)})
     if not work:
-        flash('Práca neexistuje.', 'error')
+        flash("Práca neexistuje.", "error")
         return redirect(url_for('admin_dashboard'))  # Ak práca neexistuje, presmerujeme na dashboard
 
     # Získanie posudku k práci
@@ -616,19 +609,19 @@ def view_review_admin(work_id):
 @app.route('/view_review_recenzent/<work_id>', methods=['GET'])
 def view_review_recenzent(work_id):
     if 'user_id' not in session:
-        flash('Musíte byť prihlásený.', 'error')
+        flash("Musíte byť prihlásený/á.", "error")
         return redirect(url_for('login'))
 
     # Získame informácie o práci
     work = works_collection.find_one({'_id': ObjectId(work_id)})
     if not work:
-        flash('Práca neexistuje.', 'error')
+        flash("Práca neexistuje.", "error")
         return redirect(url_for('recenzent_dashboard'))  # Ak práca neexistuje, presmerujeme na dashboard
 
     # Skontrolujeme, že recenzent je priradený k tejto práci
     reviewer_id = str(session['user_id'])
     if 'recenzent' not in work or str(work['recenzent']) != reviewer_id:
-        flash('Nemáte prístup k tomuto posudku.', 'error')
+        flash("Nemáte prístup k tomuto posudku.", "error")
         return redirect(url_for('recenzent_dashboard'))
 
     # Získame posudok pre danú prácu
@@ -648,12 +641,12 @@ def enter_conference(conference_id):
     roles = list(roles_collection)
     
     if 'user_id' not in session:
-        flash('You must be logged in to enter a conference.', 'error')
+        flash("Musíte sa prihlásiť, aby ste vedeli vstúpiť do konferencie.", "error")
         return redirect(url_for('login'))
 
     conference = conferences_collection.find_one({"_id": ObjectId(conference_id)})
     if not conference:
-        flash('Conference not found.', 'error')
+        flash("Konferencia nebola nájdená.", "error")
         return redirect(url_for('view_conferences'))
 
     # Save conference info in session
@@ -701,7 +694,7 @@ def enter_conference(conference_id):
     elif current_role == "admin":
         return redirect(url_for('admin_dashboard'))
     else:
-        flash('Neznáma rola.', 'error')
+        flash("Neznáma rola.", "error")
         return redirect(url_for('view_conferences'))
     
 @app.route('/review_redirect/<work_id>', methods=['POST'])
@@ -709,7 +702,7 @@ def review_redirect(work_id):
     try:
         # Overenie, či je používateľ prihlásený a má rolu recenzenta
         if 'user_id' not in session or ((session.get('role') != 'recenzent') and (session.get('role') != 'recenzent, student')):
-            flash('Musíte byť prihlásený ako recenzent.', 'error')
+            flash("Musíte byť prihlásený/á ako recenzent.", "error")
             return redirect(url_for('login'))
 
         # Načítanie posudku pre aktuálneho recenzenta a prácu
@@ -727,7 +720,7 @@ def review_redirect(work_id):
 
     except Exception as e:
         logging.error(f"Error in review_redirect: {e}")
-        flash('Došlo k chybe pri spracovaní požiadavky. Skúste to prosím neskôr.', 'error')
+        flash("Nastala chyba pri spracovaní požiadavky. Skúste, prosím, opäť neskôr.", "error")
         return redirect(url_for('recenzent_dashboard'))
 
 
@@ -747,7 +740,7 @@ def create_conference():
         }
         conferences_collection.insert_one(new_conference)
 
-        flash('Konferencia bola úspešne vytvorená!', 'success')
+        flash("Konferencia bola úspešne vytvorená.", "success")
         return redirect(url_for('view_conferences'))
 
     return render_template('create_conference.html')
@@ -755,13 +748,13 @@ def create_conference():
 @app.route('/delete_conference/<conference_id>', methods=['POST'])
 def delete_conference(conference_id):
     if 'user_id' not in session or session['role'] != 'admin':
-        flash('Nemáte oprávnenie na vymazanie konferencie.', 'error')
+        flash("Nemáte oprávnenie na vymazanie konferencie.", "error")
         return redirect(url_for('view_conferences'))
 
     # Vymazanie konferencie z databázy
     conferences_collection.delete_one({'_id': ObjectId(conference_id)})
 
-    flash('Konferencia bola úspešne vymazaná.', 'success')
+    flash("Konferencia bola úspešne vymazaná.", "success")
     return redirect(url_for('view_conferences'))
 
 
@@ -770,13 +763,13 @@ def delete_conference(conference_id):
 @app.route('/edit_conference/<conference_id>', methods=['GET'])
 def edit_conference(conference_id):
     if 'user_id' not in session or session['role'] != 'admin':
-        flash('Nemáte oprávnenie na úpravu konferencie.', 'error')
+        flash("Nemáte oprávnenie na úpravu konferencie.", "error")
         return redirect(url_for('view_conferences'))
 
     # Načítanie konferencie z databázy
     conference = conferences_collection.find_one({'_id': ObjectId(conference_id)})
     if not conference:
-        flash('Konferencia sa nenašla.', 'error')
+        flash("Konferencia nebola nájdená.", "error")
         return redirect(url_for('view_conferences'))
 
     return render_template('edit_conference.html', conference=conference)
@@ -785,7 +778,7 @@ def edit_conference(conference_id):
 @app.route('/update_conference/<conference_id>', methods=['POST'])
 def update_conference(conference_id):
     if 'user_id' not in session or session['role'] != 'admin':
-        flash('Nemáte oprávnenie na úpravu konferencie.', 'error')
+        flash("Nemáte oprávnenie na úpravu konferencie.", "error")
         return redirect(url_for('view_conferences'))
 
     # Získanie údajov z formulára
@@ -799,7 +792,7 @@ def update_conference(conference_id):
         {'$set': {'name': name, 'description': description, 'date': date}}
     )
 
-    flash('Konferencia bola úspešne upravená.', 'success')
+    flash("Konferencia bola úspešne upravená.", "success")
     return redirect(url_for('view_conferences'))
 
 
