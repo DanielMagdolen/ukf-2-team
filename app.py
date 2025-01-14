@@ -320,7 +320,37 @@ def edit_work(work_id):
     # Ak je požiadavka GET, zobrazíme formulár pre úpravu
     return render_template('edit_work.html', work=work)
 
+@app.route('/edit_role/<role_id>', methods=['GET', 'POST'])
+def edit_role(role_id):
+    if 'user_id' not in session or session.get('role') != 'admin':
+        flash("Nemáte oprávnenie na zmenu role.", "error")
+        return redirect(url_for('admin_dashboard'))
 
+    try:
+        user_role = roles_collection.find_one({"_id": ObjectId(role_id)})
+    except Exception as e:
+        flash("Neplatný ID formát.", "error")
+        return redirect(url_for('admin_dashboard'))
+
+    if not user_role:
+        flash("Rola nebola nájdená.", "danger")
+        return redirect(url_for('admin_dashboard'))
+
+    if request.method == 'POST':
+        role = request.form['role']
+
+        try:
+            roles_collection.update_one(
+                {"_id": ObjectId(role_id)},
+                {"$set": {"role": role}}
+            )
+            flash("Rola bola úspešne zmenená.", "success")
+            return redirect(url_for('admin_dashboard'))
+        except Exception as e:
+            flash("Nastala chyba pri menení role.", "danger")
+            return redirect(url_for('edit_role', role_id=role_id))
+
+    return render_template('edit_role.html', role=role)
 
 @app.route('/assign_recenzent/<work_id>', methods=['POST'])
 def assign_recenzent(work_id):
