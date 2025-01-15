@@ -329,74 +329,23 @@ def add_work():
 
 
 
-@app.route('/add_review/<work_id>', methods=['GET', 'POST'])
-def add_review(work_id):
-    # Overenie, či je používateľ prihlásený a má rolu recenzenta
-    if 'user_id' not in session or ((session.get('role') != 'recenzent') and (session.get('role') != 'recenzent, student')):
-        flash("Musíte byť prihlásený/á ako recenzent.", "error")
-        return redirect(url_for('login'))
 
-    # Načítanie práce podľa ID
-    work = works_collection.find_one({'_id': ObjectId(work_id)})
-    if not work:
-        flash("Práca neexistuje.", "error")
-        return redirect(url_for('recenzent_dashboard'))
 
-    # Načítanie posudku pre aktuálneho recenzenta a prácu
-    existing_review = reviews_collection.find_one({
-        "user_id": ObjectId(session['user_id']),
-        "work_id": ObjectId(work_id)
-    })
 
-    # Ak už existuje posudok, zobrazí sa iba posudok
-    if existing_review:
-        return render_template('view_review.html', review=existing_review, work=work)
 
-    # Spracovanie formulára (POST žiadosť)
-    if request.method == 'POST':
-        file = request.files.get('file')
-        decision = request.form.get('decision')
 
-        # Overenie, či bol nahraný súbor
-        if not file or not allowed_file(file.filename):
-            flash("Neplatný alebo chýbajúci súbor. Povolené formáty: pdf, doc, docx", "error")
-            return redirect(url_for('add_review', work_id=work_id))
 
-        try:
-            # Uloženie súboru na server
-            filename = secure_filename(file.filename)
-            file_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
-            file.save(file_path)
 
-            # Uloženie posudku do databázy
-            review_data = {
-                "user_id": ObjectId(session['user_id']),  # ID recenzenta
-                "work_id": ObjectId(work_id),  # ID priradenej práce
-                "goal": request.form['goal'],
-                "methodology": request.form['methodology'],
-                "results": request.form['results'],
-                "practical_value": request.form['practical_value'],
-                "grammar": request.form['grammar'],
-                "structure": request.form['structure'],
-                "citations": request.form['citations'],
-                "decision": decision,  # Záverečné rozhodnutie
-                "file_path": file_path,  # Cesta k súboru
-                "uploaded_at": datetime.utcnow()  # Čas nahratia
-            }
 
-            # Uloženie posudku do databázy
-            reviews_collection.insert_one(review_data)
 
-            flash("Posudok bol úspešne pridaný k práci.", "success")
-            return redirect(url_for('recenzent_dashboard'))
 
-        except Exception as e:
-            logging.error(f"Error adding review: {e}")
-            flash("Nastala chyba pri pridávaní vášho posudku. Skúste, prosím, opäť neskôr.", "error")
-            return redirect(url_for('add_review', work_id=work_id))
 
-    # Zobrazenie formulára na pridanie posudku (GET žiadosť)
-    return render_template('add_review.html', work=work)
+
+
+
+
+
+
 
 @app.route('/view_review/<work_id>', methods=['GET'])
 def view_review(work_id):
@@ -517,31 +466,7 @@ def view_review_recenzent(work_id):
 
 
 
-@app.route('/review_redirect/<work_id>', methods=['POST'])
-def review_redirect(work_id):
-    try:
-        # Overenie, či je používateľ prihlásený a má rolu recenzenta
-        if 'user_id' not in session or ((session.get('role') != 'recenzent') and (session.get('role') != 'recenzent, student')):
-            flash("Musíte byť prihlásený/á ako recenzent.", "error")
-            return redirect(url_for('login'))
 
-        # Načítanie posudku pre aktuálneho recenzenta a prácu
-        existing_review = reviews_collection.find_one({
-            "user_id": ObjectId(session['user_id']),
-            "work_id": ObjectId(work_id)
-        })
-
-        # Ak už existuje posudok, presmerujeme na stránku na zobrazenie detailov posudku
-        if existing_review:
-            return redirect(url_for('view_review_recenzent', work_id=work_id))
-
-        # Ak posudok neexistuje, presmerujeme na stránku pre pridanie posudku
-        return redirect(url_for('add_review', work_id=work_id))
-
-    except Exception as e:
-        logging.error(f"Error in review_redirect: {e}")
-        flash("Nastala chyba pri spracovaní požiadavky. Skúste, prosím, opäť neskôr.", "error")
-        return redirect(url_for('recenzent_dashboard'))
 
 
 @app.route('/create_conference', methods=['GET', 'POST'])
@@ -716,51 +641,67 @@ def get_reviewers_for_conference(conference_id):
     users = db.users.find({"_id": {"$in": reviewer_ids}})
     
     return users
-
-
-
-
-@app.route('/assign_recenzent/<work_id>', methods=['POST'])
+@app.route('/assign_recenzent/<work_id>', methods=['GET', 'POST'])
 def assign_recenzent(work_id):
     # Skontrolujeme, či je prihlásený admin
     if 'user_id' not in session or session.get('role') != 'admin':
         flash("Musíte byť prihlásený/á ako admin.", "error")
         return redirect(url_for('login'))
 
-    reviewer_id = request.form.get('reviewer_id')  # Získame ID recenzenta z formulára
-
-    if not reviewer_id:
-        flash("Vyberte, prosím, recenzenta.", "error")
+    # Načítame prácu podľa work_id
+    work = works_collection.find_one({'_id': ObjectId(work_id)})
+    if not work:
+        flash("Práca so zadaným ID neexistuje.", "error")
         return redirect(url_for('admin_dashboard'))
 
-    # Debugging: vypíšeme získané ID recenzenta
-    print(f"Prijaté ID recenzenta: {reviewer_id}")
-
-    # Skontrolujeme, či recenzent existuje v kolekcii roles
-    role = roles_collection.find_one({
-        'user_id': ObjectId(reviewer_id),
+    # Načítame všetkých recenzentov z kolekcie roles
+    reviewers = roles_collection.find({
         'role': {'$in': ['recenzent', 'recenzent,student']}
     })
 
-    # Debugging: vypíšeme rolu recenzenta
-    print(f"Získaná rola: {role}")
+    # Pre každý recenzent získaj meno a priezvisko z kolekcie users
+    reviewer_data = []
+    seen_reviewers = set()  # Na sledovanie už pridaných recenzentov
 
-    if not role:
-        flash("Recenzent neexistuje alebo nemá správnu rolu.", "error")
+    for reviewer in reviewers:
+        user_id = reviewer['user_id']
+        
+        # Skontroluj, či už tento recenzent bol pridaný
+        if user_id not in seen_reviewers:
+            user = users_collection.find_one({'_id': user_id})
+            if user:
+                reviewer_data.append({
+                    'user_id': user_id,
+                    'name': user.get('name', 'N/A'),
+                    'surname': user.get('surname', 'N/A')
+                })
+                seen_reviewers.add(user_id)  # Pridaj recenzenta do množiny
+
+    # Ak je to POST požiadavka, spracujeme formulár
+    if request.method == 'POST':
+        reviewer_id = request.form.get('reviewer_id')
+
+        # Skontrolujeme, či je vybrané ID recenzenta
+        if not reviewer_id:
+            flash("Vyberte, prosím, recenzenta.", "error")
+            return redirect(url_for('assign_recenzent', work_id=work_id))
+
+        # Uložíme recenzenta k práci
+        result = works_collection.update_one(
+            {'_id': ObjectId(work_id)},
+            {'$set': {'recenzent': ObjectId(reviewer_id)}}
+        )
+
+        if result.modified_count > 0:
+            flash("Recenzent bol úspešne priradený k práci.", "success")
+        else:
+            flash("Nastala chyba pri priraďovaní recenzenta.", "error")
+
         return redirect(url_for('admin_dashboard'))
 
-    # Aktualizujeme prácu a priradíme recenzenta
-    result = works_collection.update_one(
-        {'_id': ObjectId(work_id)},
-        {'$set': {'recenzent': ObjectId(reviewer_id)}}
-    )
+    # Ak je to GET požiadavka, zobrazíme stránku
+    return render_template('assign_recenzent.html', work=work, reviewers=reviewer_data)
 
-    if result.modified_count > 0:
-        flash("Recenzent bol úspešne priradený k práci.", "success")
-    else:
-        flash("Nastala chyba pri priraďovaní recenzenta.", "error")
-
-    return redirect(url_for('admin_dashboard'))
 
 
 
@@ -938,6 +879,156 @@ def register():
         return redirect(url_for('login'))  # Po registrácii presmeruj na prihlásenie
 
     return render_template('register.html')
+
+
+@app.route('/view_review_rec_stud/<work_id>', methods=['GET'])
+def view_review_rec_stud(work_id):
+    try:
+        # Skontrolujeme, či je používateľ prihlásený
+        if 'user_id' not in session:
+            flash("Musíte byť prihlásený/á.", "error")
+            return redirect(url_for('login'))
+
+        # Získame informácie o práci
+        work = works_collection.find_one({"_id": ObjectId(work_id)})
+        if not work:
+            flash("Práca neexistuje.", "error")
+            return redirect(url_for('rec_stud_dashboard'))  # Ak práca neexistuje, presmerujeme na dashboard
+
+        # Skontrolujeme, akú rolu má používateľ
+        user_role = session.get('role')
+
+        # Ak má používateľ rolu "recenzent", skontrolujeme, či je priradený k tejto práci
+        if 'recenzent' in user_role:
+            reviewer_id = str(session['user_id'])
+            if 'recenzent' not in work or str(work['recenzent']) != reviewer_id:
+                flash("Nemáte prístup k tomuto posudku.", "error")
+                return redirect(url_for('rec_stud_dashboard'))  # Ak recenzent nie je priradený, presmerujeme
+
+        # Získame posudok pre danú prácu
+        review = reviews_collection.find_one({'work_id': ObjectId(work_id), 'user_id': ObjectId(session['user_id'])})
+
+        if review:
+            work['review'] = review
+        else:
+            work['review'] = None  # Ak posudok neexistuje
+
+        # Rozhodneme, ktorú šablónu zobraziť podľa roly používateľa
+        if 'recenzent' in user_role:
+            return render_template('view_review_recenzent.html', work=work, review=review)
+        elif 'recenzent,student' in user_role:
+            return render_template('view_review_rec_stud.html', work=work, review=review)
+
+    except Exception as e:
+        logging.error(f"Chyba pri načítaní posudku: {e}")
+        flash("Nastala chyba pri načítaní posudku. Skúste to znova.", "error")
+        return redirect(url_for('rec_stud_dashboard'))
+
+
+
+# Funkcia pre presmerovanie na stránku s posudkom
+@app.route('/review_redirect/<work_id>', methods=['POST'])
+def review_redirect(work_id):
+    try:
+        # Overenie, či je používateľ prihlásený a má rolu recenzenta alebo recenzenta-študenta
+        if 'user_id' not in session or (session.get('role') not in ['recenzent', 'recenzent,student']):
+            flash("Musíte byť prihlásený/á ako recenzent.", "error")
+            return redirect(url_for('login'))
+
+        # Načítanie posudku pre aktuálneho používateľa
+        existing_review = reviews_collection.find_one({
+            "user_id": ObjectId(session['user_id']),
+            "work_id": ObjectId(work_id)
+        })
+
+        if existing_review:
+            if 'recenzent' in session['role']:
+                return redirect(url_for('view_review_recenzent', work_id=work_id))
+            elif 'recenzent,student' in session['role']:
+                return redirect(url_for('view_review_rec_stud', work_id=work_id))
+
+        return redirect(url_for('add_review', work_id=work_id))
+
+    except Exception as e:
+        logging.error(f"Error in review_redirect: {e}")
+        flash("Nastala chyba pri spracovaní požiadavky. Skúste to znova.", "error")
+        return redirect(url_for('recenzent_dashboard'))
+
+
+@app.route('/add_review/<work_id>', methods=['GET', 'POST'])
+def add_review(work_id):
+    # Logovanie hodnoty roly
+    print(f"User role: {session.get('role')}")
+
+    # Overenie, či je používateľ prihlásený a má rolu recenzenta alebo recenzenta,študenta
+    if 'user_id' not in session or (session.get('role') not in ['recenzent', 'recenzent,student']):
+        flash("Musíte byť prihlásený/á ako recenzent.", "error")
+        return redirect(url_for('login'))
+
+    # Načítanie práce podľa ID
+    work = works_collection.find_one({'_id': ObjectId(work_id)})
+    if not work:
+        flash("Práca neexistuje.", "error")
+        return redirect(url_for('recenzent_dashboard'))
+
+    # Načítanie posudku pre aktuálneho recenzenta a prácu
+    existing_review = reviews_collection.find_one({
+        "user_id": ObjectId(session['user_id']),
+        "work_id": ObjectId(work_id)
+    })
+
+    # Ak už existuje posudok, zobrazí sa iba posudok
+    if existing_review:
+        return render_template('view_review.html', review=existing_review, work=work)
+
+    # Spracovanie formulára (POST žiadosť)
+    if request.method == 'POST':
+        file = request.files.get('file')
+        decision = request.form.get('decision')
+
+        # Overenie, či bol nahraný súbor
+        if not file or not allowed_file(file.filename):
+            flash("Neplatný alebo chýbajúci súbor. Povolené formáty: pdf, doc, docx", "error")
+            return redirect(url_for('add_review', work_id=work_id))
+
+        try:
+            # Uloženie súboru na server
+            filename = secure_filename(file.filename)
+            file_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+            file.save(file_path)
+
+            # Uloženie posudku do databázy
+            review_data = {
+                "user_id": ObjectId(session['user_id']),  # ID recenzenta
+                "work_id": ObjectId(work_id),  # ID priradenej práce
+                "goal": request.form['goal'],
+                "methodology": request.form['methodology'],
+                "results": request.form['results'],
+                "practical_value": request.form['practical_value'],
+                "grammar": request.form['grammar'],
+                "structure": request.form['structure'],
+                "citations": request.form['citations'],
+                "decision": decision,  # Záverečné rozhodnutie
+                "file_path": file_path,  # Cesta k súboru
+                "uploaded_at": datetime.utcnow()  # Čas nahratia
+            }
+
+            # Uloženie posudku do databázy
+            reviews_collection.insert_one(review_data)
+
+            flash("Posudok bol úspešne pridaný k práci.", "success")
+            return redirect(url_for('recenzent_dashboard'))
+
+        except Exception as e:
+            logging.error(f"Error adding review: {e}")
+            flash("Nastala chyba pri pridávaní vášho posudku. Skúste, prosím, opäť neskôr.", "error")
+            return redirect(url_for('add_review', work_id=work_id))
+
+    # Zobrazenie formulára na pridanie posudku (GET žiadosť)
+    return render_template('add_review.html', work=work)
+
+
+
 
 
 if __name__ == '__main__':

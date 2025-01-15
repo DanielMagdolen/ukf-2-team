@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="sk">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Posudok - Recenzent, Študent</title>
+    <link href="{{ url_for('static', filename='style_css/student_dashboard.css') }}" rel="stylesheet">
+</head>
+
+<body>
+    <div class="container">
+        <h1>Posudok pre Vašu Prácu: {{ work.title }}</h1>
+
+        <!-- Zobrazenie roly používateľa -->
+        
+
+        <div class="work-details">
+            <p><strong>Študent:</strong> {{ work.student_name }}</p>
+            <p><strong>Popis Práce:</strong> {{ work.description }}</p>
+            <p><strong>Škola:</strong> {{ work.school }}</p>
+            <p><strong>Fakulta:</strong> {{ work.faculty }}</p>
+            <p><strong>Dátum Nahratia:</strong> {{ work.uploaded_at.strftime('%d.%m.%Y %H:%M:%S') }}</p>
+            <p><strong>Priložený súbor:</strong> <a href="{{ work.file_path }}" target="_blank">Zobraziť Súbor</a></p>
+        </div>
+
+        <div class="review-details">
+            <h2>Posudok</h2>
+            <p><strong>Text Posudku:</strong> {{ review.text }}</p>
+            <p><strong>Rozhodnutie:</strong> {{ review.decision }}</p>
+            <p><strong>Dátum Posudku:</strong> {{ review.created_at.strftime('%d.%m.%Y %H:%M:%S') }}</p>
+
+            {% if review.file_path %}
+            <p><strong>Priložený súbor k posudku:</strong> <a href="{{ review.file_path }}" target="_blank">Zobraziť
+                    súbor</a></p>
+            {% else %}
+            <p><strong>Žiadny súbor priložený k posudku.</strong></p>
+            {% endif %}
+        </div>
+
+        <!-- Odkaz na návrat na dashboard podľa roly -->
+        <div class="actions">
+            {% if 'recenzent' in session['role'] %}
+            <a href="{{ url_for('recenzent_dashboard') }}" class="back-link">Naspäť na Recenzent Dashboard</a>
+            {% elif 'recenzent,student' in session['role'] %}
+            <a href="{{ url_for('rec_stud_dashboard') }}" class="back-link">Naspäť na Dashboard</a>
+            {% else %}
+            <a href="{{ url_for('login') }}" class="back-link">Naspäť na Prihlásenie</a>
+            {% endif %}
+        </div>
+
+    </div>
+</body>
+
+</html>

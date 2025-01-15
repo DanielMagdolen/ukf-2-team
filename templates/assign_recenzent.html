@@ -1,22 +1,52 @@
-<!DOCTYPE html lang="sk">
-  <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title> Priradenie recenzenta </title>
-  </head>
-  <body>
-    <div>
-      <h2> Priradenie recenzenta k práci </h2>
-      <form action="" method="post">
-        {% if users %}
-          {% for user in users %}
-            <input type="radio" id="{{ user.surname }}" name="recenzent" value="{{ user.surname }}" />
-          {% endfor %}
-          <input type="submit" value="Priradiť" />
-        {% else %}
-          <p> Nenašli sa recenzenti na priradenie. </p>
-        {% endif %}
-      </form>
-    </div>
-  </body>
+<!-- assign_recenzent.html -->
+<!DOCTYPE html>
+<html lang="sk">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Priradiť recenzenta</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style_css/admin_dashboard.css') }}">
+</head>
+
+<body>
+  <div class="container">
+    <h3>Priradiť recenzenta k práci: {{ work.title }}</h3>
+
+    <!-- Zobrazíme chybové alebo úspešné správy -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+    <ul>
+      {% for category, message in messages %}
+      <li class="{{ category }}">{{ message }}</li>
+      {% endfor %}
+    </ul>
+    {% endif %}
+    {% endwith %}
+
+<h4>Priradiť recenzenta:</h4>
+<form method="POST" action="{{ url_for('assign_recenzent', work_id=work['_id']) }}">
+  <label for="reviewer_id_{{ work['_id'] }}">Vyberte recenzenta:</label>
+  <select name="reviewer_id" id="reviewer_id_{{ work['_id'] }}">
+    <option value="" {% if not work.selected_reviewer_id %}selected{% endif %}>Vyberte recenzenta</option>
+    {% for reviewer in reviewers %}
+    <option value="{{ reviewer['user_id'] }}" {% if work.selected_reviewer_id==reviewer['user_id'] %}selected{% endif
+      %}>
+      {{ reviewer['surname'] }} {{ reviewer['name'] }}
+    </option>
+    {% endfor %}
+  </select>
+  <button type="submit">Priradiť recenzenta</button>
+</form>
+
+
+
+
+
+    <!-- Odkaz na späť na admin_dashboard -->
+    <br>
+    <a href="{{ url_for('admin_dashboard') }}">Späť na administrátorský panel</a>
+  </div>
+</body>
+
 </html>

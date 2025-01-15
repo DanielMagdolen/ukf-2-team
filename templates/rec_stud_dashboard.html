@@ -12,6 +12,7 @@
     <div class="container">
         <!-- Zobrazenie názvu konferencie -->
         <h1>Vitajte v konferencii: {{ session['current_conference_name'] }}</h1>
+        <p><strong>Vaša rola:</strong> {{ session.get('role', 'Nezistené') }}</p>
         <div class="auth-buttons">
             <a href="{{ url_for('add_work') }}" class="back-link">Pridať Prácu</a>
             <a href="{{ url_for('logout') }}" class="logout-link">Odhlásiť sa</a>
@@ -63,7 +64,7 @@
                     {% if work.review %}
                     {{ work.review }}
                     <br>
-                    <a href="{{ url_for('view_review_reviewer', work_id=work['_id']) }}">Zobraziť podrobnosti
+                    <a href="{{ url_for('view_review_rec_stud', work_id=work['_id']) }}">Zobraziť podrobnosti
                         posudku</a>
                     {% else %}
                     Posudok ešte nebol pridaný.

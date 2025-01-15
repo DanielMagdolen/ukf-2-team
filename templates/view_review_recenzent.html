@@ -18,11 +18,31 @@
     <p><strong>Je práca štruktúrovaná prehľadne?</strong> {{ review.structure }}</p>
     <p><strong>Sú všetky citácie uvedené správne?</strong> {{ review.citations }}</p>
     <p><strong>Záverečné rozhodnutie:</strong> {{ review.decision }}</p>
-    </p>
-
     <p><strong>Dátum pridania:</strong> {{ review.uploaded_at }}</p>
 
-    <a href="{{ url_for('recenzent_dashboard') }}">Späť na dashboard</a>
+<div class="actions">
+    {% set roles = session['role'].split(',') %}
+
+    {% if 'recenzent' in roles and 'student' in roles %}
+    <!-- Ak máš rolu "recenzent" aj "student" (kombinovaná rola) -->
+    <a href="{{ url_for('rec_stud_dashboard') }}">Späť na RecStud Dashboard</a>
+
+    {% elif 'recenzent' in roles %}
+    <!-- Ak máš rolu len "recenzent" -->
+    <a href="{{ url_for('recenzent_dashboard') }}">Späť na Recenzent Dashboard</a>
+
+    {% elif 'student' in roles %}
+    <!-- Ak máš rolu len "student" -->
+    <a href="{{ url_for('student_dashboard') }}">Späť na Dashboard</a>
+
+    {% else %}
+    <!-- Ak nie je žiadna rola alebo rola nie je rozpoznaná -->
+    <a href="{{ url_for('login') }}">Späť na Prihlásenie</a>
+    {% endif %}
+</div>
+
+
+
 </body>
 
 </html>
