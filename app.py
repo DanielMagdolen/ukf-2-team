@@ -56,32 +56,6 @@ def first_page():
     conferences = list(conferences_collection.find().sort("date", 1))  # Fetching conferences
     return render_template('first_page.html', conferences=conferences)
 
-@app.route('/register', methods=['GET', 'POST'])
-def register():
-    if request.method == 'POST':
-        name = request.form['name']
-        surname = request.form['surname']
-        email = request.form['email']
-        password = request.form['password']
-        school = request.from['school']
-        # Skontrolovanie, či už nie je niekto so zadaným emailom zaregistrovaný
-        if users_collection.find_one({'email': email}):
-            flash("S týmto emailom už je zaregistrovaný iný používateľ. Použite, prosím, iný email.", "error")
-            return redirect(url_for('register'))
-
-        # Save user to the database
-        users_collection.insert_one({
-            "name": name,
-            "surname": surname,
-            "email": email,
-            "password": password,
-            "school": school
-        })
-
-        flash("Boli ste úspešne zaregistrovaný/á!", "success")
-        return redirect(url_for('login'))
-
-    return render_template('register.html')
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
@@ -117,12 +91,23 @@ def view_conferences():
         flash("Pre prístup na túto stránku sa musíte prihlásiť.", "error")
         return redirect(url_for('login'))
 
+    # Získanie aktuálnej role z databázy
+    role_entry = roles_collection.find_one({
+        "user_id": ObjectId(session['user_id'])
+    })
+
+    if role_entry:
+        session['role'] = role_entry['role']
+    else:
+        session['role'] = 'visitor'
+
     conferences = list(conferences_collection.find().sort("date", 1))  # Načítanie konferencií
     return render_template('view_conferences.html', conferences=conferences)
 
+
 @app.route('/student_dashboard')
 def student_dashboard():
-    if 'user_id' not in session or ((session.get('role') != 'student') and (session.get('role') != 'recenzent, student')):
+    if 'user_id' not in session or ((session.get('role') != 'student') and (session.get('role') != 'recenzent,student')):
         return redirect(url_for('login'))
 
     user_id = ObjectId(session['user_id'])
@@ -151,7 +136,7 @@ def student_dashboard():
 
 @app.route('/recenzent_dashboard')
 def recenzent_dashboard():
-    if 'user_id' not in session or ((session.get('role') != 'recenzent') and (session.get('role') != 'recenzent, student')):
+    if 'user_id' not in session or ((session.get('role') != 'recenzent') and (session.get('role') != 'recenzent,student')):
         return redirect(url_for('login'))
 
     # Získame ID recenzenta z relácie
@@ -193,77 +178,6 @@ def recenzent_dashboard():
     # Zobrazíme stránku s priradenými prácami
     return render_template('recenzent_dashboard.html', works=works)
 
-@app.route('/admin_dashboard', methods=['GET', 'POST'])
-def admin_dashboard():
-    if 'user_id' not in session or session.get('role') != 'admin':
-        flash("Musíte byť prihlásený/á ako admin.", "error")
-        return redirect(url_for('login'))
-
-    if request.method == 'POST':
-        # Spracovanie formulára na aktualizáciu prác
-        work_id = request.form.get('work_id')
-        title = request.form.get('title')
-        description = request.form.get('description')
-        reviewer_id = request.form.get('reviewer_id')
-
-        # Aktualizácia práce v databáze
-        work = works_collection.find_one({"_id": ObjectId(work_id)})
-        if work:
-            update_data = {
-                "title": title,
-                "description": description,
-                "recenzent": ObjectId(reviewer_id) if reviewer_id else None
-            }
-            works_collection.update_one({"_id": ObjectId(work_id)}, {"$set": update_data})
-            flash("Práca bola úspešne aktualizovaná.", "success")
-        else:
-            flash("Práca nebola nájdená.", "error")
-
-        return redirect(url_for('admin_dashboard'))
-
-    # Načítanie konferencií, študentov a recenzentov pre dropdown menu
-    conferences = list(conferences_collection.find().sort("date", 1))
-    users = list(users_collection.find())
-    students = list(users_collection.find({"role": "student"}))
-    reviewers = list(users_collection.find({"role": "recenzent"}))
-    
-    for conference in conferences:
-        conference["_id"] = str(conference["_id"])
-    for student in students:
-        student["_id"] = str(student["_id"])
-    for reviewer in reviewers:
-        reviewer["_id"] = str(reviewer["_id"])
-
-    # Získanie vybraného študenta a recenzenta z URL parametrov
-    selected_student_id = request.args.get('student_id')
-    selected_reviewer_id = request.args.get('reviewer_id')
-
-    query = {"conference_id": ObjectId(session['current_conference_id'])}
-    if selected_student_id:
-        query['user_id'] = ObjectId(selected_student_id)
-    if selected_reviewer_id:
-        query['recenzent'] = ObjectId(selected_reviewer_id)
-
-    works = list(works_collection.find(query))
-    for work in works:
-        user = users_collection.find_one({"_id": ObjectId(work.get("user_id"))})
-        work["full_name"] = f"{user.get('surname', '')} {user.get('name', '')}".strip() if user else "Neznámy"
-        reviewer = users_collection.find_one({"_id": ObjectId(work.get("recenzent"))}) if work.get("recenzent") else None
-        work["reviewer_name"] = f"{reviewer.get('surname', '')} {reviewer.get('name', '')}".strip() if reviewer else "Nepriradený"
-        conference = conferences_collection.find_one({"_id": ObjectId(work.get("conference_id"))})
-        work["conference_name"] = conference["name"] if conference else "Nepriradená konferencia"
-        review = reviews_collection.find_one({"work_id": work['_id']})
-        work["review"] = review['decision'] if review else "Posudok nebol pridaný"
-
-    return render_template(
-        'admin_dashboard.html',
-        works=works,
-        conferences=conferences,
-        students=students,
-        reviewers=reviewers,
-        selected_student_id=selected_student_id,
-        selected_reviewer_id=selected_reviewer_id
-    )
 
 
 @app.route('/delete_work/<work_id>', methods=['POST'])
@@ -320,69 +234,6 @@ def edit_work(work_id):
     # Ak je požiadavka GET, zobrazíme formulár pre úpravu
     return render_template('edit_work.html', work=work)
 
-@app.route('/edit_role/<role_id>', methods=['GET', 'POST'])
-def edit_role(role_id):
-    if 'user_id' not in session or session.get('role') != 'admin':
-        flash("Nemáte oprávnenie na zmenu role.", "error")
-        return redirect(url_for('admin_dashboard'))
-
-    try:
-        user_role = roles_collection.find_one({"_id": ObjectId(role_id)})
-    except Exception as e:
-        flash("Neplatný ID formát.", "error")
-        return redirect(url_for('admin_dashboard'))
-
-    if not user_role:
-        flash("Rola nebola nájdená.", "danger")
-        return redirect(url_for('admin_dashboard'))
-
-    if request.method == 'POST':
-        role = request.form['role']
-
-        try:
-            roles_collection.update_one(
-                {"_id": ObjectId(role_id)},
-                {"$set": {"role": role}}
-            )
-            flash("Rola bola úspešne zmenená.", "success")
-            return redirect(url_for('admin_dashboard'))
-        except Exception as e:
-            flash("Nastala chyba pri menení role.", "danger")
-            return redirect(url_for('edit_role', role_id=role_id))
-
-    return render_template('edit_role.html', role=role)
-
-@app.route('/assign_recenzent/<work_id>', methods=['POST'])
-def assign_recenzent(work_id):
-    if 'user_id' not in session or session.get('role') != 'admin':
-        flash("Musíte byť prihlásený/á ako admin.", "error")
-        return redirect(url_for('login'))
-
-    reviewer_id = request.form.get('reviewer_id')  # Získame ID recenzenta z formulára
-
-    if not reviewer_id:
-        flash("Vyberte, prosím, recenzenta.", "error")
-        return redirect(url_for('admin_dashboard'))
-
-    # Uistíme sa, že recenzent existuje
-    reviewer = users_collection.find_one({'_id': ObjectId(reviewer_id), 'role': 'recenzent'})
-    if not reviewer:
-        flash("Recenzent neexistuje.", "error")
-        return redirect(url_for('admin_dashboard'))
-
-    # Aktualizujeme prácu a priradíme recenzenta
-    result = works_collection.update_one(
-        {'_id': ObjectId(work_id)},
-        {'$set': {'recenzent': ObjectId(reviewer_id)}}
-    )
-
-    if result.modified_count > 0:
-        flash("Recenzent bol úspešne priradený k práci.", "success")
-    else:
-        flash("Nastala chyba pri priraďovaní recenzenta.", "error")
-
-    return redirect(url_for('admin_dashboard'))
-
 
 
 
@@ -406,47 +257,39 @@ def assign_recenzent(work_id):
 
     return render_template('admin_dashboard.html', works=works)
 
-
-
-
 @app.route('/add_work', methods=['GET', 'POST'])
 def add_work():
-    if 'user_id' not in session or ((session.get('role') != 'student') and (session.get('role') != 'recenzent, student')):
+    if 'user_id' not in session or ((session.get('role') != 'student') and (session.get('role') != 'recenzent,student')):
         flash("Musíte byť prihlásený/á ako študent.", "error")
         return redirect(url_for('login'))
 
-    # Získanie aktuálnej konferencie zo session
     current_conference_id = session.get('current_conference_id')
 
     if not current_conference_id:
         flash("Najprv je potrebné vybrať si konferenciu.", "error")
-        return redirect(url_for('view_conferences'))  # Ak nie je vybraná konferencia, presmeruj na výber
+        return redirect(url_for('view_conferences'))
 
     if request.method == 'POST':
-        # Získanie údajov z formulára
         title = request.form.get('title')
         description = request.form.get('description')
         school = request.form.get('school')
         faculty = request.form.get('faculty')
         year = request.form.get('year')
-        conference_id = current_conference_id  # Automaticky vyplnená konferencia zo session
+        conference_id = current_conference_id
         file = request.files.get('file')
 
-        # Validácia súboru
         if not file or not allowed_file(file.filename):
             flash("Neplatný alebo chýbajúci súbor. Povolené formáty: pdf, doc, docx", "error")
             return redirect(url_for('add_work'))
 
         try:
-            # Uloženie súboru na server
             filename = secure_filename(file.filename)
             file_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
             file.save(file_path)
 
-            # Vloženie práce do databázy vrátane conference_id
             works_collection.insert_one({
                 "user_id": ObjectId(session['user_id']),
-                "conference_id": ObjectId(conference_id),  # Prepojenie s konferenciou
+                "conference_id": ObjectId(conference_id),
                 "title": title,
                 "description": description,
                 "school": school,
@@ -457,23 +300,30 @@ def add_work():
             })
 
             flash("Práca bola úspešne pridaná do vybranej konferencie.", "success")
-            return redirect(url_for('student_dashboard'))
+            
+            # Presmerovanie na správny dashboard podľa role
+            if session.get('role') == 'recenzent,student':
+                return redirect(url_for('rec_stud_dashboard'))
+            else:
+                return redirect(url_for('student_dashboard'))
 
         except Exception as e:
             logging.error(f"Error adding work: {e}")
             flash("Nastala chyba pri pridávaní vašej práce. Skúste, prosím, opäť neskôr.", "error")
             return redirect(url_for('add_work'))
 
-    # Získanie informácií o konferencii zo session pre predvyplnenie
     conferences = list(conferences_collection.find({"_id": ObjectId(current_conference_id)}))
     if not conferences:
         flash("Nie sú dostupné konferencie, do ktorých by sa dala pridať práca.", "error")
         return redirect(url_for('student_dashboard'))
 
-    # Vypísanie konferencie pre zobrazenie v šablóne
     conference_name = conferences[0]['name'] if conferences else 'Unknown Conference'
 
     return render_template('add_work.html', conferences=conferences, selected_conference_id=current_conference_id, conference_name=conference_name)
+
+
+
+
 
 
 
@@ -550,7 +400,7 @@ def add_review(work_id):
 
 @app.route('/view_review/<work_id>', methods=['GET'])
 def view_review(work_id):
-    if 'user_id' not in session or ((session.get('role') != 'student') and (session.get('role') != 'recenzent, student')):
+    if 'user_id' not in session or ((session.get('role') != 'student') and (session.get('role') != 'recenzent,student')):
         flash("Musíte byť prihlásený/á ako študent.", "error")
         return redirect(url_for('login'))
 
@@ -666,67 +516,7 @@ def view_review_recenzent(work_id):
 
 
 
-@app.route('/enter_conference/<conference_id>', methods=['POST'])
-def enter_conference(conference_id):
-    roles = list(roles_collection)
-    
-    if 'user_id' not in session:
-        flash("Musíte sa prihlásiť, aby ste vedeli vstúpiť do konferencie.", "error")
-        return redirect(url_for('login'))
 
-    conference = conferences_collection.find_one({"_id": ObjectId(conference_id)})
-    if not conference:
-        flash("Konferencia nebola nájdená.", "error")
-        return redirect(url_for('view_conferences'))
-
-    # Save conference info in session
-    session['current_conference_id'] = str(conference['_id'])
-    session['current_conference_name'] = conference['name']
-
-    role_found = False
-
-    for user_role in roles:
-        if (str(role['conference_id']) == session['current_conference_id']) and (role['user_id'] == session['user_id']):
-            role_found = True
-            current_role = user_role['role']
-    
-    if role_found == False:
-        # Bezpečnostné opatrenie, aby nemal možnosť vstúpiť do konferencie a pridať do nej prácu ktokoľvek a v prípade väčšieho počtu používateľov tak preplniť systém napríklad náhodnými súbormi, ktoré tam nepatria
-        # Zaregistrovanie sa pomocou univerzitného emailu automaticky zabezpečí priradenie role "student" pri vstupe do konferencie
-        # Používateľ sa môže zaregistrovať iným emailom, ale získa tak pri pokuse o vstup do konferencie rolu "visitor" a kvôli bezpečnosti musí počkať, kým mu inú rolu priradí admin
-        domain_name = (email.split("@"))[1]
-        domain_name_found = False
-        domains = ["ukf", "uniba", "stuba", "bisla", "euba", "ku", "unipo", "uniag", "szu", "truni", "umb", "upjs", "ucm", "uvlf", "vsbm", "vsemba", "vsm", "ismpo", "uniza", "vsmu"]
-
-        for domain in domains: # Automatické priraďovanie role podľa doménového mena v emaili
-            if (domain_name == ("student." + domain + ".sk")) or (domain_name == (domain + ".sk")):
-                domain_name_found = True
-                current_role = "student"
-        if domain_name_found == False:
-            current_role = "visitor"
-
-        session['role'] = current_role
-
-        roles_collection.insert_one({
-            "conference_id": ObjectId(session['current_conference_id']),
-            "user_id": ObjectId(session['user_id']),
-            "role": current_role
-        })
-
-    if current_role == "visitor":
-        return redirect(url_for('visitor_page'))
-    elif current_role == "student":
-        return redirect(url_for('student_dashboard'))
-    elif current_role == "recenzent":
-        return redirect(url_for('recenzent_dashboard'))
-    elif current_role == "recenzent, student":
-        return redirect(url_for('recenzent_dashboard'))
-    elif current_role == "admin":
-        return redirect(url_for('admin_dashboard'))
-    else:
-        flash("Neznáma rola.", "error")
-        return redirect(url_for('view_conferences'))
-    
 @app.route('/review_redirect/<work_id>', methods=['POST'])
 def review_redirect(work_id):
     try:
@@ -825,7 +615,329 @@ def update_conference(conference_id):
     flash("Konferencia bola úspešne upravená.", "success")
     return redirect(url_for('view_conferences'))
 
+@app.route('/enter_conference/<conference_id>', methods=['POST'])
+def enter_conference(conference_id):
+    if 'user_id' not in session:
+        flash("Musíte sa prihlásiť, aby ste vedeli vstúpiť do konferencie.", "error")
+        return redirect(url_for('login'))
 
+    conference = conferences_collection.find_one({"_id": ObjectId(conference_id)})
+    if not conference:
+        flash("Konferencia nebola nájdená.", "error")
+        return redirect(url_for('view_conferences'))
+
+    session['current_conference_id'] = str(conference['_id'])
+    session['current_conference_name'] = conference['name']
+
+    roles = roles_collection.find({
+        "conference_id": ObjectId(session['current_conference_id']),
+        "user_id": ObjectId(session['user_id'])
+    })
+
+    roles_list = [role['role'] for role in roles]
+    current_role = "visitor"  # Predvolená rola
+
+    if "admin" in roles_list:
+        current_role = "admin"
+    elif "recenzent,student" in roles_list:
+        current_role = "recenzent,student"
+    elif "student" in roles_list:
+        current_role = "student"
+    elif "recenzent" in roles_list:
+        current_role = "recenzent"
+
+    session['role'] = current_role
+
+    # Presmerovanie na základe aktuálnej role
+    if current_role == "visitor":
+        return redirect(url_for('visitor_page'))
+    elif current_role == "student":
+        return redirect(url_for('student_dashboard'))
+    elif current_role == "recenzent":
+        return redirect(url_for('recenzent_dashboard'))
+    elif current_role == "recenzent,student":
+        return redirect(url_for('rec_stud_dashboard'))
+    elif current_role == "admin":
+        return redirect(url_for('admin_dashboard'))
+    else:
+        flash("Neznáma rola.", "error")
+        return redirect(url_for('view_conferences'))
+    
+@app.route('/rec_stud_dashboard')
+def rec_stud_dashboard():
+    if 'user_id' not in session or session.get('role') not in ['recenzent', 'recenzent,student']:
+        flash("Musíte byť prihlásený/á ako recenzent alebo študent.", "error")
+        return redirect(url_for('login'))
+
+    user_id = ObjectId(session['user_id'])
+    conference_id = ObjectId(session['current_conference_id'])
+
+    if not conference_id:
+        flash("Nie je vybraná žiadna konferencia.", "error")
+        return redirect(url_for('view_conferences'))
+
+    # Získanie prác priradených recenzentovi
+    reviewer_works = list(works_collection.find({
+        "recenzent": user_id,
+        "conference_id": conference_id
+    }))
+
+    # Získanie prác nahraných študentom
+    student_works = list(works_collection.find({
+        "user_id": user_id,
+        "conference_id": conference_id
+    }))
+
+    # Prepojenie posudkov a údajov o študentoch
+    for work in reviewer_works:
+        review = reviews_collection.find_one({'work_id': work['_id']})
+        work['review'] = review['decision'] if review else None
+        student = users_collection.find_one({"_id": work['user_id']})
+        work['student_name'] = f"{student['surname']} {student['name']}" if student else "Neznámy študent"
+
+    logging.info(f"Reviewer works for user {user_id} in conference {conference_id}: {reviewer_works}")
+
+    return render_template('rec_stud_dashboard.html',
+                           student_works=student_works,
+                           reviewer_works=reviewer_works)
+
+
+def get_reviewers_for_conference(conference_id):
+    # Získame používateľov s roľou recenzenta alebo recenzenta a študenta v danej konferencii
+    reviewers = db.roles.find({
+        "conference_id": ObjectId(conference_id),
+        "role": {"$in": ["recenzent", "recenzent,student"]}
+    })
+    
+    # Získame list používateľov
+    reviewer_ids = [r['user_id'] for r in reviewers]
+    
+    # Získame podrobnosti o týchto používateľoch
+    users = db.users.find({"_id": {"$in": reviewer_ids}})
+    
+    return users
+
+
+
+
+@app.route('/assign_recenzent/<work_id>', methods=['POST'])
+def assign_recenzent(work_id):
+    # Skontrolujeme, či je prihlásený admin
+    if 'user_id' not in session or session.get('role') != 'admin':
+        flash("Musíte byť prihlásený/á ako admin.", "error")
+        return redirect(url_for('login'))
+
+    reviewer_id = request.form.get('reviewer_id')  # Získame ID recenzenta z formulára
+
+    if not reviewer_id:
+        flash("Vyberte, prosím, recenzenta.", "error")
+        return redirect(url_for('admin_dashboard'))
+
+    # Debugging: vypíšeme získané ID recenzenta
+    print(f"Prijaté ID recenzenta: {reviewer_id}")
+
+    # Skontrolujeme, či recenzent existuje v kolekcii roles
+    role = roles_collection.find_one({
+        'user_id': ObjectId(reviewer_id),
+        'role': {'$in': ['recenzent', 'recenzent,student']}
+    })
+
+    # Debugging: vypíšeme rolu recenzenta
+    print(f"Získaná rola: {role}")
+
+    if not role:
+        flash("Recenzent neexistuje alebo nemá správnu rolu.", "error")
+        return redirect(url_for('admin_dashboard'))
+
+    # Aktualizujeme prácu a priradíme recenzenta
+    result = works_collection.update_one(
+        {'_id': ObjectId(work_id)},
+        {'$set': {'recenzent': ObjectId(reviewer_id)}}
+    )
+
+    if result.modified_count > 0:
+        flash("Recenzent bol úspešne priradený k práci.", "success")
+    else:
+        flash("Nastala chyba pri priraďovaní recenzenta.", "error")
+
+    return redirect(url_for('admin_dashboard'))
+
+
+
+
+
+
+
+
+
+
+
+
+@app.route('/admin_dashboard', methods=['GET', 'POST'])
+def admin_dashboard():
+    # Skontrolujeme, či je používateľ prihlásený a má rolu admin
+    if 'user_id' not in session or session.get('role') != 'admin':
+        flash("Musíte byť prihlásený/á ako admin.", "error")
+        return redirect(url_for('login'))
+
+    # Získame hodnoty zo žiadosti (query params)
+    selected_student_id = request.args.get('student_id')
+    selected_reviewer_id = request.args.get('reviewer_id')
+
+    # Načítanie konferencií
+    conferences = list(conferences_collection.find().sort("date", 1))
+
+    # Načítanie všetkých používateľov podľa konferencie z kolekcie roles
+    roles = list(roles_collection.find({
+        "conference_id": ObjectId(session['current_conference_id']),
+    }))
+
+    user_ids = [role["user_id"] for role in roles]
+    users = list(users_collection.find({"_id": {"$in": user_ids}}))
+
+    # Rozdelenie na študentov a recenzentov
+    students = []
+    reviewers = []
+    for user in users:
+        user_roles = [role['role'] for role in roles if role['user_id'] == user['_id']]
+        user['is_student'] = any('student' in role for role in user_roles)
+        if user['is_student']:
+            students.append(user)
+        if any(role in ['recenzent', 'recenzent,student'] for role in user_roles):
+            reviewers.append(user)
+
+    # Načítanie prác
+    query = {"conference_id": ObjectId(session['current_conference_id'])}
+    if selected_student_id:
+        query['user_id'] = ObjectId(selected_student_id)
+    if selected_reviewer_id:
+        query['recenzent'] = ObjectId(selected_reviewer_id)
+
+    works = list(works_collection.find(query))
+    
+    for work in works:
+        user = users_collection.find_one({"_id": ObjectId(work.get("user_id"))})
+        work["full_name"] = f"{user.get('surname', '')} {user.get('name', '')}".strip() if user else "Neznámy"
+        reviewer = users_collection.find_one({"_id": ObjectId(work.get("recenzent"))}) if work.get("recenzent") else None
+        work["reviewer_name"] = f"{reviewer.get('surname', '')} {reviewer.get('name', '')}".strip() if reviewer else "Nepriradený"
+        conference = conferences_collection.find_one({"_id": ObjectId(work.get("conference_id"))})
+        work["conference_name"] = conference["name"] if conference else "Nepriradená konferencia"
+        review = reviews_collection.find_one({"work_id": work['_id']})
+        work["review"] = review['decision'] if review else "Posudok nebol pridaný"
+
+    return render_template(
+        'admin_dashboard.html',
+        works=works,
+        conferences=conferences,
+        students=students,
+        reviewers=reviewers,
+        selected_student_id=selected_student_id,
+        selected_reviewer_id=selected_reviewer_id
+    )
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+@app.route("/view_users_roles/<conference_id>", methods=["GET", "POST"])
+def view_users_roles(conference_id):
+    try:
+        # Načítavame roly pre danú konferenciu
+        roles = roles_collection.find({"conference_id": ObjectId(conference_id)})
+        
+        # Načítavame používateľov podľa user_id
+        users = {str(user["_id"]): user["name"] for user in users_collection.find()}
+        
+        # Prevod na zoznam, pridané meno používateľa
+        roles_info = []
+        for role in roles:
+            user_name = users.get(str(role["user_id"]), "Neznámy používateľ")
+            roles_info.append({
+                "user_id": str(role["user_id"]),
+                "role": role["role"],
+                "user_name": user_name
+            })
+
+        # Výpis záznamov priamo do konzoly
+        for role in roles_info:
+            print(f"Načítaná rola pre šablónu: {role}")
+        
+        if request.method == "POST":
+            user_id = request.form["user_id"]
+            new_role = request.form["role"]
+            # Aktualizujeme rolu používateľa
+            roles_collection.update_one(
+                {"user_id": ObjectId(user_id), "conference_id": ObjectId(conference_id)},
+                {"$set": {"role": new_role}}
+            )
+            return redirect(request.url)
+
+        # Odovzdávame dáta do šablóny
+        return render_template("view_users_roles.html", roles_info=roles_info)
+
+    except Exception as e:
+        return f"Chyba pri načítavaní rolí: {str(e)}"
+
+
+
+@app.route('/register', methods=['GET', 'POST'])
+def register():
+    if request.method == 'POST':
+        # Získame údaje z formulára
+        surname = request.form['surname']
+        name = request.form['name']
+        email = request.form['email']
+        password = request.form['password']  # Heslo bez hashovania
+        school = request.form['school']
+
+        # Vytvorenie nového používateľa
+        new_user = {
+            'surname': surname,
+            'name': name,
+            'email': email,
+            'password': password,  # Uložíme heslo ako bolo zadané
+            'school': school
+        }
+
+        # Uložíme používateľa do kolekcie users
+        result = users_collection.insert_one(new_user)
+        user_id = result.inserted_id
+
+        # Získame všetky konferencie, do ktorých priradíme používateľa ako "visitor"
+        conferences = conferences_collection.find()
+
+        # Pre každú konferenciu vytvoríme záznam v kolekcii roles
+        for conference in conferences:
+            role_document = {
+                'conference_id': conference['_id'],
+                'user_id': ObjectId(user_id),
+                'role': 'visitor'
+            }
+            roles_collection.insert_one(role_document)
+
+        # Po registrácii môžeme pridať používateľa do session, ak je to potrebné
+        session['user_id'] = str(user_id)
+        session['role'] = 'visitor'
+
+        flash('Registrácia bola úspešná, môžete sa prihlásiť.', 'success')
+        return redirect(url_for('login'))  # Po registrácii presmeruj na prihlásenie
+
+    return render_template('register.html')
 
 
 if __name__ == '__main__':
