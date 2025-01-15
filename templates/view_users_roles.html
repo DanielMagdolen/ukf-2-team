@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="sk">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Zobraziť roly používateľov</title>
+    <link href="{{ url_for('static', filename='style_css/admin_dashboard.css') }}" rel="stylesheet">
+</head>
+
+<body>
+    <div class="container">
+        <h1>Roly používateľov v konferencii: {{ session['current_conference_name'] }}</h1>
+
+        <table border="1">
+            <thead>
+                <tr>
+                    <th>Meno a priezvisko používateľa</th>
+                    <th>Rola</th>
+                    <th>Zmeniť rolu</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% if roles_info %}
+                {% for role in roles_info %}
+                <tr>
+                    <td>{{ role.user_name }}</td> <!-- Meno a priezvisko -->
+                    <td>{{ role.role }}</td>
+                    <td>
+                        <form method="POST">
+                            <input type="hidden" name="user_id" value="{{ role.user_id }}">
+                            <select name="role">
+                                <!-- Deaktivovanie možnosti admin pre všetkých, ktorí nie sú už admin -->
+                                <option value="visitor" {% if role.role=='visitor' %}selected{% endif %}>visitor
+                                </option>
+                                <option value="admin" {% if role.role=='admin' %}selected{% endif %} disabled>admin
+                                </option>
+                                <option value="recenzent" {% if role.role=='recenzent' %}selected{% endif %}>recenzent
+                                </option>
+                                <option value="student" {% if role.role=='student' %}selected{% endif %}>student
+                                </option>
+                                <option value="recenzent,student" {% if role.role=='recenzent,student' %}selected{%
+                                    endif %}>recenzent,student</option>
+                            </select>
+                            <button type="submit" {% if role.role=='admin' %}disabled{% endif %}>Uložiť</button>
+                        </form>
+                    </td>
+                </tr>
+                {% endfor %}
+                {% else %}
+                <tr>
+                    <td colspan="3">Žiadne roly neboli nájdené pre túto konferenciu.</td>
+                </tr>
+                {% endif %}
+            </tbody>
+        </table>
+
+        <a href="{{ url_for('admin_dashboard') }}" class="back-link">Naspäť na dashboard</a>
+    </div>
+</body>
+
+</html>

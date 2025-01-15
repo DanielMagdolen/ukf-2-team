@@ -5,8 +5,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin Dashboard</title>
-
-    <!-- Pridáme FontAwesome pre ikonky -->
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
     <link href="{{ url_for('static', filename='style_css/admin_dashboard.css') }}" rel="stylesheet">
 </head>
@@ -22,6 +20,10 @@
         <!-- Title Section -->
         <h1>Admin Dashboard</h1>
         <h3>Vitajte v konferencii: {{ session['current_conference_name'] }}</h3>
+
+        <a href="{{ url_for('view_users_roles', conference_id=session['current_conference_id']) }}">
+            <button>Zobraziť používateľov a ich roly</button>
+        </a>
 
         <!-- Flash Messages -->
         {% with messages = get_flashed_messages(with_categories=true) %}
@@ -54,6 +56,7 @@
                 {% for reviewer in reviewers %}
                 <option value="{{ reviewer['_id'] }}" {% if selected_reviewer_id==reviewer['_id'] %}selected{% endif %}>
                     {{ reviewer['surname'] }} {{ reviewer['name'] }}
+                    {% if reviewer.is_student %}(Recenzent a Študent){% endif %}
                 </option>
                 {% endfor %}
             </select>
@@ -104,30 +107,23 @@
 
                 <!-- Link to file -->
                 <p><a href="{{ work.file_path }}" target="_blank">Zobraziť súbor</a></p>
+            <h4>Priradiť recenzenta:</h4>
+            <form method="POST" action="{{ url_for('assign_recenzent', work_id=work['_id']) }}">
+                <label for="reviewer_id_{{ work['_id'] }}">Vyberte recenzenta:</label>
+                <select name="reviewer_id" id="reviewer_id_{{ work['_id'] }}">
+                    <option value="" {% if not work.selected_reviewer_id %}selected{% endif %}>Vyberte recenzenta</option>
+                    {% for reviewer in reviewers %}
+                    <option value="{{ reviewer['user_id'] }}" {% if work.selected_reviewer_id==reviewer['user_id'] %}selected{%
+                        endif %}>
+                        {{ reviewer['surname'] }} {{ reviewer['name'] }}
+                    </option>
+                    {% endfor %}
+                </select>
+                <button type="submit">Priradiť recenzenta</button>
+            </form>
 
-                <!-- Link to review -->
-                {% if work.review and work.review != "Posudok nebol pridaný" %}
-                <p><a href="{{ url_for('view_review_admin', work_id=work['_id']) }}">Pozrieť posudok</a></p>
-                {% else %}
-                <p>Posudok zatiaľ nebol pridaný.</p>
-                {% endif %}
 
-                <!-- Form for Assigning Reviewer -->
-                <h4>Priradiť recenzenta:</h4>
-                <form method="POST" action="{{ url_for('assign_recenzent', work_id=work['_id']) }}">
-                    <label for="reviewer_id_{{ work['_id'] }}">Vyberte recenzenta:</label>
-                    <select name="reviewer_id" id="reviewer_id_{{ work['_id'] }}">
-                        <option value="" {% if not work.selected_reviewer_id %}selected{% endif %}>Vyberte recenzenta
-                        </option>
-                        {% for reviewer in reviewers %}
-                        <option value="{{ reviewer['_id'] }}" {% if work.selected_reviewer_id==reviewer['_id']
-                            %}selected{% endif %}>
-                            {{ reviewer['surname'] }} {{ reviewer['name'] }}
-                        </option>
-                        {% endfor %}
-                    </select>
-                    <button type="submit">Priradiť recenzenta</button>
-                </form>
+
             </div>
             {% endfor %}
         </div>

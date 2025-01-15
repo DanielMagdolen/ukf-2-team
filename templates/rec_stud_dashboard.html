@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="sk">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard Recenzenta a Študenta</title>
+    <link href="{{ url_for('static', filename='style_css/student_dashboard.css') }}" rel="stylesheet">
+</head>
+
+<body>
+    <div class="container">
+        <!-- Zobrazenie názvu konferencie -->
+        <h1>Vitajte v konferencii: {{ session['current_conference_name'] }}</h1>
+        <div class="auth-buttons">
+            <a href="{{ url_for('add_work') }}" class="back-link">Pridať Prácu</a>
+            <a href="{{ url_for('logout') }}" class="logout-link">Odhlásiť sa</a>
+            <a href="{{ url_for('view_conferences') }}" class="back-link">Naspäť na konferencie</a>
+        </div>
+
+        <!-- Sekcia pre študentské práce -->
+        <h2>Vaše Študentské Práce:</h2>
+        <div>
+            {% for work in student_works %}
+            <div class="work-item">
+                <p><strong>Názov:</strong> {{ work.title }}</p>
+                <p><strong>Popis:</strong> {{ work.description }}</p>
+                <p><strong>Škola:</strong> {{ work.school }}</p>
+                <p><strong>Fakulta:</strong> {{ work.faculty }}</p>
+                <p><strong>Dátum nahrania:</strong> {{ work.uploaded_at.strftime('%d.%m.%Y %H:%M:%S') }}</p>
+                <a href="{{ work.file_path }}" target="_blank">Zobraziť Súbor</a><br>
+
+                <p><strong>Posudok:</strong>
+                    {% if work.review %}
+                    {{ work.review }}
+                    <br>
+                    <a href="{{ url_for('view_review_student', work_id=work['_id']) }}">Zobraziť podrobnosti posudku</a>
+                    {% else %}
+                    Posudok ešte nebol pridaný.
+                    {% endif %}
+                </p>
+            </div>
+            {% else %}
+            <p>Žiadne práce na zobrazenie.</p>
+            {% endfor %}
+        </div>
+
+        <!-- Sekcia pre recenzentské práce -->
+        <h2>Práce Priradené na Recenziu:</h2>
+        <div>
+            {% if reviewer_works %}
+            {% for work in reviewer_works %}
+            <div class="work-item">
+                <p><strong>Názov:</strong> {{ work.title }}</p>
+                <p><strong>Popis:</strong> {{ work.description }}</p>
+                <p><strong>Škola:</strong> {{ work.school }}</p>
+                <p><strong>Fakulta:</strong> {{ work.faculty }}</p>
+                <p><strong>Študent:</strong> {{ work.student_name }}</p>
+                <p><strong>Dátum nahrania:</strong> {{ work.uploaded_at.strftime('%d.%m.%Y %H:%M:%S') }}</p>
+                <a href="{{ work.file_path }}" target="_blank">Zobraziť súbor</a><br>
+
+                <p><strong>Posudok:</strong>
+                    {% if work.review %}
+                    {{ work.review }}
+                    <br>
+                    <a href="{{ url_for('view_review_reviewer', work_id=work['_id']) }}">Zobraziť podrobnosti
+                        posudku</a>
+                    {% else %}
+                    Posudok ešte nebol pridaný.
+                    {% endif %}
+                </p>
+
+                {% if not work.review %}
+                <form method="POST" action="{{ url_for('review_redirect', work_id=work['_id']) }}">
+                    <button type="submit" class="button">Pridať posudok</button>
+                </form>
+                {% endif %}
+            </div>
+            {% endfor %}
+            {% else %}
+            <p>Žiadne priradené práce na recenzovanie v tejto konferencii.</p>
+            {% endif %}
+        </div>
+    </div>
+</body>
+
+</html>

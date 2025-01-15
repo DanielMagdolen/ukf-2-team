@@ -3,6 +3,10 @@
     padding: 0;
     box-sizing: border-box;
 }
+<<<<<<< HEAD
+=======
+
+>>>>>>> a48670729da9c9015bd5824a5bc8973037f3e202
 body {
     font-family: 'Arial', sans-serif;
     background-color: #d9ead3;
@@ -10,11 +14,19 @@ body {
     line-height: 1.6;
     padding: 20px;
 }
+<<<<<<< HEAD
+=======
+
+>>>>>>> a48670729da9c9015bd5824a5bc8973037f3e202
 h1 {
     text-align: center;
     color: #1a2516;
     margin-bottom: 20px;
 }
+<<<<<<< HEAD
+=======
+
+>>>>>>> a48670729da9c9015bd5824a5bc8973037f3e202
 form {
     background-color: #fff;
     padding: 30px;
@@ -23,11 +35,19 @@ form {
     max-width: 800px;
     margin: 0 auto;
 }
+<<<<<<< HEAD
+=======
+
+>>>>>>> a48670729da9c9015bd5824a5bc8973037f3e202
 label {
     font-weight: bold;
     margin-bottom: 5px;
     display: inline-block;
 }
+<<<<<<< HEAD
+=======
+
+>>>>>>> a48670729da9c9015bd5824a5bc8973037f3e202
 input[type="text"],
 input[type="date"],
 textarea {
@@ -38,6 +58,10 @@ textarea {
     border-radius: 5px;
     font-size: 1rem;
 }
+<<<<<<< HEAD
+=======
+
+>>>>>>> a48670729da9c9015bd5824a5bc8973037f3e202
 button[type="submit"] {
     background-color: #007bffaf;
     color: #fff;
@@ -48,9 +72,17 @@ button[type="submit"] {
     cursor: pointer;
     transition: background-color 0.3s ease;
 }
+<<<<<<< HEAD
 button[type="submit"]:hover {
     background-color: #0056b3;
 }
+=======
+
+button[type="submit"]:hover {
+    background-color: #0056b3;
+}
+
+>>>>>>> a48670729da9c9015bd5824a5bc8973037f3e202
 a {
     display: block;
     text-align: center;
@@ -59,6 +91,13 @@ a {
     font-size: 1rem;
     margin-top: 10px;
 }
+<<<<<<< HEAD
 a:hover {
     text-decoration: underline;
 }
+=======
+
+a:hover {
+    text-decoration: underline;
+}
+>>>>>>> a48670729da9c9015bd5824a5bc8973037f3e202
