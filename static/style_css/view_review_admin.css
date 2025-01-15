@@ -1,0 +1,68 @@
+/* Reset základných štýlov */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+/* Základný štýl pre telo stránky */
+body {
+    font-family: 'Arial', sans-serif;
+    background-color: #d9ead3;
+    color: #333;
+    line-height: 1.6;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 20px;
+}
+
+/* Nadpisy */
+h1 {
+    color: #1a2516;
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+h3, h4 {
+    margin-bottom: 10px;
+    color: #2c3e50;
+}
+
+/* Štýl pre zoznam hodnotení */
+ul {
+    list-style-type: none;
+    margin: 20px 0;
+    padding: 0;
+}
+
+ul li {
+    margin-bottom: 10px;
+    background-color: #f9f9f9;
+    padding: 10px;
+    border-radius: 5px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* Štýl pre odkaz */
+a {
+    text-decoration: none;
+    color: #007bff;
+    font-weight: bold;
+    margin-top: 20px;
+    display: inline-block;
+    transition: color 0.3s ease;
+}
+
+a:hover {
+    color: #0056b3;
+}
+
+/* Štýl pre odsek s chýbajúcim recenzentom */
+p {
+    margin: 10px 0;
+}
+
+strong {
+    color: #2c3e50;
+}
