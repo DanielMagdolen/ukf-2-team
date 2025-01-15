@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="sk">
+
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title> Zmena role </title>
+    <link href="{{ url_for('static', filename='style_css/edit_work.css') }}" rel="stylesheet">
+  </head>
+
+  <body>
+    <div class="containter">
+      <h1> Zmeniť rolu </h1>
+      <br />
+      <br />
+      <select form="zmena_role" id="role" autofocus>
+        <option value="visitor"> Návštevník </option>
+        <option value="student"> Študent </option>
+        <option value="recenzent"> Recenzent </option>
+        <option value="recenzent, student"> Študent a recenzent </option>
+      </select>
+      <br />
+      <br />
+      <form method="POST" id="zmena_role">
+        <input type="submit" />
+      </form>
+      <a href="{{ url_for('admin_dashboard') }}" class="back-link"> Naspäť na dashboard </a>
+    </div>
+  </body>
+  
+</html>
