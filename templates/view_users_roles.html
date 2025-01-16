@@ -12,52 +12,38 @@
     <div class="container">
         <h1>Roly používateľov v konferencii: {{ session['current_conference_name'] }}</h1>
 
-        <table border="1">
-            <thead>
-                <tr>
-                    <th>Meno</th>
-                    <th>Priezvisko</th>
-                    <th>Rola</th>
-                    <th>Zmeniť rolu</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% if roles_info %}
-                {% for role in roles_info %}
-                <tr>
-                    <td>{{ role.user_surname }}</td>
-                    <td>{{ role.user_name }}</td> <!-- Meno a priezvisko -->
-                    <td>{{ role.role }}</td>
-                    <td>
-                        <form method="POST">
-                            <input type="hidden" name="user_id" value="{{ role.user_id }}">
-                            <select name="role">
-                                <!-- Deaktivovanie možnosti admin pre všetkých, ktorí nie sú už admin -->
-                                <option value="visitor" {% if role.role=='visitor' %}selected{% endif %}>visitor
-                                </option>
-                                <option value="admin" {% if role.role=='admin' %}selected{% endif %} disabled>admin
-                                </option>
-                                <option value="recenzent" {% if role.role=='recenzent' %}selected{% endif %}>recenzent
-                                </option>
-                                <option value="student" {% if role.role=='student' %}selected{% endif %}>student
-                                </option>
-                                <option value="recenzent,student" {% if role.role=='recenzent,student' %}selected{%
-                                    endif %}>recenzent,student</option>
-                            </select>
-                            <button type="submit" {% if role.role=='admin' %}disabled{% endif %}>Uložiť</button>
-                        </form>
-                    </td>
-                </tr>
-                {% endfor %}
-                {% else %}
-                <tr>
-                    <td colspan="3">Žiadne roly neboli nájdené pre túto konferenciu.</td>
-                </tr>
-                {% endif %}
-            </tbody>
-        </table>
+        <div class="users-container">
+            {% if roles_info %}
+            {% for role in roles_info %}
+            <div class="user-container">
+                <div class="user-info">
+                    <p><strong>Meno:</strong> {{ role.user_name }}</p>
+                    <p><strong>Priezvisko:</strong> {{ role.user_surname }}</p>
+                    <p><strong>Rola:</strong> {{ role.role }}</p>
+                </div>
+                <div class="role-change">
+                    <form method="POST">
+                        <input type="hidden" name="user_id" value="{{ role.user_id }}">
+                        <select name="role">
+                            <!-- Deaktivovanie možnosti admin pre všetkých, ktorí nie sú už admin -->
+                            <option value="visitor" {% if role.role=='visitor' %}selected{% endif %}>visitor</option>
+                            <option value="admin" {% if role.role=='admin' %}selected{% endif %} disabled>admin</option>
+                            <option value="recenzent" {% if role.role=='recenzent' %}selected{% endif %}>recenzent</option>
+                            <option value="student" {% if role.role=='student' %}selected{% endif %}>student</option>
+                            <option value="recenzent,student" {% if role.role=='recenzent,student' %}selected{% endif %}>recenzent,student</option>
+                        </select>
+                        <button type="submit" {% if role.role=='admin' %}disabled{% endif %}>Uložiť</button>
+                    </form>
+                </div>
+            </div>
+            {% endfor %}
+            {% else %}
+            <p>Žiadne roly neboli nájdené pre túto konferenciu.</p>
+            {% endif %}
+        </div>
 
-        <a href="{{ url_for('admin_dashboard') }}" class="back-link">Naspäť na dashboard</a>
+        <a href="{{ url_for('admin_dashboard') }}" class="back-link button">Naspäť na dashboard</a>
+
     </div>
 </body>
 

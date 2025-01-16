@@ -67,7 +67,7 @@
         <!-- Works Section -->
         {% if works %}
         <h3>Práce pridané študentami:</h3>
-        <div>
+        <div class="works-container">
             {% for work in works %}
             <div class="work-item">
                 <!-- Ikonky pre Editovať a Vymazať -->
@@ -88,38 +88,31 @@
                     </form>
                 </div>
 
-                <p><strong>Konferencia:</strong> {{ work.conference_name }}</p>
-                <p><strong>Názov práce:</strong> {{ work.title }}</p>
-                <p><strong>Študent:</strong> {{ work.full_name }}</p>
-                <p><strong>Popis:</strong> {{ work.description }}</p>
-                <p><strong>Škola:</strong> {{ work.school }}</p>
-                <p><strong>Fakulta:</strong> {{ work.faculty }}</p>
-                <p><strong>Ročník:</strong> {{ work.year }}</p>
+                <div class="work-info">
+                    <p><strong>Konferencia:</strong> {{ work.conference_name }}</p>
+                    <p><strong>Názov práce:</strong> {{ work.title }}</p>
+                    <p><strong>Študent:</strong> {{ work.full_name }}</p>
+                    <p><strong>Popis:</strong> {{ work.description }}</p>
+                    <p><strong>Škola:</strong> {{ work.school }}</p>
+                    <p><strong>Fakulta:</strong> {{ work.faculty }}</p>
+                    <p><strong>Ročník:</strong> {{ work.year }}</p>
 
-                <!-- Recenzent -->
-                <p><strong>Recenzent:</strong>
-                    {% if work.reviewer_name %}
-                    {{ work.reviewer_name }}
+                    <!-- Recenzent -->
+                    <p><strong>Recenzent:</strong>
+                        {% if work.reviewer_name %}
+                        {{ work.reviewer_name }}
+                        {% else %}
+                        Zatiaľ nebol priradený
+                        {% endif %}
+                    </p>
+                    {% if work.review and work.review != "Posudok nebol pridaný" %}
+                    <p><a href="{{ url_for('view_review_admin', work_id=work['_id']) }}">Pozrieť posudok</a></p>
                     {% else %}
-                    Zatiaľ nebol priradený
+                    <p>Posudok zatiaľ nebol pridaný.</p>
                     {% endif %}
-                </p>
-                {% if work.review and work.review != "Posudok nebol pridaný" %}
-                <p><a href="{{ url_for('view_review_admin', work_id=work['_id']) }}">Pozrieť posudok</a></p>
-                {% else %}
-                <p>Posudok zatiaľ nebol pridaný.</p>
-                {% endif %}
-                <p><a href="{{ work.file_path }}" target="_blank">Zobraziť súbor</a></p>
-                <p><a href="{{ url_for('assign_recenzent', work_id=work['_id']) }}">Priradiť recenzenta</a></p>
-              
-
-
-
-
-
-
-
-
+                    <p><a href="{{ work.file_path }}" target="_blank">Zobraziť súbor</a></p>
+                    <p><a href="{{ url_for('assign_recenzent', work_id=work['_id']) }}">Priradiť recenzenta</a></p>
+                </div>
             </div>
             {% endfor %}
         </div>
@@ -127,6 +120,7 @@
         <p>Žiadne práce neboli pridané.</p>
         {% endif %}
     </div>
+
     <footer>
         <div class="left-image">
             <img src="https://www.fpvai.ukf.sk/images/logo/fpvai.png" alt="Image" style="max-width: 280px; height: auto;">
