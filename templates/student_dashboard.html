@@ -16,12 +16,11 @@
         <!-- Zobrazenie názvu konferencie -->
         <h1>Vitajte v konferencii: {{ session['current_conference_name'] }}</h1>
         <div class="auth-buttons">
-            <a href="{{ url_for('add_work') }}" class ="back-link">Pridať Prácu</a>
+            <a href="{{ url_for('add_work') }}" class="back-link">Pridať Prácu</a>
             <a href="{{ url_for('logout') }}" class="logout-link">Odhlásiť sa</a>
             <!-- Odkaz na recenzent dashboard -->
             <a href="{{ url_for('view_conferences') }}" class="back-link">Naspäť na konferencie</a>
         </div>
-
 
         <!-- Práce -->
         <h2>Vaše Práce:</h2>
@@ -32,68 +31,68 @@
                 <p><strong>Popis:</strong> {{ work.description }}</p>
                 <p><strong>Škola:</strong> {{ work.school }}</p>
                 <p><strong>Fakulta:</strong> {{ work.faculty }}</p>
-                <p><strong>Recenzent:</strong>
-                    {% if work.recenzent %}
-                    Priradený
-                    {% else %}
-                    Nepriradený
-                    {% endif %}
-                </p>
                 <p><strong>Dátum nahrania:</strong> {{ work.uploaded_at.strftime('%d.%m.%Y %H:%M:%S') }}</p>
                 <a href="{{ work.file_path }}" target="_blank">Zobraziť Súbor</a><br>
-
-            <p><strong>Posudok:</strong>
-                {% if work.review %}
-                {{ work.review }}
-                <br>
-                <a href="{{ url_for('view_review_student', work_id=work['_id']) }}">Zobraziť podrobnosti posudku</a>
+                <p><strong>Posudok:</strong>
+                    {% if work.review %}
+                    {{ work.review }}
+                    <br>
+                    <a href="{{ url_for('view_review_student', work_id=work['_id']) }}">Zobraziť podrobnosti posudku</a>
+                    {% else %}
+                    Posudok ešte nebol pridaný.
+                    {% endif %}
+                </p>
+                {% if is_editable %}
+                <a href="{{ url_for('edit_work_stud', work_id=work['_id']) }}" class="edit-link">Editovať</a>
+                <form action="{{ url_for('delete_work_stud', work_id=work['_id']) }}" method="POST"
+                    style="display:inline;">
+                    <button type="submit" class="delete-link"
+                        onclick="return confirm('Naozaj chcete odstrániť túto prácu?');">Odstrániť</button>
+                </form>
                 {% else %}
-                Posudok ešte nebol pridaný.
+                <p>Práca už nie je možné editovať ani mazať.</p>
                 {% endif %}
-            </p>
-
             </div>
             {% else %}
             <p>Žiadne práce na zobrazenie.</p>
             {% endfor %}
         </div>
 
-        <!-- Login a predošlá strana -->
-       
+    </div>
+    <footer>
+        <div class="left-image">
+            <img src="https://www.fpvai.ukf.sk/images/logo/fpvai.png" alt="Image"
+                style="max-width: 280px; height: auto;">
         </div>
-        <footer>
-            <div class="left-image">
-                <img src="https://www.fpvai.ukf.sk/images/logo/fpvai.png" alt="Image" style="max-width: 280px; height: auto;">
+
+        <div class="contact-info">
+            <div>
+                <i class="fas fa-envelope"></i>
+                <span>Email: <a href="mailto:admin@ukf.sk">admin@ukf.sk</a></span>
             </div>
-        
-            <div class="contact-info">
-                <div>
-                    <i class="fas fa-envelope"></i>
-                    <span>Email: <a href="mailto:admin@ukf.sk">admin@ukf.sk</a></span>
-                </div>
-                <div>
-                    <i class="fas fa-phone-alt"></i>
-                    <span>Telefón: <a href="tel:+421000000000">+421 000 000 000</a></span>
-                </div>
-                <div>
-                    <i class="fas fa-map-marker-alt"></i>
-                    <span>Adresa: <a href="https://maps.app.goo.gl/xbsYHRJh5tmQj82f9" target="_blank">Tr. A. Hlinku 1, 949 01
-                            Nitra</a></span>
-                </div>
+            <div>
+                <i class="fas fa-phone-alt"></i>
+                <span>Telefón: <a href="tel:+421000000000">+421 000 000 000</a></span>
             </div>
-        
-            <div class="social-icons">
-                <a href="https://www.facebook.com/fpvai.ukf/" target="_blank">
-                    <i class="fab fa-facebook-f"></i>
-                </a>
-                <a href="https://sk.linkedin.com/company/katedra-informatiky-fpv-ukf-v-nitre" target="_blank">
-                    <i class="fab fa-linkedin-in"></i>
-                </a>
-                <a href="https://www.instagram.com/fpvai.ukf/" target="_blank">
-                    <i class="fab fa-instagram"></i>
-                </a>
+            <div>
+                <i class="fas fa-map-marker-alt"></i>
+                <span>Adresa: <a href="https://maps.app.goo.gl/xbsYHRJh5tmQj82f9" target="_blank">Tr. A. Hlinku 1, 949
+                        01 Nitra</a></span>
             </div>
-        </footer>
+        </div>
+
+        <div class="social-icons">
+            <a href="https://www.facebook.com/fpvai.ukf/" target="_blank">
+                <i class="fab fa-facebook-f"></i>
+            </a>
+            <a href="https://sk.linkedin.com/company/katedra-informatiky-fpv-ukf-v-nitre" target="_blank">
+                <i class="fab fa-linkedin-in"></i>
+            </a>
+            <a href="https://www.instagram.com/fpvai.ukf/" target="_blank">
+                <i class="fab fa-instagram"></i>
+            </a>
+        </div>
+    </footer>
 </body>
 
 </html>

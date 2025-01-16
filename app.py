@@ -105,6 +105,7 @@ def view_conferences():
     return render_template('view_conferences.html', conferences=conferences)
 
 
+
 @app.route('/student_dashboard')
 def student_dashboard():
     if 'user_id' not in session or ((session.get('role') != 'student') and (session.get('role') != 'recenzent,student')):
@@ -116,22 +117,84 @@ def student_dashboard():
         flash("Vyberte si, prosím, konferenciu, do ktorej chcete vstúpiť.", "error")
         return redirect(url_for('view_conferences'))
 
-    conference_id = session['current_conference_id']
+    conference_id = ObjectId(session['current_conference_id'])
+
+    # Načítanie dátumu konferencie
+    conference = conferences_collection.find_one({'_id': conference_id})
+    conference_date = conference.get('date')  # Predpokladáme, že 'date' je uložené ako datetime objekt
 
     # Načítanie prác pre daného študenta a konferenciu
-    works = list(works_collection.find({'user_id': user_id, 'conference_id': ObjectId(conference_id)}))
+    works = list(works_collection.find({'user_id': user_id, 'conference_id': conference_id}))
 
     # Prepojenie posudkov k prácam
     for work in works:
         review = reviews_collection.find_one({'work_id': work['_id']})
 
         if review:
-            # Pripojíme posudok k práci
-            work['review'] = review['decision']  # Ak máš ďalšie informácie, pridať ich môžeš tiež
+            work['review'] = review['decision']
         else:
-            work['review'] = None  # Ak posudok neexistuje
+            work['review'] = None
 
-    return render_template('student_dashboard.html', works=works)
+    # Pridanie informácie o možnosti editácie
+    current_date = datetime.now()
+    is_editable = current_date < conference_date
+
+    return render_template('student_dashboard.html', works=works, is_editable=is_editable)
+
+
+@app.route('/edit_work_stud/<work_id>', methods=['GET', 'POST'])
+def edit_work_stud(work_id):
+    if 'user_id' not in session or session.get('role') not in ['recenzent', 'recenzent,student', 'student']:
+        flash("Musíte byť prihlásený/á ako recenzent alebo študent.", "error")
+        return redirect(url_for('login'))
+
+    # Načítanie práce zozbieranej podľa work_id
+    work = works_collection.find_one({"_id": ObjectId(work_id)})
+    
+    if not work:
+        flash("Práca neexistuje.", "error")
+        return redirect(url_for('rec_stud_dashboard'))  # Ak práca neexistuje, vráť sa na dashboard
+
+    if request.method == 'POST':
+        # Spracovanie formulára na editovanie práce
+        work_data = {
+            'title': request.form['title'],
+            'description': request.form['description'],
+            'school': request.form['school'],
+            'faculty': request.form['faculty'],
+            # ďalšie údaje...
+        }
+
+        # Uloženie zmien do databázy
+        works_collection.update_one({"_id": ObjectId(work_id)}, {"$set": work_data})
+
+        # Presmerovanie na správny dashboard podľa roly
+        if 'recenzent' in session['role']:
+            return redirect(url_for('rec_stud_dashboard'))  # Ak je recenzent, presmerovať na rec_stud_dashboard
+        else:
+            return redirect(url_for('student_dashboard'))  # Ak je študent, presmerovať na student_dashboard
+
+    # Ak je metóda GET, zobrazí sa formulár na editovanie
+    return render_template('edit_work_stud.html', work=work)
+
+
+@app.route('/delete_work_stud/<work_id>', methods=['POST'])
+def delete_work_stud(work_id):
+    if 'user_id' not in session or ((session.get('role') != 'student') and (session.get('role') != 'recenzent,student')):
+        return redirect(url_for('login'))
+
+    work = works_collection.find_one({'_id': ObjectId(work_id), 'user_id': ObjectId(session['user_id'])})
+
+    if not work:
+        flash("Práca nebola nájdená alebo nemáte povolenie ju odstrániť.", "error")
+        return redirect(url_for('student_dashboard'))
+
+    works_collection.delete_one({'_id': ObjectId(work_id)})
+    flash("Práca bola úspešne odstránená.", "success")
+    return redirect(url_for('student_dashboard'))
+
+
+
 
 
 @app.route('/recenzent_dashboard')
@@ -587,7 +650,9 @@ def enter_conference(conference_id):
     else:
         flash("Neznáma rola.", "error")
         return redirect(url_for('view_conferences'))
-    
+
+
+
 @app.route('/rec_stud_dashboard')
 def rec_stud_dashboard():
     if 'user_id' not in session or session.get('role') not in ['recenzent', 'recenzent,student']:
@@ -601,30 +666,41 @@ def rec_stud_dashboard():
         flash("Nie je vybraná žiadna konferencia.", "error")
         return redirect(url_for('view_conferences'))
 
-    # Získanie prác priradených recenzentovi
+    # Načítanie dátumu konferencie
+    conference = conferences_collection.find_one({'_id': conference_id})
+    conference_date = conference.get('date')  # Predpokladáme, že 'date' je uložené ako datetime objekt
+
+    # Načítanie prác priradených recenzentovi
     reviewer_works = list(works_collection.find({
         "recenzent": user_id,
         "conference_id": conference_id
     }))
 
-    # Získanie prác nahraných študentom
+    # Načítanie prác nahraných študentom
     student_works = list(works_collection.find({
         "user_id": user_id,
         "conference_id": conference_id
     }))
 
-    # Prepojenie posudkov a údajov o študentoch
+    # Prepojenie posudkov a údajov o študentoch pre recenzentské práce
     for work in reviewer_works:
         review = reviews_collection.find_one({'work_id': work['_id']})
         work['review'] = review['decision'] if review else None
         student = users_collection.find_one({"_id": work['user_id']})
         work['student_name'] = f"{student['surname']} {student['name']}" if student else "Neznámy študent"
 
-    logging.info(f"Reviewer works for user {user_id} in conference {conference_id}: {reviewer_works}")
+    # Pridanie informácie o možnosti editácie pre študentské práce
+    current_date = datetime.now()
+    is_editable = current_date < conference_date if conference_date else False
 
     return render_template('rec_stud_dashboard.html',
                            student_works=student_works,
-                           reviewer_works=reviewer_works)
+                           reviewer_works=reviewer_works,
+                           is_editable=is_editable)
+
+
+
+
 
 
 def get_reviewers_for_conference(conference_id):
