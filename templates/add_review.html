@@ -93,7 +93,26 @@
 
     <br><br>
     <button type="submit">Odoslať posudok</button>
-    <a href="{{ url_for('view_conferences') }}" class="back-link">Naspäť na konferencie</a>
+    <div class="actions">
+      {% set roles = session['role'].split(',') %}
+    
+      {% if 'recenzent' in roles and 'student' in roles %}
+      <!-- Ak máš rolu "recenzent" aj "student" (kombinovaná rola) -->
+      <a href="{{ url_for('rec_stud_dashboard') }}">Späť na RecStud Dashboard</a>
+    
+      {% elif 'recenzent' in roles %}
+      <!-- Ak máš rolu len "recenzent" -->
+      <a href="{{ url_for('recenzent_dashboard') }}">Späť na Recenzent Dashboard</a>
+    
+      {% elif 'student' in roles %}
+      <!-- Ak máš rolu len "student" -->
+      <a href="{{ url_for('student_dashboard') }}">Späť na Dashboard</a>
+    
+      {% else %}
+      <!-- Ak nie je žiadna rola alebo rola nie je rozpoznaná -->
+      <a href="{{ url_for('login') }}">Späť na Prihlásenie</a>
+      {% endif %}
+    </div>
   </form>
 </body>
 

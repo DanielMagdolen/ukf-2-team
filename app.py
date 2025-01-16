@@ -793,8 +793,6 @@ def admin_dashboard():
 
 
 
-
-
 @app.route("/view_users_roles/<conference_id>", methods=["GET", "POST"])
 def view_users_roles(conference_id):
     try:
@@ -802,16 +800,22 @@ def view_users_roles(conference_id):
         roles = roles_collection.find({"conference_id": ObjectId(conference_id)})
         
         # Načítavame používateľov podľa user_id
-        users = {str(user["_id"]): user["name"] for user in users_collection.find()}
+        users = {
+            str(user["_id"]): {
+                "name": user["name"],
+                "surname": user["surname"]
+            } for user in users_collection.find()
+        }
         
-        # Prevod na zoznam, pridané meno používateľa
+        # Prevod na zoznam, pridané meno a priezvisko používateľa
         roles_info = []
         for role in roles:
-            user_name = users.get(str(role["user_id"]), "Neznámy používateľ")
+            user_info = users.get(str(role["user_id"]), {"name": "Neznámy", "surname": "Používateľ"})
             roles_info.append({
                 "user_id": str(role["user_id"]),
                 "role": role["role"],
-                "user_name": user_name
+                "user_name": user_info["name"],
+                "user_surname": user_info["surname"]
             })
 
         # Výpis záznamov priamo do konzoly
@@ -833,6 +837,7 @@ def view_users_roles(conference_id):
 
     except Exception as e:
         return f"Chyba pri načítavaní rolí: {str(e)}"
+
 
 
 

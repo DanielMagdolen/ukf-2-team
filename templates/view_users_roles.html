@@ -15,7 +15,8 @@
         <table border="1">
             <thead>
                 <tr>
-                    <th>Meno a priezvisko používateľa</th>
+                    <th>Meno</th>
+                    <th>Priezvisko</th>
                     <th>Rola</th>
                     <th>Zmeniť rolu</th>
                 </tr>
@@ -24,6 +25,7 @@
                 {% if roles_info %}
                 {% for role in roles_info %}
                 <tr>
+                    <td>{{ role.user_surname }}</td>
                     <td>{{ role.user_name }}</td> <!-- Meno a priezvisko -->
                     <td>{{ role.role }}</td>
                     <td>
