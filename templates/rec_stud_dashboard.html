@@ -6,6 +6,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dashboard Recenzenta a Študenta</title>
     <link href="{{ url_for('static', filename='style_css/student_dashboard.css') }}" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
 </head>
 
 <body>
@@ -42,11 +44,13 @@
                 </p>
 
                 {% if is_editable %}
-                <a href="{{ url_for('edit_work_stud', work_id=work['_id']) }}" class="edit-link">Editovať</a>
-                <form action="{{ url_for('delete_work_stud', work_id=work['_id']) }}" method="POST"
-                    style="display:inline;">
-                    <button type="submit" class="delete-link"
-                        onclick="return confirm('Naozaj chcete odstrániť túto prácu?');">Odstrániť</button>
+                <a href="{{ url_for('edit_work_stud', work_id=work['_id']) }}" class="edit-link">
+                    <i class="fas fa-edit"></i>
+                </a>
+                <form action="{{ url_for('delete_work_stud', work_id=work['_id']) }}" method="POST" style="display:inline;">
+                    <button type="submit" class="delete-link" onclick="return confirm('Naozaj chcete odstrániť túto prácu?');">
+                        <i class="fas fa-trash-alt"></i>
+                    </button>
                 </form>
                 {% else %}
                 <p>Práca už nie je možné editovať ani mazať.</p>

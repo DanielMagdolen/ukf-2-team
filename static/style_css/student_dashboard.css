@@ -151,6 +151,36 @@ h2 {
     margin-bottom: 10px;
 }
 
+.edit-link, .delete-link {
+    font-size: 18px;
+    color: #3498db;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 5px;
+    border: none;
+    background-color: transparent;
+    cursor: pointer;
+    transition: color 0.3s ease;
+}
+
+.edit-link:hover, .delete-link:hover {
+    color: #45a049;
+}
+
+.delete-link {
+    color: #e74c3c;
+}
+
+.delete-link:hover {
+    color: #c0392b;
+}
+
+.edit-link i, .delete-link i {
+    margin-right: 5px;
+}
+
 .logout-link,
 .back-link {
     display: block;
