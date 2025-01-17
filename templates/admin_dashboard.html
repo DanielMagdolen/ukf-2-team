@@ -105,13 +105,16 @@
                         Zatiaľ nebol priradený
                         {% endif %}
                     </p>
-                    {% if work.review and work.review != "Posudok nebol pridaný" %}
-                    <p><a href="{{ url_for('view_review_admin', work_id=work['_id']) }}">Pozrieť posudok</a></p>
-                    {% else %}
-                    <p>Posudok zatiaľ nebol pridaný.</p>
-                    {% endif %}
-                    <p><a href="{{ work.file_path }}" target="_blank">Zobraziť súbor</a></p>
-                    <p><a href="{{ url_for('assign_recenzent', work_id=work['_id']) }}">Priradiť recenzenta</a></p>
+                    
+                    <div class="file-links">
+                        <a href="{{ work.file_path }}" target="_blank">Zobraziť súbor</a>
+                        <a href="{{ url_for('assign_recenzent', work_id=work['_id']) }}">Priradiť recenzenta</a>
+                        {% if work.review and work.review != "Posudok nebol pridaný" %}
+                        <a href="{{ url_for('view_review_admin', work_id=work['_id']) }}">Pozrieť posudok</a>
+                        {% else %}
+                        <p>Posudok zatiaľ nebol pridaný.</p>
+                        {% endif %}
+                    </div>
                 </div>
             </div>
             {% endfor %}
