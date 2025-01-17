@@ -726,6 +726,7 @@ def get_reviewers_for_conference(conference_id):
     users = db.users.find({"_id": {"$in": reviewer_ids}})
     
     return users
+    
 @app.route('/assign_recenzent/<work_id>', methods=['GET', 'POST'])
 def assign_recenzent(work_id):
     # Skontrolujeme, či je prihlásený admin
@@ -957,17 +958,13 @@ def register():
             "vsemba.sk", "vsm.sk", "ismpo.sk", "uniza.sk", "vsmu.sk"
         ]
 
-        # Logika pre určenie role na základe emailu
-        domain = email.split('@')[1]
-        role = 'visitor'  # Default role
+        # Automatické priradenie role podľa emailovej domény
+        domain = email.split("@")[1]
 
-        # Kontrola pre študentov alebo recenzentov
-        if domain.startswith('student.'):
-            clean_domain = domain.split('student.')[1]
-            if clean_domain in university_domains:
-                role = 'student'
-        elif domain in university_domains:
-            role = 'recenzent'
+        if ((domain.split(".")[0] == "student") and (domain.split("student.")[1] in university_domains)) or (domain in university_domains):
+            role = "student"
+        else:
+            role = "visitor"
 
         # Získame všetky konferencie, do ktorých priradíme používateľa so správnou rolou
         conferences = conferences_collection.find()
