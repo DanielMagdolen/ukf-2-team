@@ -11,7 +11,32 @@ body {
     line-height: 1.6;
     padding: 20px;
 }
+.work-header {
+    display: flex;
+    justify-content: flex-end;
+    margin-bottom: 10px;
+}
 
+.icon-button {
+    background: none;
+    border: none;
+    color: #3498db;
+    font-size: 24px;
+    cursor: pointer;
+    margin-left: 10px;
+}
+
+.icon-button:hover {
+    color: #45a049;
+}
+
+.delete-button {
+    color: #e74c3c;
+}
+
+.delete-button:hover {
+    color: #c0392b;
+}
 .container {
     max-width: 1200px;
     margin: 0 auto;
@@ -195,6 +220,7 @@ h2 {
 .back-link:hover {
     text-decoration: underline;
 }
+
 
 footer {
     background-color: #2c3e50;

@@ -5,9 +5,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dashboard Recenzenta a Študenta</title>
-    <link href="{{ url_for('static', filename='style_css/student_dashboard.css') }}" rel="stylesheet">
     <!-- Font Awesome -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" rel="stylesheet">
+    <link href="{{ url_for('static', filename='style_css/student_dashboard.css') }}" rel="stylesheet">
+    
 </head>
 
 <body>
@@ -26,6 +28,20 @@
         <div>
             {% for work in student_works %}
             <div class="work-item">
+                <div class="work-header">
+                    {% if is_editable %}
+                    <div class="icon-group">
+                        <a href="{{ url_for('edit_work_stud', work_id=work['_id']) }}" class="icon-button">
+                            <i class="fas fa-edit"></i>
+                        </a>
+                        <form action="{{ url_for('delete_work_stud', work_id=work['_id']) }}" method="POST" style="display:inline;">
+                            <button type="submit" class="icon-button delete-button" onclick="return confirm('Naozaj chcete odstrániť túto prácu?');">
+                                <i class="fas fa-trash-alt"></i>
+                            </button>
+                        </form>
+                    </div>
+                    {% endif %}
+                </div>
                 <p><strong>Názov:</strong> {{ work.title }}</p>
                 <p><strong>Popis:</strong> {{ work.description }}</p>
                 <p><strong>Škola:</strong> {{ work.school }}</p>
@@ -43,18 +59,8 @@
                     {% endif %}
                 </p>
 
-                {% if is_editable %}
-                <a href="{{ url_for('edit_work_stud', work_id=work['_id']) }}" class="edit-link">
-                    <i class="fas fa-edit"></i>
-                </a>
-                <form action="{{ url_for('delete_work_stud', work_id=work['_id']) }}" method="POST" style="display:inline;">
-                    <button type="submit" class="delete-link" onclick="return confirm('Naozaj chcete odstrániť túto prácu?');">
-                        <i class="fas fa-trash-alt"></i>
-                    </button>
-                </form>
-                {% else %}
-                <p>Práca už nie je možné editovať ani mazať.</p>
-                {% endif %}
+               
+                
             </div>
             {% else %}
             <p>Žiadne práce na zobrazenie.</p>
