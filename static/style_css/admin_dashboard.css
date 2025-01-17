@@ -258,6 +258,64 @@ button:hover {
     justify-content: space-between;
 }
 
+.work-item .work-info .description-text {
+    display: block;
+    height: 50px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    line-height: 1.5;
+    transition: height 0.3s ease;
+}
+
+.work-item .work-info .show-more-btn{
+    background-color: #3498db;
+    color: white;
+    border: none;
+    padding: 10px 15px;
+    border-radius: 5px;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    display: block;
+    margin-top: 10px;
+}
+
+.work-item .work-info .show-more-btn:hover {
+    background-color: #2980b9;
+}
+
+.description-container {
+    display: flex;
+    flex-direction: column;
+}
+
+.description-text {
+    display: -webkit-box;
+    -webkit-line-clamp: 1;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-height: 1.2em;
+}
+
+.description-text.expanded {
+    -webkit-line-clamp: unset;
+    max-height: unset;
+}
+
+.show-more-btn {
+    display: none;
+    margin-top: 5px;
+    padding: 5px 10px;
+    font-size: 0.8em;
+    cursor: pointer;
+    background-color: #f0f0f0;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    text-align: center;
+    align-self: flex-start;
+}
+
 footer {
     background-color: #2c3e50;
     color: white;

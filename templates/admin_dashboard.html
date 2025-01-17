@@ -92,12 +92,16 @@
                     <p><strong>Konferencia:</strong> {{ work.conference_name }}</p>
                     <p><strong>Názov práce:</strong> {{ work.title }}</p>
                     <p><strong>Študent:</strong> {{ work.full_name }}</p>
-                    <p><strong>Popis:</strong> {{ work.description }}</p>
+                    <div class="description-container">
+                        <p><strong>Popis:</strong> 
+                            <span class="description-text" id="description-text">{{ work.description }}</span>
+                        </p>
+                        <button class="show-more-btn" id="show-more-btn-{{ work['_id'] }}">Zobraziť viac</button>
+                    </div>
                     <p><strong>Škola:</strong> {{ work.school }}</p>
                     <p><strong>Fakulta:</strong> {{ work.faculty }}</p>
                     <p><strong>Ročník:</strong> {{ work.year }}</p>
 
-                    <!-- Recenzent -->
                     <p><strong>Recenzent:</strong>
                         {% if work.reviewer_name %}
                         {{ work.reviewer_name }}
@@ -157,6 +161,34 @@
             </a>
         </div>
     </footer>
+
+    <!-- Skript pre zobraziť viac pri dlhom popise -->
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            // Get all description texts and show more buttons
+            const works = document.querySelectorAll('.work-item');
+            
+            works.forEach(work => {
+                const descriptionText = work.querySelector('.description-text');
+                const showMoreBtn = work.querySelector('.show-more-btn');
+                
+                // Check if the description exceeds one line and show the button
+                if (descriptionText.scrollHeight > descriptionText.clientHeight) {
+                    showMoreBtn.style.display = "inline-block";
+                }
+                
+                showMoreBtn.addEventListener('click', function() {
+                    if (descriptionText.style.maxHeight === "none") {
+                        descriptionText.style.maxHeight = "1.2em"; // 1 line
+                        showMoreBtn.textContent = "Zobraziť viac";
+                    } else {
+                        descriptionText.style.maxHeight = "none"; // Expand to show all text
+                        showMoreBtn.textContent = "Zobraziť menej";
+                    }
+                });
+            });
+        });
+    </script>
 </body>
 
 </html>
