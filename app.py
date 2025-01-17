@@ -168,7 +168,7 @@ def edit_work_stud(work_id):
         # Uloženie zmien do databázy
         works_collection.update_one({"_id": ObjectId(work_id)}, {"$set": work_data})
 
-        # Presmerovanie na správny dashboard podľa roly
+        # Presmerovanie na správny dashboard podľa role
         if 'recenzent' in session['role']:
             return redirect(url_for('rec_stud_dashboard'))  # Ak je recenzent, presmerovať na rec_stud_dashboard
         else:
@@ -332,6 +332,15 @@ def add_work():
         flash("Najprv je potrebné vybrať si konferenciu.", "error")
         return redirect(url_for('view_conferences'))
 
+    current_conference = conferences_collection.find_one({'_id': ObjectId(current_conference_id)})
+
+    conference_date = current_conference.get('date')
+    current_date = datetime.now()
+
+    if current_date > conference_date:
+        flash("Prácu nie je možné pridať, pretože je po termíne pridávania prác do tejto konferencie.", "error")
+        return redirect(url_for('add_work'))
+    
     if request.method == 'POST':
         title = request.form.get('title')
         description = request.form.get('description')
