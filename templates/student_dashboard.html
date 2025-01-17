@@ -14,7 +14,11 @@
 <body>
     <div class="container">
         <!-- Zobrazenie názvu konferencie -->
-        <h1>Vitajte v konferencii: {{ session['current_conference_name'] }}</h1>
+        <h1>Vitajte v konferencii: {{ session['current_conference_name'] }}
+            <span class="info-icon" title="Ak chcete rolu aj recenzent pre túto konferenciu, kontaktujte emailom admina.">
+                <i class="material-icons">info</i>
+            </span>
+        </h1>
         <div class="auth-buttons">
             <a href="{{ url_for('add_work') }}" class="back-link">Pridať Prácu</a>
             <a href="{{ url_for('logout') }}" class="logout-link">Odhlásiť sa</a>

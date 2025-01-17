@@ -14,9 +14,18 @@
 <body>
     <div class="container">
         <!-- Dashboard Title -->
-        <h1>Vitajte v dashboarde recenzenta</h1>
+        <h1>Vitajte v konferencii: {{ session['current_conference_name'] }}
+            <span class="info-icon" title="Ak chcete rolu aj študent pre túto konferenciu, kontaktujte emailom admina.">
+                <i class="material-icons">info</i>
+            </span>
+        </h1>
+            <div class="auth-buttons">
+                <a href="{{ url_for('logout') }}" class="logout-link">Odhlásiť sa</a>
+                <!-- Odkaz na recenzent dashboard -->
+                <a href="{{ url_for('view_conferences') }}" class="back-link">Späť na zoznam prác</a>
+            </div>
         <!-- Priradené práce -->
-        <h2>Priradené práce pre Vás v tejto konferencii - {{ session['current_conference_name'] }}</h2>
+        <h2>Priradené práce pre Vás v tejto konferencii</h2>
         <div>
             {% if works %}
             {% for work in works %}
@@ -53,15 +62,6 @@
             <p>Žiadne priradené práce na recenzovanie v tejto konferencii.</p>
             {% endif %}
         </div>
-
-        <!-- Odhlásanie a predošlá strana -->
-        <!-- Login a predošlá strana -->
-        <div class="auth-buttons">
-            <a href="{{ url_for('logout') }}" class="logout-link">Odhlásiť sa</a>
-            <!-- Odkaz na recenzent dashboard -->
-            <a href="{{ url_for('view_conferences') }}" class="back-link">Späť na zoznam prác</a>
-        </div>
-
     </div>
     <footer>
         <div class="left-image">

@@ -940,7 +940,27 @@ def register():
         result = users_collection.insert_one(new_user)
         user_id = result.inserted_id
 
-        # Získame všetky konferencie, do ktorých priradíme používateľa ako "visitor"
+        # Zoznam univerzitných domén
+        university_domains = [
+            "ukf.sk", "uniba.sk", "stuba.sk", "bisla.sk", "euba.sk", 
+            "ku.sk", "unipo.sk", "uniag.sk", "szu.sk", "truni.sk", 
+            "umb.sk", "upjs.sk", "ucm.sk", "uvlf.sk", "vsbm.sk", 
+            "vsemba.sk", "vsm.sk", "ismpo.sk", "uniza.sk", "vsmu.sk"
+        ]
+
+        # Logika pre určenie role na základe emailu
+        domain = email.split('@')[1]
+        role = 'visitor'  # Default role
+
+        # Kontrola pre študentov alebo recenzentov
+        if domain.startswith('student.'):
+            clean_domain = domain.split('student.')[1]
+            if clean_domain in university_domains:
+                role = 'student'
+        elif domain in university_domains:
+            role = 'recenzent'
+
+        # Získame všetky konferencie, do ktorých priradíme používateľa so správnou rolou
         conferences = conferences_collection.find()
 
         # Pre každú konferenciu vytvoríme záznam v kolekcii roles
@@ -948,18 +968,19 @@ def register():
             role_document = {
                 'conference_id': conference['_id'],
                 'user_id': ObjectId(user_id),
-                'role': 'visitor'
+                'role': role
             }
             roles_collection.insert_one(role_document)
 
         # Po registrácii môžeme pridať používateľa do session, ak je to potrebné
         session['user_id'] = str(user_id)
-        session['role'] = 'visitor'
+        session['role'] = role
 
         flash('Registrácia bola úspešná, môžete sa prihlásiť.', 'success')
         return redirect(url_for('login'))  # Po registrácii presmeruj na prihlásenie
 
     return render_template('register.html')
+
 
 
 @app.route('/view_review_rec_stud/<work_id>', methods=['GET'])
