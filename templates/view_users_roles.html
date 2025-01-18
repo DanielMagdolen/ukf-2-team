@@ -4,13 +4,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Zobraziť roly používateľov</title>
+    <title>Zobraziť role používateľov</title>
     <link href="{{ url_for('static', filename='style_css/admin_dashboard.css') }}" rel="stylesheet">
 </head>
 
 <body>
     <div class="container">
-        <h1>Roly používateľov v konferencii: {{ session['current_conference_name'] }}</h1>
+        <h1>Role používateľov v konferencii: {{ session['current_conference_name'] }}</h1>
 
         <div class="users-container">
             {% if roles_info %}
@@ -25,7 +25,7 @@
                     <form method="POST">
                         <input type="hidden" name="user_id" value="{{ role.user_id }}">
                         <select name="role">
-                            <!-- Deaktivovanie možnosti admin pre všetkých, ktorí nie sú už admin -->
+                            <!-- Deaktivovanie možnosti admin pre všetkých, ktorí nie sú už admini -->
                             <option value="visitor" {% if role.role=='visitor' %}selected{% endif %}>visitor</option>
                             <option value="admin" {% if role.role=='admin' %}selected{% endif %} disabled>admin</option>
                             <option value="recenzent" {% if role.role=='recenzent' %}selected{% endif %}>recenzent
@@ -40,7 +40,7 @@
             </div>
             {% endfor %}
             {% else %}
-            <p>Žiadne roly neboli nájdené pre túto konferenciu.</p>
+            <p>Žiadne role neboli nájdené pre túto konferenciu.</p>
             {% endif %}
         </div>
 
