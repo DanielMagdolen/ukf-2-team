@@ -20,6 +20,7 @@
             <p><strong>Popis Práce:</strong> {{ work.description }}</p>
             <p><strong>Škola:</strong> {{ work.school }}</p>
             <p><strong>Fakulta:</strong> {{ work.faculty }}</p>
+            <p><strong>Odovzdané v termíne:</strong> {{ work.uploaded_on_time }} </p>
             <p><strong>Dátum Nahratia:</strong> {{ work.uploaded_at.strftime('%d.%m.%Y %H:%M:%S') }}</p>
             <p><strong>Priložený súbor:</strong> <a href="{{ work.file_path }}" target="_blank">Zobraziť Súbor</a></p>
         </div>
