@@ -8,6 +8,7 @@ import logging
 from bson import ObjectId
 from flask import flash, redirect, url_for
 from datetime import datetime
+from math import ceil
 
 
 
@@ -847,7 +848,7 @@ def admin_dashboard():
                  .skip((page - 1) * per_page)
                  .limit(per_page))
 
-    from math import ceil
+    
     total_pages = ceil(total_works / per_page)
 
     for work in works:
@@ -872,23 +873,9 @@ def admin_dashboard():
         selected_reviewer_id=selected_reviewer_id
     )
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 @app.route("/view_users_roles/<conference_id>", methods=["GET", "POST"])
-def view_users_roles(conference_id):
+@app.route("/view_users_roles/<conference_id>/page/<int:page>", methods=["GET", "POST"])  # Nová routa pre stránkovanie
+def view_users_roles(conference_id, page=1):
     try:
         # Načítavame roly pre danú konferenciu
         roles = roles_collection.find({"conference_id": ObjectId(conference_id)})
@@ -926,11 +913,27 @@ def view_users_roles(conference_id):
             )
             return redirect(request.url)
 
-        # Odovzdávame dáta do šablóny
-        return render_template("view_users_roles.html", roles_info=roles_info)
+        # Nastavenie pre stránkovanie (príklad)
+        roles_per_page = 5
+        total_roles = len(roles_info)
+        total_pages = (total_roles // roles_per_page) + (1 if total_roles % roles_per_page > 0 else 0)
+
+        start_idx = (page - 1) * roles_per_page
+        end_idx = start_idx + roles_per_page
+
+        roles_info_page = roles_info[start_idx:end_idx]
+
+        return render_template(
+            "view_users_roles.html",
+            roles_info=roles_info_page,
+            conference_id=conference_id,
+            current_page=page,
+            total_pages=total_pages
+        )
 
     except Exception as e:
         return f"Chyba pri načítavaní rolí: {str(e)}"
+
 
 
 
