@@ -93,6 +93,8 @@
                     <p><strong>Škola:</strong> {{ work.school }}</p>
                     <p><strong>Fakulta:</strong> {{ work.faculty }}</p>
                     <p><strong>Ročník:</strong> {{ work.year }}</p>
+                    <p><strong>Odovzdané v termíne:</strong> {{ work.uploaded_on_time }} </p>
+                    <p><strong>Dátum nahrania:</strong> {{ work.uploaded_at.strftime('%d.%m.%Y %H:%M:%S') }} </p>
 
                     <p><strong>Recenzent:</strong>
                         {% if work.reviewer_name %}
