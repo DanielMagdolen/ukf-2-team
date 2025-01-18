@@ -346,9 +346,10 @@ def add_work():
     conference_date = current_conference.get('date')
     current_date = datetime.now()
 
-    if current_date > conference_date:
-        flash("Prácu nie je možné pridať, pretože je po termíne pridávania prác do tejto konferencie.", "error")
-        return redirect(url_for('add_work'))
+    if current_date <= conference_date:
+        uploaded_on_time = "Áno"
+    else:
+        uploaded_on_time = "Nie"
     
     if request.method == 'POST':
         title = request.form.get('title')
@@ -377,6 +378,7 @@ def add_work():
                 "faculty": faculty,
                 "year": year,
                 "file_path": file_path,
+                "uploaded_on_time": uploaded_on_time,
                 "uploaded_at": datetime.utcnow()
             })
 
