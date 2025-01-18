@@ -8,6 +8,7 @@ import logging
 from bson import ObjectId
 from flask import flash, redirect, url_for
 from datetime import datetime
+from math import ceil
 
 
 
@@ -806,23 +807,17 @@ def assign_recenzent(work_id):
 
 
 
-
-
 @app.route('/admin_dashboard', methods=['GET', 'POST'])
 def admin_dashboard():
-    # Skontrolujeme, či je používateľ prihlásený a má rolu admin
     if 'user_id' not in session or session.get('role') != 'admin':
         flash("Musíte byť prihlásený/á ako admin.", "error")
         return redirect(url_for('login'))
 
-    # Získame hodnoty zo žiadosti (query params)
     selected_student_id = request.args.get('student_id')
     selected_reviewer_id = request.args.get('reviewer_id')
 
-    # Načítanie konferencií
     conferences = list(conferences_collection.find().sort("date", 1))
 
-    # Načítanie všetkých používateľov podľa konferencie z kolekcie roles
     roles = list(roles_collection.find({
         "conference_id": ObjectId(session['current_conference_id']),
     }))
@@ -830,7 +825,6 @@ def admin_dashboard():
     user_ids = [role["user_id"] for role in roles]
     users = list(users_collection.find({"_id": {"$in": user_ids}}))
 
-    # Rozdelenie na študentov a recenzentov
     students = []
     reviewers = []
     for user in users:
@@ -841,15 +835,22 @@ def admin_dashboard():
         if any(role in ['recenzent', 'recenzent,student'] for role in user_roles):
             reviewers.append(user)
 
-    # Načítanie prác
     query = {"conference_id": ObjectId(session['current_conference_id'])}
     if selected_student_id:
         query['user_id'] = ObjectId(selected_student_id)
     if selected_reviewer_id:
         query['recenzent'] = ObjectId(selected_reviewer_id)
 
-    works = list(works_collection.find(query))
+    per_page = 5
+    page = int(request.args.get('page', 1))
+    total_works = works_collection.count_documents(query)
+    works = list(works_collection.find(query)
+                 .skip((page - 1) * per_page)
+                 .limit(per_page))
+
     
+    total_pages = ceil(total_works / per_page)
+
     for work in works:
         user = users_collection.find_one({"_id": ObjectId(work.get("user_id"))})
         work["full_name"] = f"{user.get('surname', '')} {user.get('name', '')}".strip() if user else "Neznámy"
@@ -863,6 +864,8 @@ def admin_dashboard():
     return render_template(
         'admin_dashboard.html',
         works=works,
+        total_pages=total_pages,
+        current_page=page,
         conferences=conferences,
         students=students,
         reviewers=reviewers,
@@ -870,25 +873,9 @@ def admin_dashboard():
         selected_reviewer_id=selected_reviewer_id
     )
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 @app.route("/view_users_roles/<conference_id>", methods=["GET", "POST"])
-def view_users_roles(conference_id):
+@app.route("/view_users_roles/<conference_id>/page/<int:page>", methods=["GET", "POST"])  # Nová routa pre stránkovanie
+def view_users_roles(conference_id, page=1):
     try:
         # Načítavame roly pre danú konferenciu
         roles = roles_collection.find({"conference_id": ObjectId(conference_id)})
@@ -926,11 +913,27 @@ def view_users_roles(conference_id):
             )
             return redirect(request.url)
 
-        # Odovzdávame dáta do šablóny
-        return render_template("view_users_roles.html", roles_info=roles_info)
+        # Nastavenie pre stránkovanie (príklad)
+        roles_per_page = 5
+        total_roles = len(roles_info)
+        total_pages = (total_roles // roles_per_page) + (1 if total_roles % roles_per_page > 0 else 0)
+
+        start_idx = (page - 1) * roles_per_page
+        end_idx = start_idx + roles_per_page
+
+        roles_info_page = roles_info[start_idx:end_idx]
+
+        return render_template(
+            "view_users_roles.html",
+            roles_info=roles_info_page,
+            conference_id=conference_id,
+            current_page=page,
+            total_pages=total_pages
+        )
 
     except Exception as e:
         return f"Chyba pri načítavaní rolí: {str(e)}"
+
 
 
 

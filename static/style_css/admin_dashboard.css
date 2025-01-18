@@ -267,7 +267,7 @@ button:hover {
     transition: height 0.3s ease;
 }
 
-.work-item .work-info .show-more-btn{
+.work-item .work-info .show-more-btn {
     background-color: #3498db;
     color: white;
     border: none;
@@ -289,6 +289,30 @@ button:hover {
     flex-direction: column;
 }
 
+.pagination {
+    display: flex;
+    justify-content: center;
+    margin: 20px 0;
+}
+
+.pagination a {
+    margin: 0 5px;
+    padding: 10px 15px;
+    text-decoration: none;
+    color: #007bff;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+}
+
+.pagination a.active {
+    background-color: #007bff;
+    color: white;
+    border-color: #007bff;
+}
+
+.pagination a:hover:not(.active) {
+    background-color: #ddd;
+}
 .description-text {
     display: -webkit-box;
     -webkit-line-clamp: 1;
