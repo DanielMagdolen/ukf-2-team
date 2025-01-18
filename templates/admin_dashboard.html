@@ -56,7 +56,7 @@
                 {% for reviewer in reviewers %}
                 <option value="{{ reviewer['_id'] }}" {% if selected_reviewer_id==reviewer['_id'] %}selected{% endif %}>
                     {{ reviewer['surname'] }} {{ reviewer['name'] }}
-                    {% if reviewer.is_student %}(Recenzent a Študent){% endif %}
+                    {% if reviewer.is_student %}(Recenzent){% endif %}
                 </option>
                 {% endfor %}
             </select>

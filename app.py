@@ -280,13 +280,21 @@ def edit_work(work_id):
         # Získame dáta z formulára a vykonáme úpravy
         title = request.form['title']
         description = request.form['description']
-        # Môžete pridať ďalšie polia podľa potreby
+        school = request.form['school']
+        faculty = request.form['faculty']
+        year = request.form['year']
 
         # Aktualizujeme prácu v databáze
         try:
             works_collection.update_one(
                 {"_id": ObjectId(work_id)},
-                {"$set": {"title": title, "description": description}}
+                {"$set": {
+                    "title": title,
+                    "description": description,
+                    "school": school,
+                    "faculty": faculty,
+                    "year": year
+                }}
             )
             flash("Práca bola úspešne upravená.", "success")
             return redirect(url_for('admin_dashboard'))  # Presmerujeme späť na dashboard
