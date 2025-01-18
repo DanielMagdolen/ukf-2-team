@@ -72,14 +72,11 @@
             <div class="work-item">
                 <!-- Ikonky pre Editovať a Vymazať -->
                 <div class="icon-container">
-                    <!-- Ikona Editovania -->
                     <form method="GET" action="{{ url_for('edit_work', work_id=work['_id']) }}">
                         <button type="submit" class="icon-button edit-icon">
                             <i class="fas fa-edit"></i>
                         </button>
                     </form>
-
-                    <!-- Ikona Vymazania -->
                     <form method="POST" action="{{ url_for('delete_work', work_id=work['_id']) }}"
                         onsubmit="return confirm('Naozaj chcete vymazať túto prácu?');">
                         <button type="submit" class="icon-button delete-icon">
@@ -93,11 +90,12 @@
                     <p><strong>Názov práce:</strong> {{ work.title }}</p>
                     <p><strong>Študent:</strong> {{ work.full_name }}</p>
                     <div class="description-container">
-                        <p><strong>Popis:</strong> 
+                        <p><strong>Popis:</strong>
                             <span class="description-text" id="description-text">{{ work.description }}</span>
                         </p>
                         <button class="show-more-btn" id="show-more-btn-{{ work['_id'] }}">Zobraziť viac</button>
                     </div>
+
                     <p><strong>Škola:</strong> {{ work.school }}</p>
                     <p><strong>Fakulta:</strong> {{ work.faculty }}</p>
                     <p><strong>Ročník:</strong> {{ work.year }}</p>
@@ -109,7 +107,7 @@
                         Zatiaľ nebol priradený
                         {% endif %}
                     </p>
-                    
+
                     <div class="file-links">
                         <a href="{{ work.file_path }}" target="_blank">Zobraziť súbor</a>
                         <a href="{{ url_for('assign_recenzent', work_id=work['_id']) }}">Priradiť recenzenta</a>
@@ -126,69 +124,89 @@
         {% else %}
         <p>Žiadne práce neboli pridané.</p>
         {% endif %}
+
+        <!-- Pagination Section -->
+        <div class="pagination">
+            {% if current_page > 1 %}
+            <a
+                href="{{ url_for('admin_dashboard', page=current_page-1, student_id=selected_student_id, reviewer_id=selected_reviewer_id) }}">Predchádzajúca</a>
+            {% endif %}
+            {% for page_num in range(1, total_pages + 1) %}
+            <a href="{{ url_for('admin_dashboard', page=page_num, student_id=selected_student_id, reviewer_id=selected_reviewer_id) }}"
+                class="{{ 'active' if page_num == current_page else '' }}">{{ page_num }}</a>
+            {% endfor %}
+            {% if current_page < total_pages %} <a
+                href="{{ url_for('admin_dashboard', page=current_page+1, student_id=selected_student_id, reviewer_id=selected_reviewer_id) }}">
+                Ďalšia</a>
+                {% endif %}
+        </div>
     </div>
 
-    <footer>
-        <div class="left-image">
-            <img src="https://www.fpvai.ukf.sk/images/logo/fpvai.png" alt="Image" style="max-width: 280px; height: auto;">
-        </div>
-    
-        <div class="contact-info">
-            <div>
-                <i class="fas fa-envelope"></i>
-                <span>Email: <a href="mailto:admin@ukf.sk">admin@ukf.sk</a></span>
-            </div>
-            <div>
-                <i class="fas fa-phone-alt"></i>
-                <span>Telefón: <a href="tel:+421000000000">+421 000 000 000</a></span>
-            </div>
-            <div>
-                <i class="fas fa-map-marker-alt"></i>
-                <span>Adresa: <a href="https://maps.app.goo.gl/xbsYHRJh5tmQj82f9" target="_blank">Tr. A. Hlinku 1, 949 01
-                        Nitra</a></span>
-            </div>
-        </div>
-    
-        <div class="social-icons">
-            <a href="https://www.facebook.com/fpvai.ukf/" target="_blank">
-                <i class="fab fa-facebook-f"></i>
-            </a>
-            <a href="https://sk.linkedin.com/company/katedra-informatiky-fpv-ukf-v-nitre" target="_blank">
-                <i class="fab fa-linkedin-in"></i>
-            </a>
-            <a href="https://www.instagram.com/fpvai.ukf/" target="_blank">
-                <i class="fab fa-instagram"></i>
-            </a>
-        </div>
-    </footer>
+<footer>
+    <div class="left-image">
+        <img src="https://www.fpvai.ukf.sk/images/logo/fpvai.png" alt="Image" style="max-width: 280px; height: auto;">
+    </div>
 
-    <!-- Skript pre zobraziť viac pri dlhom popise -->
-    <script>
-        document.addEventListener("DOMContentLoaded", function() {
-            // Get all description texts and show more buttons
-            const works = document.querySelectorAll('.work-item');
-            
-            works.forEach(work => {
-                const descriptionText = work.querySelector('.description-text');
-                const showMoreBtn = work.querySelector('.show-more-btn');
-                
-                // Check if the description exceeds one line and show the button
-                if (descriptionText.scrollHeight > descriptionText.clientHeight) {
-                    showMoreBtn.style.display = "inline-block";
+    <div class="contact-info">
+        <div>
+            <i class="fas fa-envelope"></i>
+            <span>Email: <a href="mailto:admin@ukf.sk">admin@ukf.sk</a></span>
+        </div>
+        <div>
+            <i class="fas fa-phone-alt"></i>
+            <span>Telefón: <a href="tel:+421000000000">+421 000 000 000</a></span>
+        </div>
+        <div>
+            <i class="fas fa-map-marker-alt"></i>
+            <span>Adresa: <a href="https://maps.app.goo.gl/xbsYHRJh5tmQj82f9" target="_blank">Tr. A. Hlinku 1, 949 01
+                    Nitra</a></span>
+        </div>
+    </div>
+
+    <div class="social-icons">
+        <a href="https://www.facebook.com/fpvai.ukf/" target="_blank">
+            <i class="fab fa-facebook-f"></i>
+        </a>
+        <a href="https://sk.linkedin.com/company/katedra-informatiky-fpv-ukf-v-nitre" target="_blank">
+            <i class="fab fa-linkedin-in"></i>
+        </a>
+        <a href="https://www.instagram.com/fpvai.ukf/" target="_blank">
+            <i class="fab fa-instagram"></i>
+        </a>
+    </div>
+</footer>
+
+ 
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        // Get all description texts and show more buttons
+        const works = document.querySelectorAll('.work-item');
+
+        works.forEach(work => {
+            const descriptionText = work.querySelector('.description-text');
+            const showMoreBtn = work.querySelector('.show-more-btn');
+
+            // Check if the description exceeds one line and show the button
+            if (descriptionText.scrollHeight > descriptionText.clientHeight) {
+                showMoreBtn.style.display = "inline-block";
+            }
+
+            showMoreBtn.addEventListener('click', function () {
+                if (descriptionText.style.maxHeight === "none") {
+                    descriptionText.style.maxHeight = "1.2em"; // 1 line
+                    showMoreBtn.textContent = "Zobraziť viac";
+                } else {
+                    descriptionText.style.maxHeight = "none"; // Expand to show all text
+                    showMoreBtn.textContent = "Zobraziť menej";
                 }
-                
-                showMoreBtn.addEventListener('click', function() {
-                    if (descriptionText.style.maxHeight === "none") {
-                        descriptionText.style.maxHeight = "1.2em"; // 1 line
-                        showMoreBtn.textContent = "Zobraziť viac";
-                    } else {
-                        descriptionText.style.maxHeight = "none"; // Expand to show all text
-                        showMoreBtn.textContent = "Zobraziť menej";
-                    }
-                });
             });
         });
-    </script>
+    });
+</script>
+
 </body>
 
 </html>
+
+
+   
