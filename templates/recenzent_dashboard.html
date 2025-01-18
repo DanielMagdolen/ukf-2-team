@@ -30,12 +30,13 @@
             {% if works %}
             {% for work in works %}
             <div class="work-item">
-                <p><strong>Názov:</strong> {{ work.title }}</p>
-                <p><strong>Popis:</strong> {{ work.description }}</p>
-                <p><strong>Škola:</strong> {{ work.school }}</p>
-                <p><strong>Fakulta:</strong> {{ work.faculty }}</p>
-                <p><strong>Študent:</strong> {{ work.student_name }}</p> <!-- Zobrazenie mena študenta -->
-                <p><strong>Dátum nahrania:</strong> {{ work.uploaded_at.strftime('%d.%m.%Y %H:%M:%S') }}</p>
+                <p><strong>Názov:</strong> {{ work.title }} </p>
+                <p><strong>Popis:</strong> {{ work.description }} </p>
+                <p><strong>Škola:</strong> {{ work.school }} </p>
+                <p><strong>Fakulta:</strong> {{ work.faculty }} </p>
+                <p><strong>Študent:</strong> {{ work.student_name }} </p> <!-- Zobrazenie mena študenta -->
+                <p><strong>Odovzdané v termíne:</strong> {{ work.uploaded_on_time }} </p>
+                <p><strong>Dátum nahrania:</strong> {{ work.uploaded_at.strftime('%d.%m.%Y %H:%M:%S') }} </p>
                 <a href="{{ work.file_path }}" target="_blank">Zobraziť súbor</a><br>
 
                 <!-- Kontrola existencie posudku pre danú prácu -->
