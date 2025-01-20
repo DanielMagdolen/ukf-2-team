@@ -5,7 +5,6 @@
     <meta charset="UTF-8">
     <title>Posudok pre prácu: {{ work['title'] }}</title>
     <link href="{{ url_for('static', filename='style_css/view_review_admin.css') }}" rel="stylesheet">
-
 </head>
 
 <body>
@@ -24,15 +23,13 @@
     <p><strong>Dátum pridania:</strong> {{ review['uploaded_at'].strftime('%d.%m.%Y %H:%M:%S') }}</p>
 
     <h3>Hodnotenie otázok:</h3>
-    <ul>
-        <li><strong>Splnila práca cieľ? - </strong> {{ review['goal'] }}</li>
-        <li><strong>Je práca metodologicky správna? - </strong> {{ review['methodology'] }}</li>
-        <li><strong>Sú výsledky práce zrozumiteľné? - </strong> {{ review['results'] }}</li>
-        <li><strong>Má práca praktickú hodnotu? - </strong> {{ review['practical_value'] }}</li>
-        <li><strong>Je text práce gramaticky správny? - </strong> {{ review['grammar'] }}</li>
-        <li><strong>Je práca štruktúrovaná prehľadne? - </strong> {{ review['structure'] }}</li>
-        <li><strong>Sú všetky citácie uvedené správne? - </strong> {{ review['citations'] }}</li>
-    </ul>
+    <p><strong>Splnila práca cieľ? </strong>{{ review['goal'] }}</p>
+    <p><strong>Je práca metodologicky správna? </strong>{{ review['methodology'] }}</p>
+    <p><strong>Sú výsledky práce zrozumiteľné? </strong>{{ review['results'] }}</p>
+    <p><strong>Má práca praktickú hodnotu? </strong>{{ review['practical_value'] }}</p>
+    <p><strong>Je text práce gramaticky správny? </strong>{{ review['grammar'] }}</p>
+    <p><strong>Je práca štruktúrovaná prehľadne? </strong>{{ review['structure'] }}</p>
+    <p><strong>Sú všetky citácie uvedené správne? </strong>{{ review['citations'] }}</p>
 
     <p><strong>Záverečné rozhodnutie:</strong> {{ review['decision'] }}</p>
 
@@ -40,7 +37,7 @@
     <p>Posudok pre túto prácu ešte nebol pridaný.</p>
     {% endif %}
 
-    <a href="{{ url_for('admin_dashboard') }}" >Späť na admin dashboard</a>
+    <a href="{{ url_for('admin_dashboard') }}">Späť na admin dashboard</a>
 </body>
 
 </html>

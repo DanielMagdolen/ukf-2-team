@@ -4,122 +4,39 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Posudok pre: {{ work.title }}</title>
-    <link href="{{ url_for('static', filename='style_css/view_review_student.css') }}" rel="stylesheet">
-
+    <title>Detail posudku</title>
+    <link href="{{ url_for('static', filename='style_css/view_review_recenzent.css') }}" rel="stylesheet">
 </head>
 
 <body>
-    <h2>Posudok pre prácu: {{ work.title }}</h2>
+    <h2>Detail posudku pre: {{ work.title }}</h2>
 
-    {% if review %}
-    <form>
-        <fieldset>
-            <legend>Hodnotenie práce</legend>
+    <p><strong>Splnila práca cieľ?</strong> {{ review.goal }}</p>
+    <p><strong>Je práca metodologicky správna?</strong> {{ review.methodology }}</p>
+    <p><strong>Sú výsledky práce zrozumiteľné?</strong> {{ review.results }}</p>
+    <p><strong>Má práca praktickú hodnotu?</strong> {{ review.practical_value }}</p>
+    <p><strong>Je text práce gramaticky správny?</strong> {{ review.grammar }}</p>
+    <p><strong>Je práca štruktúrovaná prehľadne?</strong> {{ review.structure }}</p>
+    <p><strong>Sú všetky citácie uvedené správne?</strong> {{ review.citations }}</p>
+    <p><strong>Záverečné rozhodnutie:</strong> {{ review.decision }}</p>
+    <p><strong>Dátum pridania:</strong> {{ review.uploaded_at.strftime('%d.%m.%Y %H:%M:%S') }}</p>
 
-            <!-- Otázka 1 -->
-            <p>Splnila práca cieľ?</p>
-            <input type="radio" id="goal_yes" name="goal" value="Áno" {% if review['goal']=='Áno' %}checked{% endif %}
-                disabled>
-            <label for="goal_yes">Áno</label>
-            <input type="radio" id="goal_partially" name="goal" value="Nie úplne" {% if review['goal']=='Nie úplne'
-                %}checked{% endif %} disabled>
-            <label for="goal_partially">Nie úplne</label>
-            <input type="radio" id="goal_no" name="goal" value="Nie" {% if review['goal']=='Nie' %}checked{% endif %}
-                disabled>
-            <label for="goal_no">Nie</label>
+    <div class="actions">
+        {% set roles = session['role'].split(',') %}
 
-            <!-- Otázka 2 -->
-            <p>Je práca metodologicky správna?</p>
-            <input type="radio" id="method_yes" name="methodology" value="Áno" {% if review['methodology']=='Áno'
-                %}checked{% endif %} disabled>
-            <label for="method_yes">Áno</label>
-            <input type="radio" id="method_partially" name="methodology" value="Nie úplne" {% if
-                review['methodology']=='Nie úplne' %}checked{% endif %} disabled>
-            <label for="method_partially">Nie úplne</label>
-            <input type="radio" id="method_no" name="methodology" value="Nie" {% if review['methodology']=='Nie'
-                %}checked{% endif %} disabled>
-            <label for="method_no">Nie</label>
+        {% if 'recenzent' in roles and 'student' in roles %}
+        <a href="{{ url_for('rec_stud_dashboard') }}">Späť na RecStud Dashboard</a>
 
-            <!-- Otázka 3 -->
-            <p>Sú výsledky práce zrozumiteľné?</p>
-            <input type="radio" id="results_yes" name="results" value="Áno" {% if review['results']=='Áno' %}checked{%
-                endif %} disabled>
-            <label for="results_yes">Áno</label>
-            <input type="radio" id="results_partially" name="results" value="Nie úplne" {% if
-                review['results']=='Nie úplne' %}checked{% endif %} disabled>
-            <label for="results_partially">Nie úplne</label>
-            <input type="radio" id="results_no" name="results" value="Nie" {% if review['results']=='Nie' %}checked{%
-                endif %} disabled>
-            <label for="results_no">Nie</label>
+        {% elif 'recenzent' in roles %}
+        <a href="{{ url_for('recenzent_dashboard') }}">Späť na Recenzent Dashboard</a>
 
-            <!-- Otázka 4 -->
-            <p>Má práca praktickú hodnotu?</p>
-            <input type="radio" id="value_yes" name="practical_value" value="Áno" {% if review['practical_value']=='Áno'
-                %}checked{% endif %} disabled>
-            <label for="value_yes">Áno</label>
-            <input type="radio" id="value_partially" name="practical_value" value="Nie úplne" {% if
-                review['practical_value']=='Nie úplne' %}checked{% endif %} disabled>
-            <label for="value_partially">Nie úplne</label>
-            <input type="radio" id="value_no" name="practical_value" value="Nie" {% if review['practical_value']=='Nie'
-                %}checked{% endif %} disabled>
-            <label for="value_no">Nie</label>
+        {% elif 'student' in roles %}
+        <a href="{{ url_for('student_dashboard') }}">Späť na Dashboard</a>
 
-            <!-- Otázka 5 -->
-            <p>Je text práce gramaticky správny?</p>
-            <input type="radio" id="grammar_yes" name="grammar" value="Áno" {% if review['grammar']=='Áno' %}checked{%
-                endif %} disabled>
-            <label for="grammar_yes">Áno</label>
-            <input type="radio" id="grammar_partially" name="grammar" value="Nie úplne" {% if
-                review['grammar']=='Nie úplne' %}checked{% endif %} disabled>
-            <label for="grammar_partially">Nie úplne</label>
-            <input type="radio" id="grammar_no" name="grammar" value="Nie" {% if review['grammar']=='Nie' %}checked{%
-                endif %} disabled>
-            <label for="grammar_no">Nie</label>
-
-            <!-- Otázka 6 -->
-            <p>Je práca štruktúrovaná prehľadne?</p>
-            <input type="radio" id="structure_yes" name="structure" value="Áno" {% if review['structure']=='Áno'
-                %}checked{% endif %} disabled>
-            <label for="structure_yes">Áno</label>
-            <input type="radio" id="structure_partially" name="structure" value="Nie úplne" {% if
-                review['structure']=='Nie úplne' %}checked{% endif %} disabled>
-            <label for="structure_partially">Nie úplne</label>
-            <input type="radio" id="structure_no" name="structure" value="Nie" {% if review['structure']=='Nie'
-                %}checked{% endif %} disabled>
-            <label for="structure_no">Nie</label>
-
-            <!-- Otázka 7 -->
-            <p>Sú všetky citácie uvedené správne?</p>
-            <input type="radio" id="citations_yes" name="citations" value="Áno" {% if review['citations']=='Áno'
-                %}checked{% endif %} disabled>
-            <label for="citations_yes">Áno</label>
-            <input type="radio" id="citations_partially" name="citations" value="Nie úplne" {% if
-                review['citations']=='Nie úplne' %}checked{% endif %} disabled>
-            <label for="citations_partially">Nie úplne</label>
-            <input type="radio" id="citations_no" name="citations" value="Nie" {% if review['citations']=='Nie'
-                %}checked{% endif %} disabled>
-            <label for="citations_no">Nie</label>
-        </fieldset>
-
-        <fieldset>
-            <legend>Záverečné rozhodnutie o prijatí práce:</legend>
-            <input type="radio" id="not_accepted" name="decision" value="Neprijatá" {% if
-                review['decision']=='Neprijatá' %}checked{% endif %} disabled>
-            <label for="not_accepted">Neprijatá</label>
-            <input type="radio" id="accepted" name="decision" value="Prijatá" {% if review['decision']=='Prijatá'
-                %}checked{% endif %} disabled>
-            <label for="accepted">Prijatá</label>
-        </fieldset>
-
-        <br><br>
-        <p><strong>Dátum pridania posudku:</strong> {{ review['uploaded_at'].strftime('%d.%m.%Y %H:%M:%S') }}</p>
-    </form>
-    {% else %}
-    <p>Posudok pre túto prácu ešte nebol pridaný.</p>
-    {% endif %}
-
-    <a href="{{ url_for('student_dashboard') }}">Späť na zoznam prác</a>
+        {% else %}
+        <a href="{{ url_for('login') }}">Späť na Prihlásenie</a>
+        {% endif %}
+    </div>
 </body>
 
 </html>

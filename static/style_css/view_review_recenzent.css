@@ -34,29 +34,31 @@ p strong {
     color: #2c3e50;
 }
 
-/* Štýl pre odkaz */
-a {
-    text-decoration: none;
-    color: #007bff;
-    font-weight: bold;
-    margin-top: 20px;
-    display: inline-block;
-    transition: color 0.3s ease;
-}
-
-a:hover {
-    color: #0056b3;
-}
-
-/* Kontajner pre jednotlivé hodnotenia */
+/* Štýl pre recenzie */
 .review-item {
     margin-bottom: 10px;
     background-color: #f9f9f9;
-    padding: 10px;
+    padding: 15px;
     border-radius: 5px;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
     width: 100%;
     max-width: 600px;
+}
+
+/* Akcie (tlačidlá alebo odkazy) */
+.actions a {
+    text-decoration: none;
+    color: white;
+    background-color: #007bff;
+    padding: 10px 15px;
+    border-radius: 5px;
+    margin-top: 20px;
+    display: inline-block;
+    transition: background-color 0.3s ease;
+}
+
+.actions a:hover {
+    background-color: #0056b3;
 }
 
 /* Silné zvýraznenie textu */
