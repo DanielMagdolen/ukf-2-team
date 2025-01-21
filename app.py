@@ -979,17 +979,20 @@ def register():
         else:
             role = "visitor"
 
+        current_date = datetime.now()
+
         # Získame všetky konferencie, do ktorých priradíme používateľa so správnou rolou
         conferences = conferences_collection.find()
 
         # Pre každú konferenciu vytvoríme záznam v kolekcii roles
         for conference in conferences:
-            role_document = {
-                'conference_id': conference['_id'],
-                'user_id': ObjectId(user_id),
-                'role': role
-            }
-            roles_collection.insert_one(role_document)
+            if (current_date <= conference.get('date')):
+                role_document = {
+                    'conference_id': conference['_id'],
+                    'user_id': ObjectId(user_id),
+                    'role': role
+                }
+                roles_collection.insert_one(role_document)
 
         # Po registrácii môžeme pridať používateľa do session, ak je to potrebné
         session['user_id'] = str(user_id)
