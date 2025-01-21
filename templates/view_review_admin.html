@@ -22,16 +22,24 @@
 
     <p><strong>Dátum pridania:</strong> {{ review['uploaded_at'].strftime('%d.%m.%Y %H:%M:%S') }}</p>
 
-    <h3>Hodnotenie otázok:</h3>
-    <p><strong>Splnila práca cieľ? </strong>{{ review['goal'] }}</p>
-    <p><strong>Je práca metodologicky správna? </strong>{{ review['methodology'] }}</p>
-    <p><strong>Sú výsledky práce zrozumiteľné? </strong>{{ review['results'] }}</p>
-    <p><strong>Má práca praktickú hodnotu? </strong>{{ review['practical_value'] }}</p>
-    <p><strong>Je text práce gramaticky správny? </strong>{{ review['grammar'] }}</p>
-    <p><strong>Je práca štruktúrovaná prehľadne? </strong>{{ review['structure'] }}</p>
-    <p><strong>Sú všetky citácie uvedené správne? </strong>{{ review['citations'] }}</p>
+    <div class="review-details">
+        <h3>Hodnotenie otázok:</h3>
+        <p><strong>Splnila práca cieľ? </strong>{{ review['goal'] }}</p>
+        <p><strong>Je práca metodologicky správna? </strong>{{ review['methodology'] }}</p>
+        <p><strong>Sú výsledky práce zrozumiteľné? </strong>{{ review['results'] }}</p>
+        <p><strong>Má práca praktickú hodnotu? </strong>{{ review['practical_value'] }}</p>
+        <p><strong>Je text práce gramaticky správny? </strong>{{ review['grammar'] }}</p>
+        <p><strong>Je práca štruktúrovaná prehľadne? </strong>{{ review['structure'] }}</p>
+        <p><strong>Sú všetky citácie uvedené správne? </strong>{{ review['citations'] }}</p>
 
-    <p><strong>Záverečné rozhodnutie:</strong> {{ review['decision'] }}</p>
+        {% if review.file_path %}
+        <p><strong>Priložený súbor k posudku:</strong> <a href="{{ review['file_path'] }}" target="_blank">Zobraziť súbor</a></p>
+        {% else %}
+        <p><strong>Žiadny súbor priložený k posudku.</strong></p>
+        {% endif %}
+
+        <p><strong>Záverečné rozhodnutie:</strong> {{ review['decision'] }}</p>
+    </div>
 
     {% else %}
     <p>Posudok pre túto prácu ešte nebol pridaný.</p>
