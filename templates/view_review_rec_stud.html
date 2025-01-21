@@ -4,24 +4,24 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Posudok - Recenzent, Študent</title>
+    <title>Posudok - Recenzent, študent</title>
     <link href="{{ url_for('static', filename='style_css/student_dashboard.css') }}" rel="stylesheet">
 </head>
 
 <body>
     <div class="container">
-        <h1>Posudok pre Vašu Prácu: {{ work.title }}</h1>
+        <h1>Posudok pre Vašu prácu: {{ work.title }}</h1>
 
-        <!-- Zobrazenie roly používateľa -->
+        <!-- Zobrazenie role používateľa -->
         
 
         <div class="work-details">
             <p><strong>Študent:</strong> {{ work.student_name }}</p>
-            <p><strong>Popis Práce:</strong> {{ work.description }}</p>
+            <p><strong>Popis práce:</strong> {{ work.description }}</p>
             <p><strong>Škola:</strong> {{ work.school }}</p>
             <p><strong>Fakulta:</strong> {{ work.faculty }}</p>
             <p><strong>Odovzdané v termíne:</strong> {{ work.uploaded_on_time }} </p>
-            <p><strong>Dátum Nahratia:</strong> {{ work.uploaded_at.strftime('%d.%m.%Y %H:%M:%S') }}</p>
+            <p><strong>Dátum pridania:</strong> {{ work.uploaded_at.strftime('%d.%m.%Y %H:%M:%S') }}</p>
             <p><strong>Priložený súbor:</strong> <a href="{{ work.file_path }}" target="_blank">Zobraziť Súbor</a></p>
         </div>
 
@@ -32,21 +32,20 @@
             <p><strong>Dátum Posudku:</strong> {{ review.created_at.strftime('%d.%m.%Y %H:%M:%S') }}</p>
 
             {% if review.file_path %}
-            <p><strong>Priložený súbor k posudku:</strong> <a href="{{ review.file_path }}" target="_blank">Zobraziť
-                    súbor</a></p>
+            <p><strong>Priložený súbor k posudku:</strong> <a href="{{ review.file_path }}" target="_blank">Zobraziť súbor</a></p>
             {% else %}
             <p><strong>Žiadny súbor priložený k posudku.</strong></p>
             {% endif %}
         </div>
 
-        <!-- Odkaz na návrat na dashboard podľa roly -->
+        <!-- Odkaz na návrat na dashboard podľa role -->
         <div class="actions">
             {% if 'recenzent' in session['role'] %}
-            <a href="{{ url_for('recenzent_dashboard') }}" class="back-link">Naspäť na Recenzent Dashboard</a>
+            <a href="{{ url_for('recenzent_dashboard') }}" class="back-link">Naspäť na recenzent dashboard</a>
             {% elif 'recenzent,student' in session['role'] %}
-            <a href="{{ url_for('rec_stud_dashboard') }}" class="back-link">Naspäť na Dashboard</a>
+            <a href="{{ url_for('rec_stud_dashboard') }}" class="back-link">Naspäť na dashboard</a>
             {% else %}
-            <a href="{{ url_for('login') }}" class="back-link">Naspäť na Prihlásenie</a>
+            <a href="{{ url_for('login') }}" class="back-link">Naspäť na prihlásenie</a>
             {% endif %}
         </div>
 
