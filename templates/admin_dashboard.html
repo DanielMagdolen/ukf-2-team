@@ -5,48 +5,175 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin Dashboard</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    <link href="{{ url_for('static', filename='style_css/admin_dashboard.css') }}" rel="stylesheet">
 </head>
 
 <body>
-    <h1>Admin Dashboard</h1>
+    <div class="container">
+        <!-- Logout and Previous Page Buttons -->
+        <div class="auth-buttons">
+            <a href="{{ url_for('logout') }}" class="logout-link">Odhlásiť sa</a>
+            <a href="{{ url_for('view_conferences') }}" class="back-link">Naspäť</a>
+        </div>
 
-    <!-- Dropdown menu na filtrovanie podľa konferencií -->
-    <form method="get" action="{{ url_for('admin_dashboard') }}">
-        <label for="conference">Vyberte konferenciu:</label>
-        <select name="conference_id" id="conference" onchange="this.form.submit()">
-            <option value="" {% if not selected_conference_id %}selected{% endif %}>Všetky konferencie</option>
-            {% for conference in conferences %}
-            <option value="{{ conference['_id'] }}" {% if selected_conference_id==conference['_id'] %}selected{% endif
-                %}>
-                {{ conference['name'] }}
-            </option>
+        <!-- Title Section -->
+        <h1>Admin Dashboard</h1>
+        <h3>Vitajte v konferencii: {{ session['current_conference_name'] }}</h3>
+
+        <a href="{{ url_for('view_users_roles', conference_id=session['current_conference_id']) }}">
+            <button>Zobraziť používateľov a ich roly</button>
+        </a>
+
+        <!-- Flash Messages -->
+        {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+        <div class="message-list">
+            <ul>
+                {% for category, message in messages %}
+                <li>{{ message }}</li>
+                {% endfor %}
+            </ul>
+        </div>
+        {% endif %}
+        {% endwith %}
+
+        <!-- Filtering Form -->
+        <form method="get" action="{{ url_for('admin_dashboard') }}">
+            <label for="student">Vyberte študenta:</label>
+            <select name="student_id" id="student">
+                <option value="" {% if not selected_student_id %}selected{% endif %}>Všetci študenti</option>
+                {% for student in students %}
+                <option value="{{ student['_id'] }}" {% if selected_student_id==student['_id'] %}selected{% endif %}>
+                    {{ student['surname'] }} {{ student['name'] }}
+                </option>
+                {% endfor %}
+            </select>
+
+            <label for="reviewer">Vyberte recenzenta:</label>
+            <select name="reviewer_id" id="reviewer">
+                <option value="" {% if not selected_reviewer_id %}selected{% endif %}>Všetci recenzenti</option>
+                {% for reviewer in reviewers %}
+                <option value="{{ reviewer['_id'] }}" {% if selected_reviewer_id==reviewer['_id'] %}selected{% endif %}>
+                    {{ reviewer['surname'] }} {{ reviewer['name'] }}
+                    {% if reviewer.is_student %}(Recenzent a Študent){% endif %}
+                </option>
+                {% endfor %}
+            </select>
+
+            <button type="submit">Filtruj</button>
+        </form>
+
+        <!-- Works Section -->
+        {% if works %}
+        <h3>Práce pridané študentami:</h3>
+        <div class="works-container">
+            {% for work in works %}
+            <div class="work-item">
+                <!-- Ikonky pre Editovať a Vymazať -->
+                <div class="icon-container">
+                    <form method="GET" action="{{ url_for('edit_work', work_id=work['_id']) }}">
+                        <button type="submit" class="icon-button edit-icon">
+                            <i class="fas fa-edit"></i>
+                        </button>
+                    </form>
+                    <form method="POST" action="{{ url_for('delete_work', work_id=work['_id']) }}"
+                        onsubmit="return confirm('Naozaj chcete vymazať túto prácu?');">
+                        <button type="submit" class="icon-button delete-icon">
+                            <i class="fas fa-trash-alt"></i>
+                        </button>
+                    </form>
+                </div>
+
+                <div class="work-info">
+                    <p><strong>Konferencia:</strong> {{ work.conference_name }}</p>
+                    <p><strong>Názov práce:</strong> {{ work.title }}</p>
+                    <p><strong>Študent:</strong> {{ work.full_name }}</p>
+                    <p><strong>Popis:</strong>{{work.description}}</p>
+                    <p><strong>Škola:</strong> {{ work.school }}</p>
+                    <p><strong>Fakulta:</strong> {{ work.faculty }}</p>
+                    <p><strong>Ročník:</strong> {{ work.year }}</p>
+                    <p><strong>Odovzdané v termíne:</strong> {{ work.uploaded_on_time }} </p>
+                    <p><strong>Dátum nahrania:</strong> {{ work.uploaded_at.strftime('%d.%m.%Y %H:%M:%S') }} </p>
+
+                    <p><strong>Recenzent:</strong>
+                        {% if work.reviewer_name %}
+                        {{ work.reviewer_name }}
+                        {% else %}
+                        Zatiaľ nebol priradený
+                        {% endif %}
+                    </p>
+
+                    <div class="file-links">
+                        <a href="{{ work.file_path }}" target="_blank">Zobraziť súbor</a>
+                        <a href="{{ url_for('assign_recenzent', work_id=work['_id']) }}">Priradiť recenzenta</a>
+                        {% if work.review and work.review != "Posudok nebol pridaný" %}
+                        <a href="{{ url_for('view_review_admin', work_id=work['_id']) }}">Pozrieť posudok</a>
+                        {% else %}
+                        <p>Posudok zatiaľ nebol pridaný.</p>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
             {% endfor %}
-        </select>
-    </form>
+        </div>
+        {% else %}
+        <p>Žiadne práce neboli pridané.</p>
+        {% endif %}
 
-    <!-- Zobrazenie prác -->
-    {% if works %}
-    <h3>Práce pridané študentami:</h3>
-    <ul>
-        {% for work in works %}
-        <li>
-            <strong>Konferencia:</strong> {{ work.conference_name }}<br>
-            <strong>Názov práce:</strong> {{ work.title }}<br>
-            Študent: {{ work.full_name }}<br>
-            Popis: {{ work.description }}<br>
-            Škola: {{ work.school }}<br>
-            Fakulta: {{ work.faculty }}<br>
-            Ročník: {{ work.year }}<br>
-            <a href="{{ work.file_path }}" target="_blank">Zobraziť súbor</a><br>
-            <a href = "{{ url_for('assign_recenzent') }}"><button> Priradiť recenzenta </button></a><br>
-        </li>
-        {% endfor %}
-    </ul>
-    {% else %}
-    <p>Žiadne práce neboli pridané.</p>
-    {% endif %}
+        <!-- Pagination Section -->
+        <div class="pagination">
+            {% if current_page > 1 %}
+            <a
+                href="{{ url_for('admin_dashboard', page=current_page-1, student_id=selected_student_id, reviewer_id=selected_reviewer_id) }}">Predchádzajúca</a>
+            {% endif %}
+            {% for page_num in range(1, total_pages + 1) %}
+            <a href="{{ url_for('admin_dashboard', page=page_num, student_id=selected_student_id, reviewer_id=selected_reviewer_id) }}"
+                class="{{ 'active' if page_num == current_page else '' }}">{{ page_num }}</a>
+            {% endfor %}
+            {% if current_page < total_pages %} <a
+                href="{{ url_for('admin_dashboard', page=current_page+1, student_id=selected_student_id, reviewer_id=selected_reviewer_id) }}">
+                Ďalšia</a>
+                {% endif %}
+        </div>
+    </div>
 
-    <a href="{{ url_for('logout') }}">Odhlásiť sa</a>
+<footer>
+    <div class="left-image">
+        <img src="https://www.fpvai.ukf.sk/images/logo/fpvai.png" alt="Image" style="max-width: 280px; height: auto;">
+    </div>
+
+    <div class="contact-info">
+        <div>
+            <i class="fas fa-envelope"></i>
+            <span>Email: <a href="mailto:admin@ukf.sk">admin@ukf.sk</a></span>
+        </div>
+        <div>
+            <i class="fas fa-phone-alt"></i>
+            <span>Telefón: <a href="tel:+421000000000">+421 000 000 000</a></span>
+        </div>
+        <div>
+            <i class="fas fa-map-marker-alt"></i>
+            <span>Adresa: <a href="https://maps.app.goo.gl/xbsYHRJh5tmQj82f9" target="_blank">Tr. A. Hlinku 1, 949 01
+                    Nitra</a></span>
+        </div>
+    </div>
+
+    <div class="social-icons">
+        <a href="https://www.facebook.com/fpvai.ukf/" target="_blank">
+            <i class="fab fa-facebook-f"></i>
+        </a>
+        <a href="https://sk.linkedin.com/company/katedra-informatiky-fpv-ukf-v-nitre" target="_blank">
+            <i class="fab fa-linkedin-in"></i>
+        </a>
+        <a href="https://www.instagram.com/fpvai.ukf/" target="_blank">
+            <i class="fab fa-instagram"></i>
+        </a>
+    </div>
+</footer>
 </body>
 
 </html>
+
+
+   

@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="sk">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Detail posudku</title>
+    <link href="{{ url_for('static', filename='style_css/view_review_recenzent.css') }}" rel="stylesheet">
+
+</head>
+
+<body>
+        <h1>Posudok pre prácu: {{ work.title }} </h1>
+        {% if review %}
+        <h3>Podrobnosti o posudku:</h3>
+        <p><strong>Dátum pridania:</strong> {{ review['uploaded_at'].strftime('%d.%m.%Y %H:%M:%S') }} </p>
+
+        <div class="review-details">
+            <h3>Hodnotenie otázok:</h3>
+            <p><strong>Splnila práca cieľ?</strong> {{ review['goal'] }} </p>
+            <p><strong>Je práca metodologicky správna?</strong> {{ review['methodology'] }} </p>
+            <p><strong>Sú výsledky práce zrozumiteľné?</strong> {{ review['results'] }} </p>
+            <p><strong>Má práca praktickú hodnotu?</strong> {{ review['practical_value'] }} </p>
+            <p><strong>Je text práce gramaticky správny?</strong> {{ review['grammar'] }} </p>
+            <p><strong>Je práca štruktúrovaná prehľadne?</strong> {{ review['structure'] }} </p>
+            <p><strong>Sú všetky citácie uvedené správne?</strong> {{ review['citations'] }} </p>
+
+            {% if review.file_path %}
+            <p><strong>Priložený súbor k posudku:</strong> <a href="{{ review['file_path'] }}" target="_blank">Zobraziť súbor</a></p>
+            {% else %}
+            <p><strong>Žiadny súbor priložený k posudku.</strong></p>
+            {% endif %}
+
+            <p><strong>Záverečné rozhodnutie:</strong> {{ review['decision'] }} </p>
+        </div>
+
+        {% else %}
+        <p>Posudok pre túto prácu ešte nebol pridaný.</p>
+        {% endif %}
+
+<div class="actions">
+    {% set roles = session['role'].split(',') %}
+
+    {% if 'recenzent' in roles and 'student' in roles %}
+    <!-- Ak máš rolu "recenzent" aj "student" (kombinovaná rola) -->
+    <a href="{{ url_for('rec_stud_dashboard') }}">Späť na RecStud Dashboard</a>
+
+    {% elif 'recenzent' in roles %}
+    <!-- Ak máš rolu len "recenzent" -->
+    <a href="{{ url_for('recenzent_dashboard') }}">Späť na Recenzent Dashboard</a>
+
+    {% elif 'student' in roles %}
+    <!-- Ak máš rolu len "student" -->
+    <a href="{{ url_for('student_dashboard') }}">Späť na Dashboard</a>
+
+    {% else %}
+    <!-- Ak nie je žiadna rola alebo rola nie je rozpoznaná -->
+    <a href="{{ url_for('login') }}">Späť na Prihlásenie</a>
+    {% endif %}
+</div>
+
+
+
+</body>
+
+</html>

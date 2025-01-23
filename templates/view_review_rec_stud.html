@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="sk">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Posudok - Recenzent, študent</title>
+    <link href="{{ url_for('static', filename='style_css/student_dashboard.css') }}" rel="stylesheet">
+</head>
+
+<body>
+    <div class="container">
+        <h1>Vaša práca: {{ work.title }}</h1>
+
+        <div class="work-details">
+            <p><strong>Popis práce:</strong> {{ work.description }}</p>
+            <p><strong>Škola:</strong> {{ work.school }}</p>
+            <p><strong>Fakulta:</strong> {{ work.faculty }}</p>
+            <p><strong>Odovzdané v termíne:</strong> {{ work.uploaded_on_time }} </p>
+            <p><strong>Dátum pridania:</strong> {{ work.uploaded_at.strftime('%d.%m.%Y %H:%M:%S') }}</p>
+            <p><strong>Priložený súbor:</strong> <a href="{{ work.file_path }}" target="_blank">Zobraziť Súbor</a></p>
+        </div>
+
+        <h1>Posudok pre Vašu prácu: {{ work.title }} </h1>
+        {% if review %}
+        <h3>Podrobnosti o posudku:</h3>
+        <p><strong>Dátum pridania:</strong> {{ review['uploaded_at'].strftime('%d.%m.%Y %H:%M:%S') }} </p>
+
+        <div class="review-details">
+            <h3>Hodnotenie otázok:</h3>
+            <p><strong>Splnila práca cieľ?</strong> {{ review['goal'] }} </p>
+            <p><strong>Je práca metodologicky správna?</strong> {{ review['methodology'] }} </p>
+            <p><strong>Sú výsledky práce zrozumiteľné?</strong> {{ review['results'] }} </p>
+            <p><strong>Má práca praktickú hodnotu?</strong> {{ review['practical_value'] }} </p>
+            <p><strong>Je text práce gramaticky správny?</strong> {{ review['grammar'] }} </p>
+            <p><strong>Je práca štruktúrovaná prehľadne?</strong> {{ review['structure'] }} </p>
+            <p><strong>Sú všetky citácie uvedené správne?</strong> {{ review['citations'] }} </p>
+
+            {% if review.file_path %}
+            <p><strong>Priložený súbor k posudku:</strong> <a href="{{ review['file_path'] }}" target="_blank">Zobraziť súbor</a></p>
+            {% else %}
+            <p><strong>Žiadny súbor priložený k posudku.</strong></p>
+            {% endif %}
+
+            <p><strong>Záverečné rozhodnutie:</strong> {{ review['decision'] }} </p>
+        </div>
+
+        {% else %}
+        <p>Posudok pre túto prácu ešte nebol pridaný.</p>
+        {% endif %}
+
+        <!-- Odkaz na návrat na dashboard podľa role -->
+        <div class="actions">
+            {% if 'recenzent' in session['role'] %}
+            <a href="{{ url_for('recenzent_dashboard') }}" class="back-link">Naspäť na recenzent dashboard</a>
+            {% elif 'recenzent,student' in session['role'] %}
+            <a href="{{ url_for('rec_stud_dashboard') }}" class="back-link">Naspäť na dashboard</a>
+            {% else %}
+            <a href="{{ url_for('login') }}" class="back-link">Naspäť na prihlásenie</a>
+            {% endif %}
+        </div>
+
+    </div>
+</body>
+
+</html>

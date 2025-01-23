@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title> Školský konferenčný systém </title>
+  <link href="{{ url_for('static', filename='style_css/view_conferences.css') }}" rel="stylesheet">
+</head>
+
+<body>
+  <h1> Vitajte v školskom konferenčnom systéme! </h1>
+  <br><br>
+  <div>
+    <p> Vaša aktuálna rola v systéme je návštevník.
+      Pre prihlasovanie sa do konferencií musíte získať rolu študent alebo recenzent.
+      Ak ste sa prihlásili pod iným ako univerzitným emailom, musíte počkať, kým Vám zmení rolu administrátor systému.
+    </p>
+  </div>
+  <br><br>
+  <h2> Dostupné konferencie: </h2>
+  <!-- List of Conferences -->
+  <div class="conference-list">
+    {% for conference in conferences %}
+    <div class="conference-item">
+      <h3>{{ conference['name'] }}</h3>
+      <p><em>{{ conference['date'].strftime('%d.%m.%Y') if conference['date'] else 'Neznámy dátum' }}</em></p>
+      <p>{{ conference['description'] }}</p>
+    </div>
+    {% endfor %}
+  </div> <!-- End of conference-list -->
+
+  <!-- Footer -->
+  <footer>
+    <div class="left-image">
+      <img src="https://www.fpvai.ukf.sk/images/logo/fpvai.png" alt="Image" style="max-width: 280px; height: auto;">
+    </div>
+
+    <div class="contact-info">
+      <div>
+        <i class="fas fa-envelope"></i>
+        <span>Email: <a href="mailto:admin@ukf.sk">admin@ukf.sk</a></span>
+      </div>
+      <div>
+        <i class="fas fa-phone-alt"></i>
+        <span>Telefón: <a href="tel:+421000000000">+421 000 000 000</a></span>
+      </div>
+      <div>
+        <i class="fas fa-map-marker-alt"></i>
+        <span>Adresa: <a href="https://maps.app.goo.gl/xbsYHRJh5tmQj82f9" target="_blank">Tr. A. Hlinku 1, 949 01
+            Nitra</a></span>
+      </div>
+    </div>
+
+    <div class="social-icons">
+      <a href="https://www.facebook.com/fpvai.ukf/" target="_blank">
+        <i class="fab fa-facebook-f"></i>
+      </a>
+      <a href="https://sk.linkedin.com/company/katedra-informatiky-fpv-ukf-v-nitre" target="_blank">
+        <i class="fab fa-linkedin-in"></i>
+      </a>
+      <a href="https://www.instagram.com/fpvai.ukf/" target="_blank">
+        <i class="fab fa-instagram"></i>
+      </a>
+    </div>
+  </footer>
+</body>
+
+</html>

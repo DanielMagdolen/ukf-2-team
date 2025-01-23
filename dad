@@ -1,0 +1,224 @@
+[33mcommit b477ac145fd53402bbfb49cce5d5c2c2afb59268[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mbackend[m[33m, [m[1;31morigin/backend[m[33m)[m
+Author: ProgrammerTomas <157529032+ProgrammerTomas@users.noreply.github.com>
+Date:   Tue Jan 14 21:09:38 2025 +0100
+
+    Doplnenie vrátenia naspäť
+
+[33mcommit 3751ff041dd206b4fbca6d788165d33efd189a37[m
+Author: ProgrammerTomas <157529032+ProgrammerTomas@users.noreply.github.com>
+Date:   Tue Jan 14 21:05:24 2025 +0100
+
+    Zmena role
+
+[33mcommit b8a455e61b2d63e52f139158eab4a2a8b8cd03c9[m
+Author: ProgrammerTomas <157529032+ProgrammerTomas@users.noreply.github.com>
+Date:   Tue Jan 14 20:40:49 2025 +0100
+
+    Zmena role
+
+[33mcommit fd3edcf25e8f4b21548a50d9eadab3042bee06db[m
+Author: ProgrammerTomas <157529032+ProgrammerTomas@users.noreply.github.com>
+Date:   Tue Jan 14 20:06:14 2025 +0100
+
+    Oprava prihlásenia, kontroly prihláseného používateľa a ďalšie úpravy
+
+[33mcommit e6d44cc8c23e568034e013c12ca47a24d8af52b0[m
+Author: Adamcapalka <adamcapalka@gmail.com>
+Date:   Tue Jan 14 16:32:18 2025 +0100
+
+    create+edit conference
+
+[33mcommit a7130222f64f842a4d2a0c1b5c83be6f78d3b885[m
+Author: ProgrammerTomas <157529032+ProgrammerTomas@users.noreply.github.com>
+Date:   Mon Jan 13 20:46:18 2025 +0100
+
+    Uloženie role v konkrétnej konferencii do session a súvisiace úpravy
+
+[33mcommit aefa97c03f01e6735a77948b75ca48a2ec9b25a5[m
+Author: ProgrammerTomas <157529032+ProgrammerTomas@users.noreply.github.com>
+Date:   Fri Jan 10 20:53:07 2025 +0100
+
+    Úprava vstupu do konferencie
+
+[33mcommit f835116fe023510e9b40d2ccf3480e5946c383ac[m
+Author: ProgrammerTomas <157529032+ProgrammerTomas@users.noreply.github.com>
+Date:   Fri Jan 10 20:30:52 2025 +0100
+
+    Úprava registrácie a vstupu do konferencie
+
+[33mcommit c07c4befe777a9ec3105ac69c7ecf427250ad92f[m
+Author: 99d3n1s99 <cernydenis3@gmail.com>
+Date:   Thu Jan 9 19:29:48 2025 +0100
+
+    Add files via upload
+
+[33mcommit 181a580ba5dbd4f53433f8123c3e9a8272b1f98a[m
+Author: Daniel Magdolen <d.magdolen@gmail.com>
+Date:   Tue Jan 7 16:02:20 2025 +0100
+
+    pridanie skoly do registracie
+
+[33mcommit 1b5b74ce91d27696a568e374423cb2d354c6242b[m
+Author: Denis Cerny <cernydenis3@gmail.com>
+Date:   Mon Jan 6 20:36:27 2025 +0100
+
+    register.css
+
+[33mcommit efe8ffe3de33e2e31609bd77ad1ff9e1c616cc0d[m
+Author: Daniel Magdolen <d.magdolen@gmail.com>
+Date:   Mon Jan 6 13:15:43 2025 +0100
+
+    visitor_page
+
+[33mcommit 56f1e4e646108eb914fc3ee1fd2c8057275cd7f6[m
+Author: Daniel Magdolen <d.magdolen@gmail.com>
+Date:   Mon Jan 6 12:35:54 2025 +0100
+
+    kopirovanie css do samostaneho foldera
+
+[33mcommit 605b3d304c72ec6ceb817ed5c55c17d5ff06a3bf[m
+Author: Denis Cerny <cernydenis3@gmail.com>
+Date:   Mon Jan 6 00:29:59 2025 +0100
+
+    login
+
+[33mcommit 1d8ed6b9969a3ba43e001cf036488912b85bceb4[m
+Author: Denis Cerny <cernydenis3@gmail.com>
+Date:   Sun Jan 5 23:56:37 2025 +0100
+
+    responzívny footer
+
+[33mcommit e8c91812276b792801e48d025e0c12f5ebccfa3d[m
+Author: Denis Cerny <cernydenis3@gmail.com>
+Date:   Sun Jan 5 22:33:24 2025 +0100
+
+    alignment
+
+[33mcommit 547fef2b2f74178a8f1173b31ec9ebf77a09e728[m
+Author: Denis Cerny <cernydenis3@gmail.com>
+Date:   Sun Jan 5 20:28:14 2025 +0100
+
+    Footer update
+
+[33mcommit eb2ae8d5bcc414af50cf85ef376354db037f77e1[m
+Author: Daniel Magdolen <d.magdolen@gmail.com>
+Date:   Sat Jan 4 18:41:08 2025 +0100
+
+    admin editovanie a vymazanie prace
+
+[33mcommit d05fde06b8db027d3dda98b297c401303fa6f018[m
+Author: Daniel Magdolen <d.magdolen@gmail.com>
+Date:   Sat Jan 4 11:12:30 2025 +0100
+
+    oprava
+
+[33mcommit 25e9d6b9a3cb4818652d433588fa861ce936efa6[m
+Author: Daniel Magdolen <d.magdolen@gmail.com>
+Date:   Fri Jan 3 11:35:27 2025 +0100
+
+    admin
+
+[33mcommit 4a4ee54ab519894e8a52cf3b1fa7cf303310ade7[m
+Author: Denis Cerny <cernydenis3@gmail.com>
+Date:   Thu Jan 2 22:34:41 2025 +0100
+
+    Footer
+
+[33mcommit c1fa687263ddd52128807d4ea7e3c809a0129c62[m
+Author: Denis Cerny <cernydenis3@gmail.com>
+Date:   Thu Jan 2 22:13:11 2025 +0100
+
+    dasboardy
+
+[33mcommit 3d68c00ac248891c2c5c646c91ac12b600826188[m
+Author: Denis Cerny <cernydenis3@gmail.com>
+Date:   Thu Jan 2 21:56:19 2025 +0100
+
+    Updated admin dasboard
+
+[33mcommit 3481a97bba0e070cd46b0e994b93d66729b2aa45[m
+Author: Denis Cerny <cernydenis3@gmail.com>
+Date:   Thu Jan 2 21:35:00 2025 +0100
+
+    updated prvá strana
+
+[33mcommit b5eb641b45b7f9900fbc5f145ab1fabbb3d5ea08[m
+Merge: b87a69b b9317e4
+Author: Denis Cerny <cernydenis3@gmail.com>
+Date:   Thu Jan 2 21:11:15 2025 +0100
+
+    Your commit message here
+
+[33mcommit b87a69beef419d9549b2a8971ee8218dfd9c2bc4[m
+Author: Denis Cerny <cernydenis3@gmail.com>
+Date:   Thu Jan 2 20:38:56 2025 +0100
+
+    Your commit message here
+
+[33mcommit fe615fe511ecd8b5a7fb7590152b9f102b50984d[m
+Author: Daniel Magdolen <d.magdolen@gmail.com>
+Date:   Thu Jan 2 09:45:18 2025 +0100
+
+    zmena anglickych slov na sk
+
+[33mcommit dd4703fe71f2b583a4479b563881dc0dea979b07[m
+Merge: 7a1aa62 ec01a8a
+Author: Denis Cerny <cernydenis3@gmail.com>
+Date:   Wed Jan 1 22:50:12 2025 +0100
+
+    Your commit message
+
+[33mcommit 7a1aa62b49eddb7e143463c0163abf773bf0238c[m
+Author: Denis Cerny <cernydenis3@gmail.com>
+Date:   Wed Jan 1 22:41:35 2025 +0100
+
+    Your commit message
+
+[33mcommit 4c734bdec3825ee8db3f506fdcedd20e07997def[m
+Author: Denis Cerny <cernydenis3@gmail.com>
+Date:   Wed Jan 1 22:34:10 2025 +0100
+
+    your message
+
+[33mcommit ec01a8a67018f887e4737565231dc5b329a47019[m
+Author: Daniel Magdolen <d.magdolen@gmail.com>
+Date:   Mon Dec 30 10:41:51 2024 +0100
+
+    formular pridanie prace s monznostou pridanie skoly
+
+[33mcommit 9ea4097c2178596e5e3373d808fb91f9fe4a213d[m
+Author: Daniel Magdolen <d.magdolen@gmail.com>
+Date:   Sun Dec 29 16:17:08 2024 +0100
+
+    upravy
+
+[33mcommit 7eab2c4c8a21eeb5b7944d7159f1c868be812e57[m
+Author: Daniel Magdolen <d.magdolen@gmail.com>
+Date:   Sun Dec 29 14:04:48 2024 +0100
+
+    pridanie delete a edit pre admina
+
+[33mcommit 20128f5f1308c40daa4d05109df023cdd2139f82[m
+Author: Daniel Magdolen <d.magdolen@gmail.com>
+Date:   Thu Dec 26 14:08:42 2024 +0100
+
+    pridanie textu
+
+[33mcommit b9317e4814076861766c0242669d59ebd795776e[m
+Author: ProgrammerTomas <157529032+ProgrammerTomas@users.noreply.github.com>
+Date:   Mon Dec 23 20:08:03 2024 +0100
+
+    Zoznam úloh na dokončenie projektu
+
+[33mcommit 22741b2c36e5fba37a8a09d009b6ab9b67299c8a[m
+Merge: 8de870e 023d7ce
+Author: Daniel Magdolen <d.magdolen@gmail.com>
+Date:   Sun Dec 22 12:11:12 2024 +0100
+
+    Merge branch 'backend' of https://github.com/DanielMagdolen/ukf-2-team into backend
+
+[33mcommit 8de870efb554ebebafe6019b9803d148666b20c3[m
+Author: Daniel Magdolen <d.magdolen@gmail.com>
+Date:   Sun Dec 22 12:10:54 2024 +0100
+
+    uprava systemu podla poziadaviek

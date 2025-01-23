@@ -1,0 +1,107 @@
+/* Reset základných štýlov */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+/* Základný štýl pre telo stránky */
+body {
+    font-family: 'Arial', sans-serif;
+    background-color: #d9ead3;
+    color: #333;
+    line-height: 1.6;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 20px;
+}
+
+/* Kontajner */
+.container {
+    max-width: 800px;
+    width: 100%;
+    margin: 0 auto;
+    background-color: white;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* Nadpisy */
+h1 {
+    color: #1a2516;
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+h2 {
+    color: #2c3e50;
+    margin-bottom: 15px;
+}
+
+/* Odkazy */
+.auth-buttons a {
+    text-decoration: none;
+    color: white;
+    background-color: #007bff;
+    padding: 10px 15px;
+    border-radius: 5px;
+    margin: 0 10px;
+    transition: background-color 0.3s ease;
+}
+
+.auth-buttons a:hover {
+    background-color: #0056b3;
+}
+
+/* Štýl pre práce */
+.work-item {
+    background-color: #f9f9f9;
+    padding: 15px;
+    margin-bottom: 15px;
+    border-radius: 5px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.work-item p {
+    margin: 10px 0;
+}
+
+.work-item a {
+    text-decoration: none;
+    color: #007bff;
+    font-weight: bold;
+    transition: color 0.3s ease;
+}
+
+.work-item a:hover {
+    color: #0056b3;
+}
+
+/* Silné zvýraznenie textu */
+strong {
+    color: #2c3e50;
+}
+
+/* Odkaz pre návrat */
+.back-link, .logout-link {
+    text-decoration: none;
+    color: white;
+    background-color: #28a745;
+    padding: 10px 15px;
+    border-radius: 5px;
+    transition: background-color 0.3s ease;
+}
+
+.logout-link {
+    background-color: #dc3545;
+}
+
+.back-link:hover {
+    background-color: #218838;
+}
+
+.logout-link:hover {
+    background-color: #c82333;
+}

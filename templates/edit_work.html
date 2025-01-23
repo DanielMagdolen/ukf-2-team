@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="sk">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edit Work</title>
+    <link href="{{ url_for('static', filename='style_css/edit_work.css') }}" rel="stylesheet">
+</head>
+
+<body>
+    <div class="container">
+        <h1>Upraviť prácu</h1>
+        <form method="POST">
+            <label for="title">Názov práce</label>
+            <input type="text" id="title" name="title" value="{{ work.title }}" required>
+
+            <label for="description">Popis</label>
+            <textarea id="description" name="description" rows="5" required>{{ work.description }}</textarea>
+
+            <label for="school">Škola</label>
+            <input type="text" id="school" name="school" value="{{ work.school }}" required>
+
+            <label for="faculty">Fakulta</label>
+            <input type="text" id="faculty" name="faculty" value="{{ work.faculty }}" required>
+
+            <label for="year">Ročník</label>
+            <input type="text" id="year" name="year" value="{{ work.year }}" required>
+
+            <button type="submit">Uložiť zmeny</button>
+        </form>
+        <a href="{{ url_for('admin_dashboard') }}" class="back-link">Naspäť na dashboard</a>
+    </div>
+</body>
+
+</html>

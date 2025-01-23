@@ -4,31 +4,31 @@
 <head>
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-	<title>Submission of Work</title>
+	<title>Odovzdanie práce</title>
 </head>
 
 <body>
-	<h2>Submission of Work</h2>
+	<h2>Odovzdanie práce</h2>
 	<form action="{{ url_for('add_work') }}" method="POST" enctype="multipart/form-data">
-		<label for="title">Title:</label>
+		<label for="title">Názov:</label>
 		<input type="text" name="title" required><br>
 
-		<label for="description">Description:</label>
+		<label for="description">Popis:</label>
 		<textarea name="description" required></textarea><br>
 
-		<label for="school">School:</label>
+		<label for="school">Škola:</label>
 		<input type="text" name="school" required><br>
 
-		<label for="faculty">Faculty:</label>
+		<label for="faculty">Fakulta:</label>
 		<input type="text" name="faculty" required><br>
 
-		<label for="year">Year:</label>
+		<label for="year">Ročník:</label>
 		<input type="number" name="year" required><br>
 
-		<label for="file">File:</label>
+		<label for="file">Súbor:</label>
 		<input type="file" name="file" required><br>
 
-		<input type="submit" value="Submit Work">
+		<input type="submit" value="Odovzdať prácu">
 	</form>
 </body>
 

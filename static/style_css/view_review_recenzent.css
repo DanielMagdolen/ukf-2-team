@@ -1,0 +1,67 @@
+/* Reset základných štýlov */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+/* Základný štýl pre telo stránky */
+body {
+    font-family: 'Arial', sans-serif;
+    background-color: #d9ead3;
+    color: #333;
+    line-height: 1.6;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 20px;
+}
+
+/* Nadpisy */
+h2 {
+    color: #1a2516;
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+/* Štýl pre textové bloky */
+p {
+    margin: 10px 0;
+    font-size: 1rem;
+}
+
+p strong {
+    color: #2c3e50;
+}
+
+/* Štýl pre recenzie */
+.review-item {
+    margin-bottom: 10px;
+    background-color: #f9f9f9;
+    padding: 15px;
+    border-radius: 5px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    width: 100%;
+    max-width: 600px;
+}
+
+/* Akcie (tlačidlá alebo odkazy) */
+.actions a {
+    text-decoration: none;
+    color: white;
+    background-color: #007bff;
+    padding: 10px 15px;
+    border-radius: 5px;
+    margin-top: 20px;
+    display: inline-block;
+    transition: background-color 0.3s ease;
+}
+
+.actions a:hover {
+    background-color: #0056b3;
+}
+
+/* Silné zvýraznenie textu */
+strong {
+    color: #2c3e50;
+}

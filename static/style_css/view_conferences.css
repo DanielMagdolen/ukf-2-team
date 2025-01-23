@@ -1,0 +1,191 @@
+body {
+    font-family: 'Arial', sans-serif;
+    background-color: #d9ead3;
+    /* svetlo zelené pozadie */
+    color: #333;
+    margin: 0;
+    padding: 20px;
+}
+
+/* Základné nastavenia pre konferencie */
+.conference-list {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    padding: 20px;
+}
+
+.conference-item {
+    background-color: white;
+    /* Biele pozadie pre každú konferenciu */
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+h3 {
+    font-size: 1.5rem;
+    color: #1a2516;
+}
+
+.conference-item p {
+    color: #555;
+}
+
+/* Tlačidlo "Vstúpiť" */
+.btn-enter {
+    background-color: #3498db;
+    /* Modré pozadie */
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    font-size: 1rem;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.btn-enter:hover {
+    background-color: #2980b9;
+    /* Tmavšie modré pozadie pri hover */
+}
+
+/* Admin akcie: Delete a Edit */
+.admin-actions form {
+    display: inline-block;
+}
+
+.delete-button,
+.edit-button {
+    background-color: transparent;
+    border: none;
+    cursor: pointer;
+    padding: 10px;
+    font-size: 20px;
+}
+
+.delete-button i,
+.edit-button i {
+    font-size: 24px;
+}
+
+.delete-button i {
+    color: #e74c3c;
+    /* Červená pre delete */
+}
+
+.delete-button:hover i {
+    color: #c0392b;
+    /* Tmavšia červená pri hover */
+}
+
+.edit-button i {
+    color: #3498db;
+    /* Modrá pre edit */
+}
+
+.edit-button:hover i {
+    color: #2980b9;
+    /* Tmavšia modrá pri hover */
+}
+footer {
+    background-color: #2c3e50;
+    color: white;
+    padding: 20px;
+    width: 100%;
+    margin-top: auto;
+    font-size: 1rem;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 20px;
+}
+
+footer .left-image {
+    flex: 1;
+    text-align: center;
+}
+
+footer .contact-info {
+    font-size: 1rem;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    text-align: left;
+    flex: 2;
+    max-width: 350px;
+    padding-left: 20px;
+    padding-right: 20px;
+    margin: 0 auto;
+}
+
+footer .social-icons {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+}
+
+footer .contact-info i {
+    margin-right: 10px;
+}
+
+footer .contact-info div {
+    margin-bottom: 10px;
+}
+
+footer .contact-info a {
+    color: #3498db;
+    text-decoration: none;
+}
+
+footer .contact-info a:hover {
+    text-decoration: underline;
+}
+
+footer .social-icons a {
+    color: white;
+    font-size: 30px;
+    text-decoration: none;
+    transition: color 0.3s ease;
+}
+
+footer .social-icons a:hover {
+    color: #3498db;
+}
+
+@media (max-width: 768px) {
+    footer {
+        flex-direction: column;
+        align-items: center;
+        gap: 20px;
+    }
+
+    footer .left-image,
+    footer .contact-info,
+    footer .social-icons {
+        flex: none;
+        width: 100%;
+        text-align: center;
+    }
+
+    footer .contact-info {
+        max-width: none;
+        padding-left: 0;
+        padding-right: 0;
+    }
+
+    footer .social-icons {
+        justify-content: center;
+    }
+}
+
+@media (max-width: 480px) {
+    footer .social-icons {
+        gap: 10px;
+    }
+
+    footer .left-image img {
+        max-width: 80px;
+    }
+}

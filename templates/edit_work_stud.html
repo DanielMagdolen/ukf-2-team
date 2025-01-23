@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="sk">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Upraviť Prácu</title>
+    <link href="{{ url_for('static', filename='style_css/edit_work_stud.css') }}" rel="stylesheet">
+</head>
+
+<body>
+    <div class="container">
+        <h1>Upraviť Prácu</h1>
+        <form method="POST">
+            <label for="title">Názov:</label>
+            <input type="text" id="title" name="title" value="{{ work.title }}" required>
+
+            <label for="description">Popis:</label>
+            <textarea id="description" name="description" required>{{ work.description }}</textarea>
+
+            <label for="school">Škola:</label>
+            <input type="text" id="school" name="school" value="{{ work.school }}" required>
+
+            <label for="faculty">Fakulta:</label>
+            <input type="text" id="faculty" name="faculty" value="{{ work.faculty }}" required>
+
+            <button type="submit">Uložiť Zmeny</button>
+        </form>
+
+        <!-- Sekcia pre odkaz na správny dashboard -->
+        <div class="actions">
+            {% set roles = session['role'].split(',') %}
+
+            {% if 'recenzent' in roles and 'student' in roles %}
+            <!-- Ak máš rolu "recenzent" aj "student" (kombinovaná rola) -->
+            <a href="{{ url_for('rec_stud_dashboard') }}">Späť na Dashboard</a>
+
+            {% elif 'recenzent' in roles %}
+            <!-- Ak máš rolu len "recenzent" -->
+            <a href="{{ url_for('recenzent_dashboard') }}">Späť na Dashboard</a>
+
+            {% elif 'student' in roles %}
+            <!-- Ak máš rolu len "student" -->
+            <a href="{{ url_for('student_dashboard') }}">Späť na Dashboard</a>
+
+            {% else %}
+            <!-- Ak nie je žiadna rola alebo rola nie je rozpoznaná -->
+            <a href="{{ url_for('login') }}">Späť na Prihlásenie</a>
+            {% endif %}
+        </div>
+    </div>
+</body>
+
+</html>

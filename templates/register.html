@@ -5,11 +5,16 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Registrácia</title>
+    <link href="{{ url_for('static', filename='style_css/register.css') }}" rel="stylesheet">
 </head>
 
 <body>
     <h1>Registrácia</h1>
-
+    <div class="auth-buttons">
+        <a href="{{ url_for('login') }}">Prihlásiť sa</a>
+        <a href="{{ url_for('register') }}">Registrovať sa</a>
+    </div>
+    <br>
     <!-- Zobrazenie chybových a úspešných hlásení (flash správ) -->
     {% with messages = get_flashed_messages(with_categories=true) %}
     {% if messages %}
@@ -40,25 +45,14 @@
 
         <label for="school">Vyberte školu:</label>
         <select name="school" required>
-            <option value="Trnava">Trnava</option>
-            <option value="Nitra">Nitra</option>
-            <option value="Banska Bystrica">Banská Bystrica</option>
-        </select>
-        <br>
-
-        <label for="role">Vyberte funkciu:</label>
-        <select name="role" required>
-            <option value="student">Študent</option>
-            <option value="recenzent">Recenzent</option>
+            <option value="Univerzita sv. Cyrila a Metoda v Trnave">Univerzita sv. Cyrila a Metoda v Trnave</option>
+            <option value="Univerzita Konštantína Filozofa v Nitre">Univerzita Konštantína Filozofa v Nitre</option>
+            <option value="Univerzita Mateja Bela v Banskej Bystrici">Univerzita Mateja Bela v Banskej Bystrici</option>
         </select>
         <br>
 
         <button type="submit">Zaregistrovať sa</button>
     </form>
-    <br>
-    <a href="{{ url_for('login') }}">
-        <button>Späť na prihlásenie</button>
-    </a>
 </body>
 
 </html>

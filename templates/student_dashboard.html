@@ -3,46 +3,103 @@
 
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dashboard Študenta</title>
+    <!-- Pridanie odkazu na Material Icons -->
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" rel="stylesheet">
+    
+    <link href="{{ url_for('static', filename='style_css/student_dashboard.css') }}" rel="stylesheet">
 </head>
 
 <body>
-    <!-- Zobrazenie názvu konferencie -->
-    <h1>Vitajte v konferencii: {{ session['current_conference_name'] }}</h1>
+    <div class="container">
+        <!-- Zobrazenie názvu konferencie -->
+        <h1>Vitajte v konferencii: {{ session['current_conference_name'] }}
+            <span class="info-icon" title="Ak chcete rolu aj recenzent pre túto konferenciu, kontaktujte emailom admina.">
+                <i class="material-icons">info</i>
+            </span>
+        </h1>
+        <div class="auth-buttons">
+            <a href="{{ url_for('add_work') }}" class="back-link">Pridať Prácu</a>
+            <a href="{{ url_for('logout') }}" class="logout-link">Odhlásiť sa</a>
+            <a href="{{ url_for('view_conferences') }}" class="back-link">Naspäť na konferencie</a>
+        </div>
 
-    <!-- Tlačidlo na pridanie práce -->
-    <a href="{{ url_for('add_work') }}">
-        <button>Pridať Prácu</button>
-    </a>
-    <br><br>
-
-    <!-- Tlačidlo na odhlásenie -->
-    <a href="{{ url_for('logout') }}">
-        <button>Odhlásiť sa</button>
-    </a>
-
-    <h2>Vaše Práce:</h2>
-    <ul>
-        {% for work in works %}
-        <li>
-            <strong>Názov:</strong> {{ work.title }}<br>
-            <strong>Popis:</strong> {{ work.description }}<br>
-            <strong>Škola:</strong> {{ work.school }}<br>
-            <strong>Fakulta:</strong> {{ work.faculty }}<br>
-            <strong>Recenzent:</strong>
-            {% if work.recenzent %}
-            {{ work.recenzent }} <!-- Meno recenzenta, ak je priradený -->
+        <!-- Práce -->
+        <h2>Vaše Práce:</h2>
+        <div>
+            {% for work in works %}
+            <div class="work-item">
+                <div class="work-header">
+                    {% if is_editable %}
+                    <a href="{{ url_for('edit_work_stud', work_id=work['_id']) }}" class="icon-button">
+                        <i class="material-icons">edit</i>
+                    </a>
+                    <form action="{{ url_for('delete_work_stud', work_id=work['_id']) }}" method="POST" style="display:inline;">
+                        <button type="submit" class="icon-button delete-button"
+                            onclick="return confirm('Naozaj chcete odstrániť túto prácu?');">
+                            <i class="material-icons">delete</i>
+                        </button>
+                    </form>
+                    {% endif %}
+                </div>
+                <p><strong>Názov:</strong> {{ work.title }}</p>
+                <p><strong>Popis:</strong> {{ work.description }}</p>
+                <p><strong>Škola:</strong> {{ work.school }}</p>
+                <p><strong>Fakulta:</strong> {{ work.faculty }}</p>
+                <p><strong>Odovzdané v termíne:</strong> {{ work.uploaded_on_time }} </p>
+                <p><strong>Dátum nahrania:</strong> {{ work.uploaded_at.strftime('%d.%m.%Y %H:%M:%S') }}</p>
+                <a href="{{ work.file_path }}" target="_blank">Zobraziť Súbor</a><br>
+                <p><strong>Posudok:</strong>
+                    {% if work.review %}
+                    {{ work.review }}
+                    <br>
+                    <a href="{{ url_for('view_review_student', work_id=work['_id']) }}">Zobraziť podrobnosti posudku</a>
+                    {% else %}
+                    Posudok ešte nebol pridaný.
+                    {% endif %}
+                </p>
+            </div>
             {% else %}
-            Nepriradený
-            {% endif %}
-            <br>
-            <strong>Dátum nahrania:</strong> {{ work.uploaded_at.strftime('%d.%m.%Y %H:%M:%S') }}<br>
-            <a href="{{ work.file_path }}" target="_blank">Zobraziť Súbor</a><br>
-        </li>
-        {% else %}
-        <li>Žiadne práce na zobrazenie.</li>
-        {% endfor %}
-    </ul>
+            <p>Žiadne práce na zobrazenie.</p>
+            {% endfor %}
+        </div>
+    </div>
+
+    <footer>
+        <div class="left-image">
+            <img src="https://www.fpvai.ukf.sk/images/logo/fpvai.png" alt="Image" style="max-width: 280px; height: auto;">
+        </div>
+
+        <div class="contact-info">
+            <div>
+                <i class="fas fa-envelope"></i>
+                <span>Email: <a href="mailto:admin@ukf.sk">admin@ukf.sk</a></span>
+            </div>
+            <div>
+                <i class="fas fa-phone-alt"></i>
+                <span>Telefón: <a href="tel:+421000000000">+421 000 000 000</a></span>
+            </div>
+            <div>
+                <i class="fas fa-map-marker-alt"></i>
+                <span>Adresa: <a href="https://maps.app.goo.gl/xbsYHRJh5tmQj82f9" target="_blank">Tr. A. Hlinku 1, 949
+                        01 Nitra</a></span>
+            </div>
+        </div>
+
+        <div class="social-icons">
+            <a href="https://www.facebook.com/fpvai.ukf/" target="_blank">
+                <i class="fab fa-facebook-f"></i>
+            </a>
+            <a href="https://sk.linkedin.com/company/katedra-informatiky-fpv-ukf-v-nitre" target="_blank">
+                <i class="fab fa-linkedin-in"></i>
+            </a>
+            <a href="https://www.instagram.com/fpvai.ukf/" target="_blank">
+                <i class="fab fa-instagram"></i>
+            </a>
+        </div>
+    </footer>
 </body>
 
 </html>

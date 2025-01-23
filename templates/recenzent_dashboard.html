@@ -1,14 +1,102 @@
 <!DOCTYPE html>
-<html>
+<html lang="sk">
 
 <head>
-    <title>Recenzent Dashboard</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reviewer Dashboard</title>
+    <!-- Pridanie odkazu na Material Icons -->
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" rel="stylesheet">
+    <link href="{{ url_for('static', filename='style_css/recenzent_dashboard.css') }}" rel="stylesheet">
 </head>
 
 <body>
-    <h1>Welcome to the Recenzent Dashboard</h1>
-    <p>This is the dashboard for reviewers.</p>
-    <!-- Pridaj tu zoznam prác na recenzovanie -->
+    <div class="container">
+        <!-- Dashboard Title -->
+        <h1>Vitajte v konferencii: {{ session['current_conference_name'] }}
+            <span class="info-icon" title="Ak chcete rolu aj študent pre túto konferenciu, kontaktujte emailom admina.">
+                <i class="material-icons">info</i>
+            </span>
+        </h1>
+            <div class="auth-buttons">
+                <a href="{{ url_for('logout') }}" class="logout-link">Odhlásiť sa</a>
+                <!-- Odkaz na recenzent dashboard -->
+                <a href="{{ url_for('view_conferences') }}" class="back-link">Späť na zoznam prác</a>
+            </div>
+        <!-- Priradené práce -->
+        <h2>Priradené práce pre Vás v tejto konferencii</h2>
+        <div>
+            {% if works %}
+            {% for work in works %}
+            <div class="work-item">
+                <p><strong>Názov:</strong> {{ work.title }} </p>
+                <p><strong>Popis:</strong> {{ work.description }} </p>
+                <p><strong>Škola:</strong> {{ work.school }} </p>
+                <p><strong>Fakulta:</strong> {{ work.faculty }} </p>
+                <p><strong>Študent:</strong> {{ work.student_name }} </p> <!-- Zobrazenie mena študenta -->
+                <p><strong>Odovzdané v termíne:</strong> {{ work.uploaded_on_time }} </p>
+                <p><strong>Dátum nahrania:</strong> {{ work.uploaded_at.strftime('%d.%m.%Y %H:%M:%S') }} </p>
+                <a href="{{ work.file_path }}" target="_blank">Zobraziť súbor</a><br>
+
+                <!-- Kontrola existencie posudku pre danú prácu -->
+            <p><strong>Posudok:</strong>
+                {% if work.review %}
+                {{ work.review }}
+                <br>
+                <a href="{{ url_for('view_review_recenzent', work_id=work['_id']) }}">Zobraziť podrobnosti posudku</a>
+                {% else %}
+                Posudok ešte nebol pridaný.
+                {% endif %}
+            </p>
+
+
+                <!-- Tlačidlo na recenziu (pridať posudok) -->
+                {% if not work.review %}
+                <form method="POST" action="{{ url_for('review_redirect', work_id=work['_id']) }}">
+                    <button type="submit" class="button">Pridať posudok</button>
+                </form>
+                {% endif %}
+            </div>
+            {% endfor %}
+            {% else %}
+            <p>Žiadne priradené práce na recenzovanie v tejto konferencii.</p>
+            {% endif %}
+        </div>
+    </div>
+    <footer>
+        <div class="left-image">
+            <img src="https://www.fpvai.ukf.sk/images/logo/fpvai.png" alt="Image" style="max-width: 280px; height: auto;">
+        </div>
+    
+        <div class="contact-info">
+            <div>
+                <i class="fas fa-envelope"></i>
+                <span>Email: <a href="mailto:admin@ukf.sk">admin@ukf.sk</a></span>
+            </div>
+            <div>
+                <i class="fas fa-phone-alt"></i>
+                <span>Telefón: <a href="tel:+421000000000">+421 000 000 000</a></span>
+            </div>
+            <div>
+                <i class="fas fa-map-marker-alt"></i>
+                <span>Adresa: <a href="https://maps.app.goo.gl/xbsYHRJh5tmQj82f9" target="_blank">Tr. A. Hlinku 1, 949 01
+                        Nitra</a></span>
+            </div>
+        </div>
+    
+        <div class="social-icons">
+            <a href="https://www.facebook.com/fpvai.ukf/" target="_blank">
+                <i class="fab fa-facebook-f"></i>
+            </a>
+            <a href="https://sk.linkedin.com/company/katedra-informatiky-fpv-ukf-v-nitre" target="_blank">
+                <i class="fab fa-linkedin-in"></i>
+            </a>
+            <a href="https://www.instagram.com/fpvai.ukf/" target="_blank">
+                <i class="fab fa-instagram"></i>
+            </a>
+        </div>
+    </footer>
 </body>
 
 </html>

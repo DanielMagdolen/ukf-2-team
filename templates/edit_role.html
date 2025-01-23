@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="sk">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Zmena roly</title>
+  <link href="{{ url_for('static', filename='style_css/edit_work.css') }}" rel="stylesheet">
+</head>
+
+<body>
+  <div class="container">
+    <h1>Zmeniť rolu používateľa</h1>
+
+    <form method="POST">
+      <label for="role">Vyberte novú rolu:</label>
+      <select id="role" name="role">
+        <option value="visitor" {% if role=="visitor" %}selected{% endif %}>Návštevník</option>
+        <option value="student" {% if role=="student" %}selected{% endif %}>Študent</option>
+        <option value="recenzent" {% if role=="recenzent" %}selected{% endif %}>Recenzent</option>
+        <option value="recenzent, student" {% if role=="recenzent, student" %}selected{% endif %}>Študent a recenzent
+        </option>
+      </select>
+      <br><br>
+      <input type="submit" value="Uložiť rolu">
+    </form>
+
+    <a href="{{ url_for('view_users_roles', conference_id=session['current_conference_id']) }}"
+      class="back-link">Naspäť</a>
+  </div>
+</body>
+
+</html>
